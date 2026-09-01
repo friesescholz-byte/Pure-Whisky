@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@theme {
+  --font-woodblock: 'Bebas Neue', 'Oswald', sans-serif;
+  --font-serif: 'Bebas Neue', 'Oswald', sans-serif;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-script: 'Caveat', cursive;
+  --font-mono-craft: 'Space Mono', monospace;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  --color-highland-moss: #1F382B;
+  --color-highland-green: #2D6A4F;
+  --color-highland-light: #E8EFEA;
+  
+  --color-whisky-amber: #B85D2C;
+  --color-whisky-dark: #A04E24;
+  --color-whisky-gold: #D48B38;
+  
+  --color-paper-cream: #FAF8F5;
+  --color-paper-border: #E2DDD5;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #FAF8F5;
+  color: #181F1C;
+  overflow-x: hidden;
+}
+
+.font-woodblock {
+  font-family: 'Bebas Neue', 'Oswald', sans-serif;
+  letter-spacing: 0.06em;
+}
+
+.font-script {
+  font-family: 'Caveat', cursive;
+}
+
+.font-craft-mono {
+  font-family: 'Space Mono', monospace;
+}
+
+/* Custom Clean Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #FAF8F5;
+}
+::-webkit-scrollbar-thumb {
+  background: #D4C8B8;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #B85D2C;
+}
