@@ -22,19 +22,20 @@ import LegalModal from './components/LegalModal';
 
 import { PRODUCTS, BLOG_POSTS } from './data/pureWhiskyFullData';
 
-const getTabFromPath = () => {
+function getTabFromUrl() {
   if (typeof window === 'undefined') return 'home';
-  const path = window.location.pathname.toLowerCase().replace(/^\/+ |\/+$/g, '').trim();
-  if (path === 'admin') return 'admin';
-  if (path === 'shop' || path === 'faesser' || path === 'die-4-faesser') return 'shop';
-  if (path === 'about' || path === 'ueber-uns' || path === 'ines-zager') return 'about';
-  if (path === 'sustainability' || path === 'nachhaltigkeit' || path === 'audit') return 'sustainability';
-  if (path === 'blog' || path === 'journal' || path === 'messen') return 'blog';
+  const path = window.location.pathname.toLowerCase().trim();
+  if (path === '/admin' || path.startsWith('/admin')) return 'admin';
+  if (path === '/shop' || path.startsWith('/shop') || path.startsWith('/faesser')) return 'shop';
+  if (path === '/about' || path.startsWith('/about') || path.startsWith('/ueber-uns') || path.startsWith('/ines-zager')) return 'about';
+  if (path === '/sustainability' || path.startsWith('/sustainability') || path.startsWith('/nachhaltigkeit')) return 'sustainability';
+  if (path === '/blog' || path.startsWith('/blog') || path.startsWith('/journal') || path.startsWith('/messen')) return 'blog';
+  if (path === '/product' || path.startsWith('/product')) return 'product';
   return 'home';
-};
+}
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState(getTabFromPath);
+  const [activeTab, setActiveTab] = useState(getTabFromUrl);
   const [selectedProduct, setSelectedProduct] = useState(PRODUCTS[0]);
   const [cartItems, setCartItems] = useState([
     { product: PRODUCTS[0], quantity: 1 }
@@ -44,13 +45,16 @@ export default function App() {
   const [selectedPost, setSelectedPost] = useState(null);
   const [legalType, setLegalType] = useState(null);
 
-  // Sync activeTab with browser URL on popstate
+  // Sync state on component mount & on browser back/forward navigation
   useEffect(() => {
-    const handlePopState = () => {
-      setActiveTab(getTabFromPath());
+    const handleUrlSync = () => {
+      const detected = getTabFromUrl();
+      setActiveTab(detected);
     };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+
+    handleUrlSync();
+    window.addEventListener('popstate', handleUrlSync);
+    return () => window.removeEventListener('popstate', handleUrlSync);
   }, []);
 
   // Persistent Blog Posts
@@ -223,7 +227,7 @@ export default function App() {
           />
         )}
 
-        {/* ADMIN VIEW OPENS DIRECTLY AT /admin */}
+        {/* 100% RELIABLE ADMIN VIEW ON /admin */}
         {activeTab === 'admin' && (
           <AdminView
             blogPosts={blogPosts}
