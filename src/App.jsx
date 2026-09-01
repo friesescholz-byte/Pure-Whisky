@@ -22,8 +22,19 @@ import LegalModal from './components/LegalModal';
 
 import { PRODUCTS, BLOG_POSTS } from './data/pureWhiskyFullData';
 
+const getTabFromPath = () => {
+  if (typeof window === 'undefined') return 'home';
+  const path = window.location.pathname.toLowerCase().replace(/^\/+ |\/+$/g, '').trim();
+  if (path === 'admin') return 'admin';
+  if (path === 'shop' || path === 'faesser' || path === 'die-4-faesser') return 'shop';
+  if (path === 'about' || path === 'ueber-uns' || path === 'ines-zager') return 'about';
+  if (path === 'sustainability' || path === 'nachhaltigkeit' || path === 'audit') return 'sustainability';
+  if (path === 'blog' || path === 'journal' || path === 'messen') return 'blog';
+  return 'home';
+};
+
 export default function App() {
-  const [activeTab, setActiveTab] = useState('home');
+  const [activeTab, setActiveTab] = useState(getTabFromPath);
   const [selectedProduct, setSelectedProduct] = useState(PRODUCTS[0]);
   const [cartItems, setCartItems] = useState([
     { product: PRODUCTS[0], quantity: 1 }
@@ -32,6 +43,15 @@ export default function App() {
   const [isPhilosophyOpen, setIsPhilosophyOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
   const [legalType, setLegalType] = useState(null);
+
+  // Sync activeTab with browser URL on popstate
+  useEffect(() => {
+    const handlePopState = () => {
+      setActiveTab(getTabFromPath());
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Persistent Blog Posts
   const [blogPosts, setBlogPosts] = useState(() => {
@@ -132,12 +152,19 @@ export default function App() {
 
   const handleNavClick = (tab) => {
     setActiveTab(tab);
+    const targetPath = tab === 'home' ? '/' : `/${tab}`;
+    if (window.location.pathname !== targetPath) {
+      window.history.pushState({ tab }, '', targetPath);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleOpenProductDetail = (product) => {
     setSelectedProduct(product);
     setActiveTab('product');
+    if (window.location.pathname !== '/product') {
+      window.history.pushState({ tab: 'product' }, '', '/product');
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -196,6 +223,7 @@ export default function App() {
           />
         )}
 
+        {/* ADMIN VIEW OPENS DIRECTLY AT /admin */}
         {activeTab === 'admin' && (
           <AdminView
             blogPosts={blogPosts}
