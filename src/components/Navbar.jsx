@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Menu, X, ArrowRight, ChevronDown, Sparkles } from 'lucide-react';
+import { ShoppingBag, Menu, X, ArrowRight, ChevronDown } from 'lucide-react';
 import { IMAGES, PRODUCTS } from '../data/pureWhiskyFullData';
 
 export default function Navbar({ activeTab, setActiveTab, onSelectProduct, cartItemsCount, setIsCartOpen }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
-
-  const upcomingProducts = PRODUCTS.filter(p => p.isUpcoming);
-  const regularProducts = PRODUCTS.filter(p => !p.isUpcoming);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#FAF8F5]/92 backdrop-blur-md border-b border-[#E2DDD5] transition-all">
@@ -49,7 +46,7 @@ export default function Navbar({ activeTab, setActiveTab, onSelectProduct, cartI
             )}
           </button>
 
-          {/* Die Fässer (with Luxury Hover Dropdown) */}
+          {/* Die Fässer (Clean, Spacious Dropdown) */}
           <div 
             className="relative group py-6"
             onMouseEnter={() => setShopDropdownOpen(true)}
@@ -62,100 +59,71 @@ export default function Navbar({ activeTab, setActiveTab, onSelectProduct, cartI
               }`}
             >
               <span>Die Fässer</span>
-              <span className="px-1.5 py-0.5 rounded bg-[#FAF0EB] text-[#B85D2C] text-[10px] font-craft-mono font-bold">
-                +4 Neu
-              </span>
               <ChevronDown className="w-4 h-4 text-[#55695E] group-hover:text-[#B85D2C] group-hover:rotate-180 transition-transform duration-200" />
               {(activeTab === 'shop' || activeTab === 'product') && (
                 <span className="absolute bottom-6 left-0 right-0 h-0.5 bg-[#B85D2C] rounded-full" />
               )}
             </button>
 
-            {/* Dropdown Menu */}
-            <div className="absolute top-full left-1/2 -translate-x-1/2 w-[390px] bg-white border border-[#D4C8B8] rounded-2xl shadow-xl p-3 space-y-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 text-left max-h-[80vh] overflow-y-auto">
+            {/* Dropdown Menu - Clean, Legible, All Casks Readable */}
+            <div className="absolute top-full left-1/2 -translate-x-1/2 w-[420px] bg-white border border-[#D4C8B8] rounded-2xl shadow-xl p-4 space-y-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 text-left max-h-[80vh] overflow-y-auto">
               
-              {/* SECTION 1: 4 NEW RELEASES 17. SEPTEMBER */}
-              <div className="p-2 bg-[#FAF0EB] rounded-xl border border-[#F2DDD2] space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="font-craft-mono text-[11px] uppercase tracking-widest text-[#B85D2C] font-bold flex items-center space-x-1">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>Release am 17. September (Vorab)</span>
-                  </span>
-                </div>
-
-                {upcomingProducts.map((prod) => (
-                  <button
-                    key={prod.id}
-                    onClick={() => {
-                      onSelectProduct(prod);
-                      setShopDropdownOpen(false);
-                    }}
-                    className="w-full p-2 rounded-lg hover:bg-white transition-colors flex items-center space-x-2.5 text-left group/item"
-                  >
-                    <div className="w-9 h-11 bg-white rounded border border-[#E2DDD5] p-0.5 flex items-center justify-center shrink-0">
-                      <img src={prod.image} alt={prod.name} className="max-h-full max-w-full object-contain" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <span className="font-woodblock text-sm text-[#181F1C] uppercase truncate group-hover/item:text-[#B85D2C]">
-                          {prod.name}
-                        </span>
-                        <span className="font-craft-mono text-[10px] text-[#B85D2C] font-bold shrink-0 ml-1">
-                          17.09.
-                        </span>
-                      </div>
-                      <span className="font-craft-mono text-[9px] text-[#55695E] block truncate">
-                        {prod.region} · {prod.abv} · {prod.caskType}
-                      </span>
-                    </div>
-                  </button>
-                ))}
+              <div className="pb-3 border-b border-[#E2DDD5] flex items-center justify-between">
+                <span className="font-woodblock text-sm uppercase tracking-wider text-[#181F1C]">
+                  Alle Abfüllungen ({PRODUCTS.length})
+                </span>
+                <button
+                  onClick={() => { setActiveTab('shop'); setShopDropdownOpen(false); }}
+                  className="font-craft-mono text-xs text-[#B85D2C] font-bold hover:underline"
+                >
+                  Gesamten Shop öffnen →
+                </button>
               </div>
 
-              {/* SECTION 2: CURRENTLY AVAILABLE CASKS */}
-              <div className="space-y-1">
-                <div className="px-2 pt-1 flex items-center justify-between">
-                  <span className="font-craft-mono text-[11px] uppercase tracking-widest text-[#55695E] font-bold">
-                    Sofort lieferbar
-                  </span>
-                </div>
-
-                {regularProducts.map((prod) => (
+              <div className="space-y-1.5 divide-y divide-[#FAF8F5]">
+                {PRODUCTS.map((prod) => (
                   <button
                     key={prod.id}
                     onClick={() => {
                       onSelectProduct(prod);
                       setShopDropdownOpen(false);
                     }}
-                    className="w-full p-2 rounded-xl hover:bg-[#FAF8F5] transition-colors flex items-center space-x-3 text-left group/item"
+                    className="w-full p-2.5 rounded-xl hover:bg-[#FAF8F5] transition-colors flex items-center space-x-3 text-left group/item pt-2"
                   >
-                    <div className="w-9 h-12 bg-[#FAF8F5] rounded-lg border border-[#E2DDD5] p-0.5 flex items-center justify-center shrink-0">
+                    <div className="w-12 h-14 bg-[#FAF8F5] rounded-xl border border-[#E2DDD5] p-1 flex items-center justify-center shrink-0">
                       <img src={prod.image} alt={prod.name} className="max-h-full max-w-full object-contain" />
                     </div>
+                    
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <span className="font-woodblock text-sm text-[#181F1C] uppercase truncate group-hover/item:text-[#B85D2C] transition-colors">
+                        <span className="font-woodblock text-base text-[#181F1C] uppercase truncate group-hover/item:text-[#B85D2C] transition-colors">
                           {prod.name}
                         </span>
-                        <span className="font-woodblock text-xs text-[#181F1C] shrink-0">
+                        <span className="font-woodblock text-sm text-[#181F1C] shrink-0 ml-2">
                           {prod.price.toFixed(2)} €
                         </span>
                       </div>
-                      <span className="font-craft-mono text-[9px] text-[#55695E] block truncate">
-                        {prod.region} · {prod.abv} · {prod.caskType}
-                      </span>
+                      
+                      <div className="flex items-center justify-between text-xs text-[#55695E] font-craft-mono mt-0.5">
+                        <span className="truncate">{prod.region} · {prod.abv}</span>
+                        {prod.isUpcoming ? (
+                          <span className="text-[#B85D2C] font-bold shrink-0 ml-2">Ab 17.09.</span>
+                        ) : !prod.isAvailable ? (
+                          <span className="text-neutral-400 font-bold shrink-0 ml-2">Sold Out</span>
+                        ) : null}
+                      </div>
                     </div>
                   </button>
                 ))}
               </div>
 
-              <div className="pt-2 border-t border-[#E2DDD5]">
+              <div className="pt-3 border-t border-[#E2DDD5]">
                 <button
                   onClick={() => { setActiveTab('shop'); setShopDropdownOpen(false); }}
-                  className="w-full py-2.5 rounded-lg bg-[#181F1C] hover:bg-[#2C3831] text-white font-woodblock text-sm tracking-wider uppercase text-center flex items-center justify-center space-x-2"
+                  className="w-full py-3 rounded-xl bg-[#181F1C] hover:bg-[#2C3831] text-white font-woodblock text-base tracking-wider uppercase text-center flex items-center justify-center space-x-2"
                 >
-                  <span>Alle 8 Fässer im Shop ansehen</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <span>Alle Abfüllungen im Shop ansehen</span>
+                  <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
 
@@ -236,7 +204,7 @@ export default function Navbar({ activeTab, setActiveTab, onSelectProduct, cartI
         <div className="lg:hidden bg-white border-b border-[#D4C8B8] px-6 py-8 space-y-4 text-left shadow-lg">
           {[
             { id: 'home', label: 'Startseite' },
-            { id: 'shop', label: 'Die Fässer (Alle 8 Abfüllungen)' },
+            { id: 'shop', label: 'Die Fässer (Alle Abfüllungen)' },
             { id: 'about', label: 'Über Ines Zager' },
             { id: 'sustainability', label: 'Nachhaltigkeit & Audit' },
             { id: 'blog', label: 'Journal & Messen' },

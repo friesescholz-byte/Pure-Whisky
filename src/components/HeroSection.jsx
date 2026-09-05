@@ -4,6 +4,9 @@ import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { PRODUCTS, IMAGES } from '../data/pureWhiskyFullData';
 
 export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct }) {
+  // Only use the 4 original cut-out transparent bottles for the 3D Hero Carousel!
+  const heroProducts = PRODUCTS.filter(p => !p.isUpcoming);
+
   const [activeIdx, setActiveIdx] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -11,17 +14,17 @@ export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct }) 
   useEffect(() => {
     if (isPaused) return;
     const interval = setInterval(() => {
-      setActiveIdx((prev) => (prev + 1) % PRODUCTS.length);
+      setActiveIdx((prev) => (prev + 1) % heroProducts.length);
     }, 4200);
     return () => clearInterval(interval);
-  }, [isPaused]);
+  }, [isPaused, heroProducts.length]);
 
   const handleNext = () => {
-    setActiveIdx((prev) => (prev + 1) % PRODUCTS.length);
+    setActiveIdx((prev) => (prev + 1) % heroProducts.length);
   };
 
   const handlePrev = () => {
-    setActiveIdx((prev) => (prev - 1 + PRODUCTS.length) % PRODUCTS.length);
+    setActiveIdx((prev) => (prev - 1 + heroProducts.length) % heroProducts.length);
   };
 
   return (
@@ -76,7 +79,7 @@ export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct }) 
                 onClick={onOpenShop}
                 className="inline-flex items-center justify-center space-x-3 px-9 py-4.5 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-xl tracking-wider uppercase transition-all shadow-md hover:shadow-lg"
               >
-                <span>Die Fässer im Shop entdecken</span>
+                <span>Die 4 Fässer entdecken</span>
                 <ArrowRight className="w-5 h-5" />
               </button>
 
@@ -100,8 +103,8 @@ export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct }) 
             {/* The 3D Rotating Carousel Container - Massive Scale */}
             <div className="relative w-full h-[580px] sm:h-[660px] lg:h-[720px] flex items-center justify-center">
               
-              {PRODUCTS.map((prod, idx) => {
-                const offset = (idx - activeIdx + PRODUCTS.length) % PRODUCTS.length;
+              {heroProducts.map((prod, idx) => {
+                const offset = (idx - activeIdx + heroProducts.length) % heroProducts.length;
                 let x = 0;
                 let scale = 1;
                 let zIndex = 30;
@@ -122,7 +125,7 @@ export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct }) 
                   zIndex = 20;
                   opacity = 0.4;
                   blur = 1.5;
-                } else if (offset === PRODUCTS.length - 1) {
+                } else if (offset === heroProducts.length - 1) {
                   // Previous bottle to the left
                   x = -210;
                   scale = 0.76;
