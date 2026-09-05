@@ -96,7 +96,7 @@ export const PRODUCTS = [
     image: IMAGES.jura,
     cutoutImage: IMAGES.jura,
     cardBg: IMAGES.card_bg_islands,
-    galleryImages: [IMAGES.jura_new, IMAGES.jura, IMAGES.card_bg_islands, IMAGES.ines_islay],
+    galleryImages: [IMAGES.jura, IMAGES.jura_new, IMAGES.card_bg_islands, IMAGES.ines_islay],
     character: ['Saurer Apfel', 'Kluntjes', 'Mandelkuchen', 'Minze & Assam-Tee'],
     intro: 'Von der abgelegenen Hebrideninsel Jura mit nur einer einzigen Straße und rund 200 Einwohnern. 15 Jahre maritime Fassreife formten einen unverwechselbaren, frischen Single Cask Whisky mit maritimen Noten.',
     history: {
@@ -139,13 +139,13 @@ export const PRODUCTS = [
     image: IMAGES.glengarioch,
     cutoutImage: IMAGES.glengarioch,
     cardBg: IMAGES.card_bg_highlands,
-    galleryImages: [IMAGES.glengarioch_new, IMAGES.glengarioch, IMAGES.card_bg_highlands, IMAGES.ines_testing],
+    galleryImages: [IMAGES.glengarioch, IMAGES.glengarioch_new, IMAGES.card_bg_highlands, IMAGES.ines_testing],
     character: ['Jahrmarktszuckerwatte', 'Bourbon-Vanille', 'Weißer Jasmin', 'Mürbeteig & Meersalz'],
     intro: 'Aus einer der ältesten funktionierenden Brennereien Schottlands (gegründet 1797). Dieser 11-jährige Single Malt besticht durch seine explosive Wucht von 56,5% vol. und ein bezaubernd süßes Mürbeteig- und Blütenaroma.',
     history: {
       headline: 'Die historische Kornkammer von Aberdeenshire',
       text: 'Glen Garioch liegt mitten im "Valley of the Garioch", das seit Jahrhunderten für die beste Braugerste Schottlands berühmt ist. Die Brennerei setzt auf traditionelle, schwere Kupferbrennblasen und direkte Kühlung, was dem Whisky seinen vollmundigen, wachsigen und cremigen Körper verleiht.',
-      image: IMAGES.scotland_travel
+      image: IMAGES.ines_testing
     },
     tastingNotes: {
       nose: 'Jahrmarktszuckerwatte, sanfte Bourbon-Vanille, blühender weißer Jasmin, süße reife Pflaume und feine Ätherik.',
@@ -326,7 +326,7 @@ export const PRODUCTS = [
     history: {
       headline: 'Die legendären Kühlringe der Cairngorms',
       text: 'Fettercairn kühlt den Hals seiner Kupferbrennblasen von außen mit eiskaltem Bergquellwasser ab. Dieser extreme Kupferkontakt erzeugt einen unvergleichlich feinen, tropisch-floralen Rohbrand. In der Kombination mit einem edlen First Fill Rivesaltes Barrique aus Südfrankreich entstand eine atemberaubende Geschmackssymbiose.',
-      image: IMAGES.scotland_travel
+      image: IMAGES.scotland_distillery
     },
     tastingNotes: {
       nose: 'Reife Nektarinen, kandierte Aprikose, zarter Waldblütenhonig, süßer französischer Vin Doux Naturel und feines Butter-Shortbread.',

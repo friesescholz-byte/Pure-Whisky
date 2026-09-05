@@ -25,12 +25,16 @@ export default function ProductDetailView({
   const gallery = product.galleryImages || [product.image];
   const activeImage = gallery[selectedImageIdx] || product.image;
 
-  // Determine if active image is a full photograph or a cut-out bottle
-  const isFullPhotograph = activeImage.includes('20241014') || 
-                           activeImage.includes('full') || 
-                           activeImage.includes('Produkte-2026') ||
-                           activeImage.includes('schottland') ||
-                           activeImage.includes('ines-');
+  // Determine if active image is a cut-out bottle or a full photograph
+  const isCutoutBottle = 
+    activeImage === product.cutoutImage ||
+    (typeof activeImage === 'string' && (
+      activeImage.includes('Pure-Whisky-Fass_0') ||
+      activeImage.includes('Pure-Whisky0') ||
+      (activeImage === product.image && !activeImage.includes('20241014') && !activeImage.includes('full') && !activeImage.includes('Testing') && !activeImage.includes('Single-Malt'))
+    ));
+
+  const isFullPhotograph = !isCutoutBottle;
 
   const handleBuy = () => {
     for (let i = 0; i < quantity; i++) {
@@ -92,10 +96,10 @@ export default function ProductDetailView({
                   <img
                     src={product.cardBg}
                     alt="Schottische Landschaft"
-                    className="absolute inset-0 w-full h-full object-cover filter brightness-[0.75] contrast-[1.10] blur-[2px] scale-105 opacity-75 group-hover:scale-110 group-hover:opacity-85 transition-all duration-700"
+                    className="absolute inset-0 w-full h-full object-cover filter brightness-[0.88] contrast-[1.05] blur-[1px] scale-105 opacity-90 group-hover:scale-110 group-hover:opacity-100 transition-all duration-700"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/35" />
-                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(212,139,56,0.25)_0%,_transparent_65%)]" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-black/30" />
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(212,139,56,0.20)_0%,_transparent_65%)]" />
 
                   <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
                     <img
@@ -453,7 +457,7 @@ export default function ProductDetailView({
               >
                 <div className="h-48 rounded-xl bg-[#FAF8F5] border border-[#E2DDD5] flex items-center justify-center p-3 relative overflow-hidden">
                   <img
-                    src={other.id === 'glengarioch-11' ? 'https://pub-b33108412309406a9a941ddc51e9a5b9.r2.dev/Pure-Whisky/Produkte/20241014_124302_03.webp' : (other.cutoutImage || other.image)}
+                    src={other.cutoutImage || other.image}
                     alt={other.name}
                     className="max-h-full w-auto object-contain group-hover:scale-105 transition-transform"
                   />

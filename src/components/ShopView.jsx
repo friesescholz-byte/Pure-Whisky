@@ -127,12 +127,12 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
                     <img
                       src={product.cardBg}
                       alt="Schottische Landschaft"
-                      className="absolute inset-0 w-full h-full object-cover filter brightness-[0.75] contrast-[1.10] blur-[1.5px] scale-105 opacity-75 group-hover:scale-110 group-hover:opacity-85 transition-all duration-700"
+                      className="absolute inset-0 w-full h-full object-cover filter brightness-[0.88] contrast-[1.05] blur-[1px] scale-105 opacity-90 group-hover:scale-110 group-hover:opacity-100 transition-all duration-700"
                     />
                     
                     {/* Layer 2: Soft Atmospheric Lighting Vignette */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/35" />
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(212,139,56,0.22)_0%,_transparent_65%)]" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-black/30" />
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(212,139,56,0.20)_0%,_transparent_65%)]" />
 
                     {/* Layer 3: Foreground Bottle */}
                     <div className="relative z-10 h-full flex flex-col items-center justify-center">
