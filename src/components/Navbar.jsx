@@ -91,7 +91,7 @@ export default function Navbar({ activeTab, setActiveTab, onSelectProduct, cartI
                     className="w-full p-2.5 rounded-xl hover:bg-[#FAF8F5] transition-colors flex items-center space-x-3 text-left group/item pt-2"
                   >
                     <div className="w-12 h-14 bg-[#FAF8F5] rounded-xl border border-[#E2DDD5] p-1 flex items-center justify-center shrink-0">
-                      <img src={prod.image} alt={prod.name} className="max-h-full max-w-full object-contain" />
+                      <img src={prod.cutoutImage || prod.image} alt={prod.name} className="max-h-full max-w-full object-contain" />
                     </div>
                     
                     <div className="flex-1 min-w-0">

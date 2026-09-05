@@ -109,103 +109,133 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
 
         {/* Product Cards Grid - Clean, Spacious, No Clutter */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16">
-          {filteredProducts.map(product => (
-            <div
-              key={product.id}
-              className="bg-white border border-[#D4C8B8] rounded-3xl p-8 sm:p-10 flex flex-col justify-between text-left shadow-xs hover:shadow-md transition-all duration-300"
-            >
-              <div>
-                {/* Bottle Stage */}
-                <div 
-                  className="h-80 sm:h-96 relative flex items-center justify-center cursor-pointer rounded-2xl mb-6 p-6 overflow-hidden border border-[#D4C8B8] group shadow-inner bg-neutral-900"
-                  onClick={() => onOpenProduct(product)}
-                >
-                  {/* Layer 1: Background Landscape */}
-                  <img
-                    src={product.cardBg}
-                    alt="Schottische Landschaft"
-                    className="absolute inset-0 w-full h-full object-cover filter brightness-[0.75] contrast-[1.10] blur-[1.5px] scale-105 opacity-75 group-hover:scale-110 group-hover:opacity-85 transition-all duration-700"
-                  />
-                  
-                  {/* Layer 2: Soft Atmospheric Lighting Vignette */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/35" />
-                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(212,139,56,0.22)_0%,_transparent_65%)]" />
+          {filteredProducts.map(product => {
+            const displayBottle = product.cutoutImage || product.image;
 
-                  {/* Layer 3: Foreground Bottle */}
-                  <div className="relative z-10 h-full flex flex-col items-center justify-center">
-                    <img
-                      src={product.image}
-                      alt={product.fullName}
-                      className="max-h-[90%] w-auto object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.7)] group-hover:scale-106 transition-transform duration-500"
-                      loading="lazy"
-                    />
-                    <div className="w-24 sm:w-28 h-3.5 bg-black/65 rounded-full blur-md -mt-2 opacity-80" />
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center border-b border-[#E2DDD5] pb-2">
-                    <span className="font-script text-2xl text-[#2D6A4F]">{product.region} Single Malt</span>
-                    <span className="font-craft-mono text-xs text-[#B85D2C] font-bold">VOL. {product.abv}</span>
-                  </div>
-
-                  <h3 className="font-woodblock text-3xl sm:text-4xl text-[#181F1C] tracking-wide uppercase">
-                    {product.name}
-                  </h3>
-
-                  <p className="font-craft-mono text-xs text-[#55695E] font-bold">
-                    {product.caskType} · {product.vintage}
-                  </p>
-
-                  <p className="text-base text-[#2E3D35] font-normal leading-relaxed pt-2">
-                    {product.tastingNotes.nose}
-                  </p>
-                </div>
-              </div>
-
-              {/* Bottom Row */}
-              <div className="pt-8 mt-6 border-t border-[#E2DDD5] flex items-center justify-between">
+            return (
+              <div
+                key={product.id}
+                className="bg-white border border-[#D4C8B8] rounded-3xl p-8 sm:p-10 flex flex-col justify-between text-left shadow-xs hover:shadow-md transition-all duration-300"
+              >
                 <div>
-                  <span className="font-woodblock text-3xl sm:text-4xl text-[#181F1C] tracking-wide block">
-                    {product.price.toFixed(2)} €
-                  </span>
-                  <span className="font-craft-mono text-[10px] text-[#55695E]">
-                    {product.pricePerLiter} · inkl. MwSt.
-                  </span>
-                </div>
-
-                <div className="flex items-center space-x-3">
-                  <button
+                  {/* Bottle Stage */}
+                  <div 
+                    className="h-80 sm:h-96 relative flex items-center justify-center cursor-pointer rounded-2xl mb-6 p-6 overflow-hidden border border-[#D4C8B8] group shadow-inner bg-neutral-900"
                     onClick={() => onOpenProduct(product)}
-                    className="px-5 py-3 rounded-lg bg-[#E8EFEA] hover:bg-[#D8E4DC] text-[#181F1C] font-woodblock text-lg tracking-wider uppercase transition-colors"
                   >
-                    Dossier
-                  </button>
+                    {/* Layer 1: Background Landscape */}
+                    <img
+                      src={product.cardBg}
+                      alt="Schottische Landschaft"
+                      className="absolute inset-0 w-full h-full object-cover filter brightness-[0.75] contrast-[1.10] blur-[1.5px] scale-105 opacity-75 group-hover:scale-110 group-hover:opacity-85 transition-all duration-700"
+                    />
+                    
+                    {/* Layer 2: Soft Atmospheric Lighting Vignette */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/35" />
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(212,139,56,0.22)_0%,_transparent_65%)]" />
 
-                  {product.isUpcoming ? (
-                    <button
-                      onClick={(e) => handleOpenReserveModal(product, e)}
-                      className="px-6 py-3 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-sm"
-                    >
-                      Vorabzugriff
-                    </button>
-                  ) : product.isAvailable ? (
-                    <button
-                      onClick={() => onAddToCart(product)}
-                      className="px-6 py-3 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-sm"
-                    >
-                      In den Korb
-                    </button>
-                  ) : (
-                    <span className="px-5 py-3 rounded-lg bg-neutral-100 text-neutral-400 font-woodblock text-lg tracking-wider uppercase">
-                      Ausverkauft
-                    </span>
-                  )}
+                    {/* Layer 3: Foreground Bottle */}
+                    <div className="relative z-10 h-full flex flex-col items-center justify-center">
+                      <img
+                        src={displayBottle}
+                        alt={product.fullName}
+                        className="max-h-[90%] w-auto object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.7)] group-hover:scale-106 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                      <div className="w-24 sm:w-28 h-3.5 bg-black/65 rounded-full blur-md -mt-2 opacity-80" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center border-b border-[#E2DDD5] pb-2">
+                      <span className="font-script text-2xl text-[#2D6A4F]">{product.region} Single Malt</span>
+                      <span className="font-craft-mono text-xs text-[#B85D2C] font-bold">VOL. {product.abv}</span>
+                    </div>
+
+                    <h3 className="font-woodblock text-3xl sm:text-4xl text-[#181F1C] tracking-wide uppercase">
+                      {product.name}
+                    </h3>
+
+                    <p className="font-craft-mono text-xs text-[#55695E] font-bold">
+                      {product.caskType} · {product.vintage}
+                    </p>
+
+                    {/* PROMINENT LARGE STOCK / AVAILABILITY STATUS DISPLAY */}
+                    <div className="pt-2 pb-1">
+                      {product.isAvailable ? (
+                        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-[#E8EFEA] border border-[#C5D8CC]">
+                          <span className="w-2.5 h-2.5 rounded-full bg-[#2D6A4F] shrink-0 animate-pulse" />
+                          <span className="font-woodblock text-sm sm:text-base text-[#2D6A4F] uppercase tracking-wider">
+                            Noch {product.bottlesRemaining} von {product.bottlesTotal} Flaschen vorrätig
+                          </span>
+                        </div>
+                      ) : product.isUpcoming ? (
+                        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-[#FAF0EB] border border-[#F2DDD2]">
+                          <span className="w-2.5 h-2.5 rounded-full bg-[#B85D2C] shrink-0" />
+                          <span className="font-woodblock text-sm sm:text-base text-[#B85D2C] uppercase tracking-wider">
+                            Release am 17. September · {product.bottlesTotal} Flaschen
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-rose-50 border border-rose-200">
+                          <span className="w-2.5 h-2.5 rounded-full bg-rose-600 shrink-0" />
+                          <span className="font-woodblock text-sm sm:text-base text-rose-700 uppercase tracking-wider">
+                            Ausverkauft · Sammler-Archiv
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    <p className="text-base text-[#2E3D35] font-normal leading-relaxed pt-1">
+                      {product.tastingNotes.nose}
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-            </div>
-          ))}
+                {/* Bottom Row */}
+                <div className="pt-8 mt-6 border-t border-[#E2DDD5] flex items-center justify-between">
+                  <div>
+                    <span className="font-woodblock text-3xl sm:text-4xl text-[#181F1C] tracking-wide block">
+                      {product.price.toFixed(2)} €
+                    </span>
+                    <span className="font-craft-mono text-[10px] text-[#55695E]">
+                      {product.pricePerLiter} · inkl. MwSt.
+                    </span>
+                  </div>
+
+                  <div className="flex items-center space-x-3">
+                    <button
+                      onClick={() => onOpenProduct(product)}
+                      className="px-5 py-3 rounded-lg bg-[#E8EFEA] hover:bg-[#D8E4DC] text-[#181F1C] font-woodblock text-lg tracking-wider uppercase transition-colors"
+                    >
+                      Dossier
+                    </button>
+
+                    {product.isUpcoming ? (
+                      <button
+                        onClick={(e) => handleOpenReserveModal(product, e)}
+                        className="px-6 py-3 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-sm"
+                      >
+                        Vorabzugriff
+                      </button>
+                    ) : product.isAvailable ? (
+                      <button
+                        onClick={() => onAddToCart(product)}
+                        className="px-6 py-3 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-sm"
+                      >
+                        In den Korb
+                      </button>
+                    ) : (
+                      <span className="px-5 py-3 rounded-lg bg-neutral-100 text-neutral-400 font-woodblock text-lg tracking-wider uppercase border border-neutral-200">
+                        Ausverkauft
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+              </div>
+            );
+          })}
         </div>
 
       </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, ShoppingBag, ShieldCheck, ArrowRight, Droplets, Leaf, RefreshCw, Check, Sparkles, Bell, CheckCircle2 } from 'lucide-react';
+import { ChevronRight, ShoppingBag, ShieldCheck, Droplets, Leaf, Check, Bell, CheckCircle2 } from 'lucide-react';
 import { PRODUCTS } from '../data/pureWhiskyFullData';
 
 export default function ProductDetailView({ 
@@ -23,6 +23,14 @@ export default function ProductDetailView({
 
   const otherProducts = PRODUCTS.filter(p => p.id !== product.id);
   const gallery = product.galleryImages || [product.image];
+  const activeImage = gallery[selectedImageIdx] || product.image;
+
+  // Determine if active image is a full photograph or a cut-out bottle
+  const isFullPhotograph = activeImage.includes('20241014') || 
+                           activeImage.includes('full') || 
+                           activeImage.includes('Produkte-2026') ||
+                           activeImage.includes('schottland') ||
+                           activeImage.includes('ines-');
 
   const handleBuy = () => {
     for (let i = 0; i < quantity; i++) {
@@ -65,43 +73,45 @@ export default function ProductDetailView({
         {/* Top Product Section: Gallery Left, Purchase Dossier Right */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start mb-24">
           
-          {/* Left Column: Interactive High-Res Bottle Stage & Thumbnails (6 cols) */}
+          {/* Left Column: Interactive Bottle Stage & Thumbnails (6 cols) */}
           <div className="lg:col-span-6 space-y-4">
             
-            {/* Main Stage Image with Cinematic Photographic Integration */}
+            {/* Main Stage Image */}
             <div className="border border-[#D4C8B8] rounded-3xl h-[500px] sm:h-[580px] flex items-center justify-center shadow-md relative overflow-hidden group bg-neutral-900">
               
-              {/* Layer 1: Background Landscape */}
-              <img
-                src={product.cardBg}
-                alt="Schottische Landschaft"
-                className="absolute inset-0 w-full h-full object-cover filter brightness-[0.75] contrast-[1.10] blur-[2px] scale-105 opacity-75 group-hover:scale-110 group-hover:opacity-85 transition-all duration-700"
-              />
-              
-              {/* Layer 2: Vignette */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/35" />
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(212,139,56,0.25)_0%,_transparent_65%)]" />
-
-              {/* Layer 3: Main Cut-out Bottle */}
-              <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
+              {isFullPhotograph ? (
+                /* Full photograph mode */
                 <img
-                  src={gallery[selectedImageIdx] || product.image}
+                  src={activeImage}
                   alt={product.fullName}
-                  className="max-h-[86%] w-auto object-contain drop-shadow-[0_25px_35px_rgba(0,0,0,0.75)] transition-all duration-500 group-hover:scale-105"
+                  className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
                 />
-                <div className="w-32 sm:w-36 h-4 bg-black/70 rounded-full blur-md -mt-2 opacity-85" />
-              </div>
+              ) : (
+                /* Cut-out bottle stage with cinematic background */
+                <>
+                  <img
+                    src={product.cardBg}
+                    alt="Schottische Landschaft"
+                    className="absolute inset-0 w-full h-full object-cover filter brightness-[0.75] contrast-[1.10] blur-[2px] scale-105 opacity-75 group-hover:scale-110 group-hover:opacity-85 transition-all duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/35" />
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(212,139,56,0.25)_0%,_transparent_65%)]" />
+
+                  <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
+                    <img
+                      src={activeImage}
+                      alt={product.fullName}
+                      className="max-h-[86%] w-auto object-contain drop-shadow-[0_25px_35px_rgba(0,0,0,0.75)] transition-all duration-500 group-hover:scale-105"
+                    />
+                    <div className="w-32 sm:w-36 h-4 bg-black/70 rounded-full blur-md -mt-2 opacity-85" />
+                  </div>
+                </>
+              )}
               
               {/* Region Label Badge */}
               <div className="absolute top-6 left-6 z-20 font-script text-3xl text-white drop-shadow-md">
                 {product.region} Single Cask
               </div>
-
-              {product.isUpcoming && (
-                <div className="absolute top-6 right-6 z-20 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-[#D4C8B8] text-[#B85D2C] font-craft-mono text-xs font-bold uppercase shadow-sm">
-                  Release 17.09.2026
-                </div>
-              )}
             </div>
 
             {/* Gallery Thumbnail Strip */}
@@ -117,7 +127,7 @@ export default function ProductDetailView({
                         : 'border-[#E2DDD5] opacity-70 hover:opacity-100 hover:border-[#D4C8B8]'
                     }`}
                   >
-                    <img src={imgUrl} alt="Thumbnail" className="w-full h-full object-contain" />
+                    <img src={imgUrl} alt="Thumbnail" className="w-full h-full object-cover rounded-lg" />
                   </button>
                 ))}
               </div>
@@ -157,37 +167,37 @@ export default function ProductDetailView({
                 </div>
 
                 <div className="text-right font-craft-mono text-xs font-bold">
-                  {product.isUpcoming ? (
-                    <>
-                      <span className="text-[#B85D2C] flex items-center space-x-1 justify-end">
-                        <Sparkles className="w-3.5 h-3.5" />
-                        <span>RELEASE: 17. SEPTEMBER 2026</span>
+                  {product.isAvailable ? (
+                    <div className="text-right">
+                      <span className="text-[#2D6A4F] text-sm block font-woodblock uppercase">
+                        🟢 Noch {product.bottlesRemaining} von {product.bottlesTotal} Flaschen
                       </span>
-                      <span className="block text-[11px] text-[#55695E] mt-0.5">Limitierte Zuteilung: {product.bottlesTotal} Flaschen</span>
-                    </>
-                  ) : product.isAvailable ? (
-                    <>
-                      <span className="text-[#2D6A4F]">NOCH {product.bottlesRemaining} VON {product.bottlesTotal} FLASCHEN</span>
-                      <span className="block text-[11px] text-[#55695E] mt-0.5">Streng limitiertes Einzelfass</span>
-                    </>
+                      <span className="text-[11px] text-[#55695E] mt-0.5 block">Streng limitiertes Einzelfass</span>
+                    </div>
+                  ) : product.isUpcoming ? (
+                    <div className="text-right">
+                      <span className="text-[#B85D2C] text-sm block font-woodblock uppercase">
+                        Release am 17. September 2026
+                      </span>
+                      <span className="text-[11px] text-[#55695E] mt-0.5 block">Vorab-Zuteilung: {product.bottlesTotal} Flaschen</span>
+                    </div>
                   ) : (
-                    <>
-                      <span className="text-rose-600">AUSVERKAUFT</span>
-                      <span className="block text-[11px] text-[#55695E] mt-0.5">Sammler-Archiv</span>
-                    </>
+                    <div className="text-right">
+                      <span className="text-rose-600 text-sm block font-woodblock uppercase">
+                        🔴 Ausverkauft
+                      </span>
+                      <span className="text-[11px] text-[#55695E] mt-0.5 block">Sammler-Archiv ({product.bottlesTotal} Flaschen)</span>
+                    </div>
                   )}
                 </div>
               </div>
 
-              {/* ----------------------------------------------------------- */}
-              {/* CASE 1: UPCOMING RELEASE (VORABZUGRIFF FORMULAR)             */}
-              {/* ----------------------------------------------------------- */}
+              {/* Purchase / Reserve Controls */}
               {product.isUpcoming ? (
                 <div className="space-y-4">
                   <div className="p-4 rounded-2xl bg-[#FAF0EB] border border-[#F2DDD2] space-y-2">
-                    <span className="font-craft-mono text-xs uppercase tracking-wider text-[#B85D2C] font-bold flex items-center space-x-1.5">
-                      <Sparkles className="w-4 h-4" />
-                      <span>Exklusiver Vorab-Zugriff für Fass-Depot Abonnenten</span>
+                    <span className="font-craft-mono text-xs uppercase tracking-wider text-[#B85D2C] font-bold">
+                      Exklusiver Vorab-Zugriff für Fass-Depot Abonnenten
                     </span>
                     <p className="text-xs text-[#3A4A40] leading-relaxed">
                       Dieses Einzelfass kommt am <strong>17. September 2026</strong> in den Verkauf. Tragen Sie sich jetzt ein, um Ihren persönlichen Bestell-Link vor allen anderen zu erhalten.
@@ -231,15 +241,10 @@ export default function ProductDetailView({
                         <Bell className="w-4 h-4" />
                         <span>Für Vorabzugriff am 17.09. vormerken</span>
                       </button>
-
-                      <p className="text-[11px] text-[#55695E] text-center font-craft-mono">
-                        🔒 Unverbindlich · Kein Spam · Sie erhalten rechtzeitig den Vorab-Link.
-                      </p>
                     </form>
                   )}
                 </div>
               ) : product.isAvailable ? (
-                /* CASE 2: REGULAR AVAILABLE PRODUCT */
                 <div className="space-y-4">
                   <div className="flex items-center space-x-4">
                     {/* Quantity Selector */}
@@ -277,9 +282,8 @@ export default function ProductDetailView({
                   )}
                 </div>
               ) : (
-                /* CASE 3: SOLD OUT */
-                <div className="p-4 rounded-xl bg-neutral-100 text-neutral-500 font-woodblock text-xl uppercase text-center">
-                  Dieses Fass ist restlos ausverkauft
+                <div className="p-5 rounded-2xl bg-neutral-100 border border-neutral-200 text-neutral-500 font-woodblock text-xl uppercase text-center">
+                  Dieses Fass ist restlos ausverkauft (Sammler-Archiv)
                 </div>
               )}
 
@@ -449,15 +453,19 @@ export default function ProductDetailView({
               >
                 <div className="h-48 rounded-xl bg-[#FAF8F5] border border-[#E2DDD5] flex items-center justify-center p-3 relative overflow-hidden">
                   <img
-                    src={other.image}
+                    src={other.cutoutImage || other.image}
                     alt={other.name}
                     className="max-h-full w-auto object-contain group-hover:scale-105 transition-transform"
                   />
-                  {other.isUpcoming && (
+                  {other.isUpcoming ? (
                     <span className="absolute top-2 right-2 px-2 py-0.5 bg-[#FAF0EB] text-[#B85D2C] text-[10px] font-craft-mono font-bold rounded">
                       Release 17.09.
                     </span>
-                  )}
+                  ) : !other.isAvailable ? (
+                    <span className="absolute top-2 right-2 px-2 py-0.5 bg-rose-100 text-rose-700 text-[10px] font-craft-mono font-bold rounded">
+                      Ausverkauft
+                    </span>
+                  ) : null}
                 </div>
 
                 <div>

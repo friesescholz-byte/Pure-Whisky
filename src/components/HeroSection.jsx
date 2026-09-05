@@ -4,8 +4,17 @@ import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { PRODUCTS, IMAGES } from '../data/pureWhiskyFullData';
 
 export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct }) {
-  // Only use the 4 original cut-out transparent bottles for the 3D Hero Carousel!
-  const heroProducts = PRODUCTS.filter(p => !p.isUpcoming);
+  // Use the 4 original cut-out transparent bottles with 100% matched labels:
+  // Tomatin 16 -> IMAGES.tomatin (Pure-Whisky02.webp - verified label: Tomatin 16)
+  // Jura 15 -> IMAGES.jura (Pure-Whisky04.webp - verified label: Jura 15)
+  // Glen Garioch 11 -> IMAGES.glengarioch (Pure-Whisky03.webp - verified label: Glen Garioch 11)
+  // Ardmore 11 -> IMAGES.ardmore (Pure-Whisky01.webp - verified label: Ardmore 11)
+  const heroProducts = [
+    { ...PRODUCTS.find(p => p.id === 'jura-15'), image: IMAGES.jura },
+    { ...PRODUCTS.find(p => p.id === 'glengarioch-11'), image: IMAGES.glengarioch },
+    { ...PRODUCTS.find(p => p.id === 'tomatin-16'), image: IMAGES.tomatin },
+    { ...PRODUCTS.find(p => p.id === 'ardmore-11'), image: IMAGES.ardmore }
+  ].filter(Boolean);
 
   const [activeIdx, setActiveIdx] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -79,7 +88,7 @@ export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct }) 
                 onClick={onOpenShop}
                 className="inline-flex items-center justify-center space-x-3 px-9 py-4.5 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-xl tracking-wider uppercase transition-all shadow-md hover:shadow-lg"
               >
-                <span>Die 4 Fässer entdecken</span>
+                <span>Die Fässer im Shop entdecken</span>
                 <ArrowRight className="w-5 h-5" />
               </button>
 
@@ -178,7 +187,7 @@ export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct }) 
                 );
               })}
 
-              {/* Clean Minimalist Arrows (Highland Green -> Whisky Brown on Hover) */}
+              {/* Clean Minimalist Arrows */}
               <button
                 onClick={(e) => { e.stopPropagation(); handlePrev(); }}
                 className="absolute left-0 sm:left-2 top-1/2 -translate-y-1/2 z-40 p-2 text-[#2D6A4F] hover:text-[#B85D2C] hover:scale-120 transition-all duration-200 focus:outline-none cursor-pointer"
