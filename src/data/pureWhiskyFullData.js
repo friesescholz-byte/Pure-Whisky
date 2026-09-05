@@ -4,12 +4,17 @@ export const R2_BASE = 'https://pub-b33108412309406a9a941ddc51e9a5b9.r2.dev/Pure
 export const IMAGES = {
   logo: `${R2_BASE}logo-pure-whisky.png`,
   hero_back: `${R2_BASE}Hero%20Back%20Pure%20Whisky_ergebnis.webp`,
+  
+  // Specific Regional Backgrounds requested by user:
+  card_bg_speyside: `${R2_BASE}Pure-Whisky-Hintergrund_01.webp`,
+  card_bg_highlands: `${R2_BASE}Pure-Whisky-Fass_01_1.webp`,
   card_bg_islands: `${R2_BASE}Pure-Whisky-bILDER07.webp`,
-  card_bg_highlands: `${R2_BASE}Pure-Whisky-bILDER01.webp`,
-  card_bg_speyside: `${R2_BASE}schottland-landschaft-kueste-1.webp`,
+  
+  // Tasting Photo requested by user for new casks & audit:
+  ines_testing: `${R2_BASE}Pure-Whisky-Testing.jpg`,
   
   // -------------------------------------------------------------
-  // THE 4 ORIGINAL CASKS - 100% VERIFIED LABEL ASSIGNMENTS:
+  // THE 4 ORIGINAL CASKS - VERIFIED CUT-OUT BOTTLES:
   // Pure-Whisky01 = Ardmore 11 (56.7%)
   // Pure-Whisky02 = Tomatin 16 (53.2%)
   // Pure-Whisky03 = Glen Garioch 11 (56.5%)
@@ -20,7 +25,7 @@ export const IMAGES = {
   glengarioch: `${R2_BASE}Produkte/Pure-Whisky03.webp`,
   jura: `${R2_BASE}Produkte/Pure-Whisky04.webp`,
 
-  // Realistic In-Situ Photos of In-Stock Casks (Supplied by user)
+  // Realistic In-Situ Photos
   jura_new: `${R2_BASE}Produkte/20241014_124522_04.webp`,
   glengarioch_new: `${R2_BASE}Produkte/20241014_124302_03.webp`,
 
@@ -31,18 +36,18 @@ export const IMAGES = {
   ardmore_label: `${R2_BASE}flasche-ardmore-11-jahre-full.webp`,
 
   // -------------------------------------------------------------
-  // 4 NEW CASKS (RELEASE 17. SEPTEMBER 2026)
+  // 4 NEW CASKS - TRANSPARENT CUT-OUT BOTTLES (HERO & SHOP CARDS)
   // -------------------------------------------------------------
-  glenburgie_11: `${R2_BASE}Produkte-2026/Single-Malt-Scotch-Whisky11Y_11.webp`,
-  fettercairn_15: `${R2_BASE}Produkte-2026/Single-Malt-Scotch-Whisky15Y_12.webp`,
-  aultmore_17: `${R2_BASE}Produkte-2026/Single-Malt-Scotch-Whisky17Y_13.webp`,
-  highlandpark_18: `${R2_BASE}Produkte-2026/Single-Malt-Scotch-Whisky18Y_14.webp`,
-
-  // 4 NEW CASKS - TRANSPARENT CUT-OUT BOTTLES FOR HERO & STAGE
   glenburgie_11_cutout: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_01.webp`,
   fettercairn_15_cutout: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_02.webp`,
   aultmore_17_cutout: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_03.webp`,
   highlandpark_18_cutout: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_04.webp`,
+
+  // Atmospheric Barrel Photos
+  glenburgie_11_barrel: `${R2_BASE}Produkte-2026/Single-Malt-Scotch-Whisky11Y_11.webp`,
+  fettercairn_15_barrel: `${R2_BASE}Produkte-2026/Single-Malt-Scotch-Whisky15Y_12.webp`,
+  aultmore_17_barrel: `${R2_BASE}Produkte-2026/Single-Malt-Scotch-Whisky17Y_13.webp`,
+  highlandpark_18_barrel: `${R2_BASE}Produkte-2026/Single-Malt-Scotch-Whisky18Y_14.webp`,
 
   ines_portrait: `${R2_BASE}ines-zager-schottland-portrait.webp`,
   ines_barrel: `${R2_BASE}ines-zager-fass-lager.webp`,
@@ -88,7 +93,7 @@ export const PRODUCTS = [
     badge: 'Sofort lieferbar · 8% Vorteil',
     bottlesTotal: 247,
     bottlesRemaining: 34,
-    image: IMAGES.jura_new,
+    image: IMAGES.jura,
     cutoutImage: IMAGES.jura,
     cardBg: IMAGES.card_bg_islands,
     galleryImages: [IMAGES.jura_new, IMAGES.jura, IMAGES.card_bg_islands, IMAGES.ines_islay],
@@ -131,10 +136,10 @@ export const PRODUCTS = [
     badge: 'Bestseller · Nur noch 18 Flaschen',
     bottlesTotal: 237,
     bottlesRemaining: 18,
-    image: IMAGES.glengarioch_new,
+    image: IMAGES.glengarioch,
     cutoutImage: IMAGES.glengarioch,
     cardBg: IMAGES.card_bg_highlands,
-    galleryImages: [IMAGES.glengarioch_new, IMAGES.glengarioch, IMAGES.card_bg_highlands, IMAGES.ines_barrel],
+    galleryImages: [IMAGES.glengarioch_new, IMAGES.glengarioch, IMAGES.card_bg_highlands, IMAGES.ines_testing],
     character: ['Jahrmarktszuckerwatte', 'Bourbon-Vanille', 'Weißer Jasmin', 'Mürbeteig & Meersalz'],
     intro: 'Aus einer der ältesten funktionierenden Brennereien Schottlands (gegründet 1797). Dieser 11-jährige Single Malt besticht durch seine explosive Wucht von 56,5% vol. und ein bezaubernd süßes Mürbeteig- und Blütenaroma.',
     history: {
@@ -150,7 +155,7 @@ export const PRODUCTS = [
     sustainability: {
       headline: 'Quellenschutz auf der Coutens Farm & Kreislauf',
       story: 'Nachdem die Brennerei in den 1960er Jahren wegen Wassermangels schließen musste, erschloss man 1972 eine geheime Quelle auf der Coutens Farm. Seitdem investiert Glen Garioch in geschlossene Kühlwasserkreisläufe, um wertvolles Grundwasser zu schonen.',
-      image: IMAGES.ines_barrel
+      image: IMAGES.glengarioch_new
     }
   },
 
@@ -178,7 +183,7 @@ export const PRODUCTS = [
     badge: 'Ausverkauft · Sammler-Archiv',
     bottlesTotal: 214,
     bottlesRemaining: 0,
-    image: IMAGES.tomatin_label,
+    image: IMAGES.tomatin,
     cutoutImage: IMAGES.tomatin,
     cardBg: IMAGES.card_bg_highlands,
     galleryImages: [IMAGES.tomatin_label, IMAGES.tomatin, IMAGES.card_bg_highlands, IMAGES.ines_barrel],
@@ -221,7 +226,7 @@ export const PRODUCTS = [
     badge: 'Ausverkauft · Sammler-Archiv',
     bottlesTotal: 109,
     bottlesRemaining: 0,
-    image: IMAGES.ardmore_label,
+    image: IMAGES.ardmore,
     cutoutImage: IMAGES.ardmore,
     cardBg: IMAGES.card_bg_highlands,
     galleryImages: [IMAGES.ardmore_label, IMAGES.ardmore, IMAGES.card_bg_highlands, IMAGES.mission],
@@ -246,6 +251,7 @@ export const PRODUCTS = [
 
   // -------------------------------------------------------------
   // 4 NEUE FÄSSER (RELEASE AB 17. SEPTEMBER 2026 · VORABZUGRIFF)
+  // MIT TRANSPARENTEN FLASCHEN FÜR DEN SHOP UND REGIONS-HINTERGRÜNDEN
   // -------------------------------------------------------------
   {
     id: 'glenburgie-11',
@@ -268,10 +274,10 @@ export const PRODUCTS = [
     badge: 'Release am 17. September · Vorabzugriff',
     bottlesTotal: 309,
     bottlesRemaining: 309,
-    image: IMAGES.glenburgie_11,
-    cutoutImage: IMAGES.glenburgie_11,
-    cardBg: IMAGES.card_bg_highlands,
-    galleryImages: [IMAGES.glenburgie_11, IMAGES.card_bg_highlands, IMAGES.scotland_distillery, IMAGES.ines_barrel],
+    image: IMAGES.glenburgie_11_cutout,
+    cutoutImage: IMAGES.glenburgie_11_cutout,
+    cardBg: IMAGES.card_bg_speyside,
+    galleryImages: [IMAGES.glenburgie_11_cutout, IMAGES.glenburgie_11_barrel, IMAGES.card_bg_speyside, IMAGES.ines_testing],
     character: ['Dunkle Oloroso-Rosinen', 'Getrocknete Feigen', 'Geröstete Haselnüsse', 'Warme Eichenholzwürze'],
     intro: 'Ein opulenter Speyside-Klassiker in nativer Fassstärke. Über 11 Jahre unberührt in einem handverlesenen First Fill Oloroso Barrique gereift – mit dichter Mahagonifarbe, tiefen Trockenfruchtaromen und samtig-nussigem Schmelz.',
     history: {
@@ -287,7 +293,7 @@ export const PRODUCTS = [
     sustainability: {
       headline: 'Wasserkreislauf am Burgie Hill & Regionale Gerste',
       story: 'Glenburgie bezieht sein reines Brauwasser aus den geschützten Quellen der nahen Burgie Hills. Die Abwärme der Brennblasen wird über moderne Wärmetauscher rückgeführt, um den Primärenergiebedarf signifikant zu senken. Das Audit vor Ort bestätigte 100% sortenreine schottische Gerste.',
-      image: IMAGES.ines_barrel
+      image: IMAGES.ines_testing
     }
   },
   {
@@ -311,10 +317,10 @@ export const PRODUCTS = [
     badge: 'Release am 17. September · Vorabzugriff',
     bottlesTotal: 302,
     bottlesRemaining: 302,
-    image: IMAGES.fettercairn_15,
-    cutoutImage: IMAGES.fettercairn_15,
+    image: IMAGES.fettercairn_15_cutout,
+    cutoutImage: IMAGES.fettercairn_15_cutout,
     cardBg: IMAGES.card_bg_highlands,
-    galleryImages: [IMAGES.fettercairn_15, IMAGES.card_bg_highlands, IMAGES.scotland_travel, IMAGES.ines_barrel],
+    galleryImages: [IMAGES.fettercairn_15_cutout, IMAGES.fettercairn_15_barrel, IMAGES.card_bg_highlands, IMAGES.ines_testing],
     character: ['Kandierte Aprikosen', 'Rivesaltes-Süßwein', 'Sizilianische Blutorange', 'Frische Muskatblüte'],
     intro: 'Aus der legendären Highland-Brennerei am Fuße der Grampian Mountains mit den weltweit einzigartigen Wasserkühlringen. Vollständig gereift in einem First Fill Barrique des französischen Edel-Süßweins Rivesaltes bei imposanten 59,9% vol.',
     history: {
@@ -330,7 +336,7 @@ export const PRODUCTS = [
     sustainability: {
       headline: 'Wasserkreislauf der Cairngorms & Lokale Aufforstung',
       story: 'Das für die legendären Kühlringe genutzte Quellwasser wird in einem geschlossenen, natürlichen Beckensystem abgekühlt und wiederverwendet. Fettercairn pflanzte vor Ort einen eigenen Wald aus schottischer Stieleiche für zukünftige Fass-Generationen.',
-      image: IMAGES.ines_islay
+      image: IMAGES.ines_testing
     }
   },
   {
@@ -354,10 +360,10 @@ export const PRODUCTS = [
     badge: 'Release am 17. September · Nur 156 Flaschen',
     bottlesTotal: 156,
     bottlesRemaining: 156,
-    image: IMAGES.aultmore_17,
-    cutoutImage: IMAGES.aultmore_17,
-    cardBg: IMAGES.card_bg_highlands,
-    galleryImages: [IMAGES.aultmore_17, IMAGES.card_bg_highlands, IMAGES.scotland_coast, IMAGES.mission],
+    image: IMAGES.aultmore_17_cutout,
+    cutoutImage: IMAGES.aultmore_17_cutout,
+    cardBg: IMAGES.card_bg_speyside,
+    galleryImages: [IMAGES.aultmore_17_cutout, IMAGES.aultmore_17_barrel, IMAGES.card_bg_speyside, IMAGES.ines_testing],
     character: ['Dunkle Waldbeeren', 'Samtige Weintannine', 'Reife Brombeere', 'Französische Eiche'],
     intro: 'Aus dem geheimnisvollen „Foggie Moss“ bei Keith. Mit nur 156 handnummerierten Flaschen die seltenste Abfüllung dieses Herbstes. 17 Jahre Reife, vollendet in einem edlen französischen Rotwein-Barrique, verleihen diesem Single Malt ein tiefes rubingoldenes Funkeln.',
     history: {
@@ -373,7 +379,7 @@ export const PRODUCTS = [
     sustainability: {
       headline: 'Moorschutz im Foggie Moss & Biodiversität',
       story: 'Das Quellgebiet des Foggie Moss steht unter strengem Naturschutz. Aultmore arbeitet aktiv an der Renaturierung der umgebenden Torfmoore mit, um CO₂ dauerhaft im Boden zu binden und das natürliche Ökosystem zu schützen.',
-      image: IMAGES.mission
+      image: IMAGES.ines_testing
     }
   },
   {
@@ -397,10 +403,10 @@ export const PRODUCTS = [
     badge: 'Release am 17. September · Orkney Single Cask',
     bottlesTotal: 240,
     bottlesRemaining: 240,
-    image: IMAGES.highlandpark_18,
-    cutoutImage: IMAGES.highlandpark_18,
+    image: IMAGES.highlandpark_18_cutout,
+    cutoutImage: IMAGES.highlandpark_18_cutout,
     cardBg: IMAGES.card_bg_islands,
-    galleryImages: [IMAGES.highlandpark_18, IMAGES.card_bg_islands, IMAGES.tasting_springbank, IMAGES.ines_barrel],
+    galleryImages: [IMAGES.highlandpark_18_cutout, IMAGES.highlandpark_18_barrel, IMAGES.card_bg_islands, IMAGES.ines_testing],
     character: ['Heidetorf-Rauch', 'Bienenwachs', 'Meersalz-Gischt', 'Bourbon-Vanillemark'],
     intro: 'Von den windgepeitschten Orkney-Inseln. 18 lange Jahre unberührt gereift in einem erstbefüllten Bourbon Barrel. Der unverwechselbare Hobbister Moor-Heidetorf verleiht diesem seltenen Einzelfass eine maritime, florale Rauchigkeit von monumentaler Tiefe.',
     history: {
@@ -416,7 +422,7 @@ export const PRODUCTS = [
     sustainability: {
       headline: 'Handwerklicher Torfabbau & Windenergie auf Orkney',
       story: 'Der Torf im Hobbister Moor wird schonend und nach strengen Zyklen von Hand gestochen, sodass sich die Moorvegetation regenerieren kann. Zudem deckt die Insel Orkney über 100% ihres Strombedarfs aus erneuerbaren Wind- und Gezeitenenergien.',
-      image: IMAGES.ines_barrel
+      image: IMAGES.ines_testing
     }
   }
 ];
@@ -473,7 +479,7 @@ export const BLOG_POSTS = [
     image: IMAGES.scotland_distillery,
     images: [
       IMAGES.scotland_distillery,
-      IMAGES.ines_barrel,
+      IMAGES.ines_testing,
       IMAGES.scotland_coast
     ],
     videoUrl: '',
