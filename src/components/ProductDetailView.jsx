@@ -453,7 +453,7 @@ export default function ProductDetailView({
               >
                 <div className="h-48 rounded-xl bg-[#FAF8F5] border border-[#E2DDD5] flex items-center justify-center p-3 relative overflow-hidden">
                   <img
-                    src={other.cutoutImage || other.image}
+                    src={other.id === 'glengarioch-11' ? 'https://pub-b33108412309406a9a941ddc51e9a5b9.r2.dev/Pure-Whisky/Produkte/20241014_124302_03.webp' : (other.cutoutImage || other.image)}
                     alt={other.name}
                     className="max-h-full w-auto object-contain group-hover:scale-105 transition-transform"
                   />

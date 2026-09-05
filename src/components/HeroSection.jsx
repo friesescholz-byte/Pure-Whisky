@@ -1,27 +1,58 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
-import { PRODUCTS, IMAGES } from '../data/pureWhiskyFullData';
+import { ArrowRight, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { PRODUCTS, IMAGES, R2_BASE } from '../data/pureWhiskyFullData';
 
 export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct }) {
-  // Use the 4 original cut-out transparent bottles with 100% matched labels:
-  // Tomatin 16 -> IMAGES.tomatin (Pure-Whisky02.webp - verified label: Tomatin 16)
-  // Jura 15 -> IMAGES.jura (Pure-Whisky04.webp - verified label: Jura 15)
-  // Glen Garioch 11 -> IMAGES.glengarioch (Pure-Whisky03.webp - verified label: Glen Garioch 11)
-  // Ardmore 11 -> IMAGES.ardmore (Pure-Whisky01.webp - verified label: Ardmore 11)
+  // Show ONLY the 2 in-stock bottles + the 4 new September 17 releases (Total 6 bottles)
+  // All using transparent cut-out images without background!
   const heroProducts = [
-    { ...PRODUCTS.find(p => p.id === 'jura-15'), image: IMAGES.jura },
-    { ...PRODUCTS.find(p => p.id === 'glengarioch-11'), image: IMAGES.glengarioch },
-    { ...PRODUCTS.find(p => p.id === 'tomatin-16'), image: IMAGES.tomatin },
-    { ...PRODUCTS.find(p => p.id === 'ardmore-11'), image: IMAGES.ardmore }
-  ].filter(Boolean);
+    // 2 in-stock casks
+    { 
+      ...PRODUCTS.find(p => p.id === 'jura-15'), 
+      image: `${R2_BASE}Produkte/Pure-Whisky04.webp`,
+      tagText: 'Sofort lieferbar',
+      isUpcoming: false
+    },
+    { 
+      ...PRODUCTS.find(p => p.id === 'glengarioch-11'), 
+      image: `${R2_BASE}Produkte/Pure-Whisky03.webp`,
+      tagText: 'Sofort lieferbar',
+      isUpcoming: false
+    },
+    // 4 new releases (Release 17. September 2026)
+    { 
+      ...PRODUCTS.find(p => p.id === 'glenburgie-11'), 
+      image: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_01.webp`,
+      tagText: 'Ab 17. September',
+      isUpcoming: true
+    },
+    { 
+      ...PRODUCTS.find(p => p.id === 'fettercairn-15'), 
+      image: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_02.webp`,
+      tagText: 'Ab 17. September',
+      isUpcoming: true
+    },
+    { 
+      ...PRODUCTS.find(p => p.id === 'aultmore-17'), 
+      image: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_03.webp`,
+      tagText: 'Ab 17. September',
+      isUpcoming: true
+    },
+    { 
+      ...PRODUCTS.find(p => p.id === 'highlandpark-18'), 
+      image: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_04.webp`,
+      tagText: 'Ab 17. September',
+      isUpcoming: true
+    }
+  ].filter(p => p && p.id);
 
   const [activeIdx, setActiveIdx] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
   // Constant smooth auto-rotation every 4.2 seconds
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || heroProducts.length === 0) return;
     const interval = setInterval(() => {
       setActiveIdx((prev) => (prev + 1) % heroProducts.length);
     }, 4200);
@@ -109,7 +140,7 @@ export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct }) 
             onMouseLeave={() => setIsPaused(false)}
           >
             
-            {/* The 3D Rotating Carousel Container - Massive Scale */}
+            {/* The 3D Rotating Carousel Container */}
             <div className="relative w-full h-[580px] sm:h-[660px] lg:h-[720px] flex items-center justify-center">
               
               {heroProducts.map((prod, idx) => {
@@ -130,19 +161,19 @@ export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct }) 
                 } else if (offset === 1) {
                   // Next bottle to the right
                   x = 210;
-                  scale = 0.76;
+                  scale = 0.74;
                   zIndex = 20;
-                  opacity = 0.4;
+                  opacity = 0.38;
                   blur = 1.5;
                 } else if (offset === heroProducts.length - 1) {
                   // Previous bottle to the left
                   x = -210;
-                  scale = 0.76;
+                  scale = 0.74;
                   zIndex = 20;
-                  opacity = 0.4;
+                  opacity = 0.38;
                   blur = 1.5;
                 } else {
-                  // Hidden back bottle
+                  // Hidden back bottles
                   x = 0;
                   scale = 0.45;
                   zIndex = 10;
@@ -174,14 +205,26 @@ export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct }) 
                       }
                     }}
                   >
-                    {/* Massive Full-Height Bottle Image */}
-                    <div className="relative h-[520px] sm:h-[620px] lg:h-[680px] flex items-center justify-center">
+                    {/* Massive Full-Height Bottle Image with Status Badge */}
+                    <div className="relative h-[500px] sm:h-[600px] lg:h-[660px] flex flex-col items-center justify-center">
                       <img
                         src={prod.image}
                         alt={prod.name}
-                        className="max-h-full w-auto object-contain drop-shadow-[0_30px_50px_rgba(0,0,0,0.38)] hover:scale-105 transition-transform duration-300 pointer-events-auto"
+                        className="max-h-[86%] w-auto object-contain drop-shadow-[0_30px_50px_rgba(0,0,0,0.38)] hover:scale-105 transition-transform duration-300 pointer-events-auto"
                         loading="eager"
                       />
+
+                      {/* Small Discreet Status Pill */}
+                      {prod.isUpcoming ? (
+                        <span className="mt-3 px-3 py-1 rounded-full bg-[#FAF0EB]/95 border border-[#F2DDD2] text-[#B85D2C] font-craft-mono text-xs font-bold uppercase tracking-wider shadow-sm flex items-center space-x-1">
+                          <Sparkles className="w-3 h-3" />
+                          <span>Ab 17. September</span>
+                        </span>
+                      ) : (
+                        <span className="mt-3 px-3 py-1 rounded-full bg-[#E8EFEA]/95 border border-[#C5D8CC] text-[#2D6A4F] font-craft-mono text-xs font-bold uppercase tracking-wider shadow-sm">
+                          Sofort lieferbar
+                        </span>
+                      )}
                     </div>
                   </motion.div>
                 );

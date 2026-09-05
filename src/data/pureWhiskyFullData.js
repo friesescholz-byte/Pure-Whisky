@@ -38,6 +38,12 @@ export const IMAGES = {
   aultmore_17: `${R2_BASE}Produkte-2026/Single-Malt-Scotch-Whisky17Y_13.webp`,
   highlandpark_18: `${R2_BASE}Produkte-2026/Single-Malt-Scotch-Whisky18Y_14.webp`,
 
+  // 4 NEW CASKS - TRANSPARENT CUT-OUT BOTTLES FOR HERO & STAGE
+  glenburgie_11_cutout: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_01.webp`,
+  fettercairn_15_cutout: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_02.webp`,
+  aultmore_17_cutout: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_03.webp`,
+  highlandpark_18_cutout: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_04.webp`,
+
   ines_portrait: `${R2_BASE}ines-zager-schottland-portrait.webp`,
   ines_barrel: `${R2_BASE}ines-zager-fass-lager.webp`,
   ines_islay: `${R2_BASE}ines-zager-islay-natur.webp`,
