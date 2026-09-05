@@ -1,11 +1,23 @@
 import React, { useState } from 'react';
-import { ChevronRight, ShoppingBag, ShieldCheck, ArrowRight, Droplets, Leaf, RefreshCw, Check } from 'lucide-react';
+import { ChevronRight, ShoppingBag, ShieldCheck, ArrowRight, Droplets, Leaf, RefreshCw, Check, Sparkles, Bell, CheckCircle2 } from 'lucide-react';
 import { PRODUCTS } from '../data/pureWhiskyFullData';
 
-export default function ProductDetailView({ product, onAddToCart, onNavigateShop, onNavigateHome, onSelectOtherProduct }) {
+export default function ProductDetailView({ 
+  product, 
+  onAddToCart, 
+  onPreReserve, 
+  onNavigateShop, 
+  onNavigateHome, 
+  onSelectOtherProduct 
+}) {
   const [selectedImageIdx, setSelectedImageIdx] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [addedNotice, setAddedNotice] = useState(false);
+
+  // Pre-reservation Form State for Upcoming Releases
+  const [reserveName, setReserveName] = useState('');
+  const [reserveEmail, setReserveEmail] = useState('');
+  const [reserveSuccess, setReserveSuccess] = useState(false);
 
   if (!product) return null;
 
@@ -20,11 +32,35 @@ export default function ProductDetailView({ product, onAddToCart, onNavigateShop
     setTimeout(() => setAddedNotice(false), 3000);
   };
 
+  const handleReserveSubmit = (e) => {
+    e.preventDefault();
+    if (!reserveEmail) return;
+
+    if (onPreReserve) {
+      onPreReserve({
+        email: reserveEmail.trim(),
+        name: reserveName.trim() || 'Whisky-Liebhaber',
+        caskInterest: `${product.name} (Vorab-Zuteilung 17.09.)`,
+        source: 'vorabzugriff-17september',
+        date: new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })
+      });
+    }
+
+    setReserveSuccess(true);
+  };
+
   return (
     <div className="pt-32 pb-36 bg-[#FAF8F5] min-h-screen text-left">
       <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
         
-
+        {/* Breadcrumb Navigation */}
+        <div className="flex items-center space-x-2 text-xs font-craft-mono font-bold text-[#55695E] mb-8">
+          <button onClick={onNavigateHome} className="hover:text-[#181F1C]">Startseite</button>
+          <ChevronRight className="w-3.5 h-3.5 text-[#D4C8B8]" />
+          <button onClick={onNavigateShop} className="hover:text-[#181F1C]">Die Fässer</button>
+          <ChevronRight className="w-3.5 h-3.5 text-[#D4C8B8]" />
+          <span className="text-[#B85D2C] truncate">{product.name}</span>
+        </div>
 
         {/* Top Product Section: Gallery Left, Purchase Dossier Right */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start mb-24">
@@ -35,25 +71,24 @@ export default function ProductDetailView({ product, onAddToCart, onNavigateShop
             {/* Main Stage Image with Cinematic Photographic Integration */}
             <div className="border border-[#D4C8B8] rounded-3xl h-[500px] sm:h-[580px] flex items-center justify-center shadow-md relative overflow-hidden group bg-neutral-900">
               
-              {/* Layer 1: Background Landscape with Bokeh Blur & Controlled Lighting */}
+              {/* Layer 1: Background Landscape */}
               <img
                 src={product.cardBg}
                 alt="Schottische Landschaft"
                 className="absolute inset-0 w-full h-full object-cover filter brightness-[0.75] contrast-[1.10] blur-[2px] scale-105 opacity-75 group-hover:scale-110 group-hover:opacity-85 transition-all duration-700"
               />
               
-              {/* Layer 2: Atmospheric Lighting Vignette & Amber Ambient Backlight */}
+              {/* Layer 2: Vignette */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/35" />
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(212,139,56,0.25)_0%,_transparent_65%)]" />
 
-              {/* Layer 3: Main Cut-out Bottle in Foreground */}
+              {/* Layer 3: Main Cut-out Bottle */}
               <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
                 <img
                   src={gallery[selectedImageIdx] || product.image}
                   alt={product.fullName}
                   className="max-h-[86%] w-auto object-contain drop-shadow-[0_25px_35px_rgba(0,0,0,0.75)] transition-all duration-500 group-hover:scale-105"
                 />
-                {/* Ground Contact Shadow */}
                 <div className="w-32 sm:w-36 h-4 bg-black/70 rounded-full blur-md -mt-2 opacity-85" />
               </div>
               
@@ -61,6 +96,12 @@ export default function ProductDetailView({ product, onAddToCart, onNavigateShop
               <div className="absolute top-6 left-6 z-20 font-script text-3xl text-white drop-shadow-md">
                 {product.region} Single Cask
               </div>
+
+              {product.isUpcoming && (
+                <div className="absolute top-6 right-6 z-20 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-[#D4C8B8] text-[#B85D2C] font-craft-mono text-xs font-bold uppercase shadow-sm">
+                  Release 17.09.2026
+                </div>
+              )}
             </div>
 
             {/* Gallery Thumbnail Strip */}
@@ -106,8 +147,8 @@ export default function ProductDetailView({ product, onAddToCart, onNavigateShop
               {product.intro}
             </p>
 
-            {/* Price & Purchase Box */}
-            <div className="p-7 rounded-2xl bg-white border border-[#D4C8B8] shadow-xs space-y-6">
+            {/* Price & Purchase / Pre-Reservation Box */}
+            <div className="p-7 rounded-3xl bg-white border border-[#D4C8B8] shadow-xs space-y-6">
               
               <div className="flex items-baseline justify-between border-b border-[#E2DDD5] pb-4">
                 <div>
@@ -116,20 +157,93 @@ export default function ProductDetailView({ product, onAddToCart, onNavigateShop
                 </div>
 
                 <div className="text-right font-craft-mono text-xs font-bold">
-                  <span className={product.isAvailable ? 'text-[#2D6A4F]' : 'text-rose-600'}>
-                    {product.isAvailable ? `NOCH ${product.bottlesRemaining} VON ${product.bottlesTotal} FLASCHEN` : 'AUSVERKAUFT'}
-                  </span>
-                  <span className="block text-[11px] text-[#55695E] mt-0.5">Streng limitiertes Einzelfass</span>
+                  {product.isUpcoming ? (
+                    <>
+                      <span className="text-[#B85D2C] flex items-center space-x-1 justify-end">
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span>RELEASE: 17. SEPTEMBER 2026</span>
+                      </span>
+                      <span className="block text-[11px] text-[#55695E] mt-0.5">Limitierte Zuteilung: {product.bottlesTotal} Flaschen</span>
+                    </>
+                  ) : product.isAvailable ? (
+                    <>
+                      <span className="text-[#2D6A4F]">NOCH {product.bottlesRemaining} VON {product.bottlesTotal} FLASCHEN</span>
+                      <span className="block text-[11px] text-[#55695E] mt-0.5">Streng limitiertes Einzelfass</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-rose-600">AUSVERKAUFT</span>
+                      <span className="block text-[11px] text-[#55695E] mt-0.5">Sammler-Archiv</span>
+                    </>
+                  )}
                 </div>
               </div>
 
-              {/* Purchase Controls */}
-              {product.isAvailable ? (
+              {/* ----------------------------------------------------------- */}
+              {/* CASE 1: UPCOMING RELEASE (VORABZUGRIFF FORMULAR)             */}
+              {/* ----------------------------------------------------------- */}
+              {product.isUpcoming ? (
+                <div className="space-y-4">
+                  <div className="p-4 rounded-2xl bg-[#FAF0EB] border border-[#F2DDD2] space-y-2">
+                    <span className="font-craft-mono text-xs uppercase tracking-wider text-[#B85D2C] font-bold flex items-center space-x-1.5">
+                      <Sparkles className="w-4 h-4" />
+                      <span>Exklusiver Vorab-Zugriff für Fass-Depot Abonnenten</span>
+                    </span>
+                    <p className="text-xs text-[#3A4A40] leading-relaxed">
+                      Dieses Einzelfass kommt am <strong>17. September 2026</strong> in den Verkauf. Tragen Sie sich jetzt ein, um Ihren persönlichen Bestell-Link vor allen anderen zu erhalten.
+                    </p>
+                  </div>
+
+                  {reserveSuccess ? (
+                    <div className="p-6 rounded-2xl bg-[#E8EFEA] border border-[#C5D8CC] text-center space-y-2">
+                      <CheckCircle2 className="w-8 h-8 text-[#2D6A4F] mx-auto" />
+                      <h4 className="font-woodblock text-xl uppercase text-[#181F1C]">
+                        Erfolgreich vorgemerkt!
+                      </h4>
+                      <p className="text-xs text-[#3A4A40]">
+                        Vielen Dank! Wir senden Ihnen am 17. September 2026 pünktlich den exklusiven Zuteilungs-Link für <strong>{product.name}</strong> per E-Mail.
+                      </p>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleReserveSubmit} className="space-y-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <input
+                          type="text"
+                          placeholder="Ihr Name (optional)"
+                          value={reserveName}
+                          onChange={(e) => setReserveName(e.target.value)}
+                          className="px-4 py-3 rounded-xl border border-[#D4C8B8] bg-[#FAF8F5] text-xs text-[#181F1C] focus:bg-white focus:outline-none"
+                        />
+                        <input
+                          type="email"
+                          required
+                          placeholder="Ihre E-Mail-Adresse *"
+                          value={reserveEmail}
+                          onChange={(e) => setReserveEmail(e.target.value)}
+                          className="px-4 py-3 rounded-xl border border-[#D4C8B8] bg-[#FAF8F5] text-xs text-[#181F1C] focus:bg-white focus:outline-none"
+                        />
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="w-full py-4 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-md flex items-center justify-center space-x-2"
+                      >
+                        <Bell className="w-4 h-4" />
+                        <span>Für Vorabzugriff am 17.09. vormerken</span>
+                      </button>
+
+                      <p className="text-[11px] text-[#55695E] text-center font-craft-mono">
+                        🔒 Unverbindlich · Kein Spam · Sie erhalten rechtzeitig den Vorab-Link.
+                      </p>
+                    </form>
+                  )}
+                </div>
+              ) : product.isAvailable ? (
+                /* CASE 2: REGULAR AVAILABLE PRODUCT */
                 <div className="space-y-4">
                   <div className="flex items-center space-x-4">
-                    
                     {/* Quantity Selector */}
-                    <div className="flex items-center border border-[#D4C8B8] rounded-lg bg-[#FAF8F5] p-1 font-craft-mono">
+                    <div className="flex items-center border border-[#D4C8B8] rounded-xl bg-[#FAF8F5] p-1 font-craft-mono">
                       <button
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
                         className="px-3 py-2 text-lg font-bold text-[#181F1C] hover:text-[#B85D2C]"
@@ -148,7 +262,7 @@ export default function ProductDetailView({ product, onAddToCart, onNavigateShop
                     {/* Add to Cart Button */}
                     <button
                       onClick={handleBuy}
-                      className="flex-1 py-4.5 px-8 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-xl tracking-wider uppercase transition-all shadow-md hover:shadow-lg flex items-center justify-center space-x-3"
+                      className="flex-1 py-4.5 px-8 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-xl tracking-wider uppercase transition-all shadow-md hover:shadow-lg flex items-center justify-center space-x-3"
                     >
                       <ShoppingBag className="w-5 h-5" />
                       <span>In den Warenkorb</span>
@@ -156,14 +270,15 @@ export default function ProductDetailView({ product, onAddToCart, onNavigateShop
                   </div>
 
                   {addedNotice && (
-                    <div className="p-3 rounded-lg bg-[#E8EFEA] border border-[#C5D8CC] text-xs font-craft-mono font-bold text-[#2D6A4F] flex items-center justify-center space-x-2">
+                    <div className="p-3 rounded-xl bg-[#E8EFEA] border border-[#C5D8CC] text-xs font-craft-mono font-bold text-[#2D6A4F] flex items-center justify-center space-x-2">
                       <Check className="w-4 h-4" />
                       <span>Flasche wurde zum Warenkorb hinzugefügt!</span>
                     </div>
                   )}
                 </div>
               ) : (
-                <div className="p-4 rounded-lg bg-neutral-100 text-neutral-500 font-woodblock text-xl uppercase text-center">
+                /* CASE 3: SOLD OUT */
+                <div className="p-4 rounded-xl bg-neutral-100 text-neutral-500 font-woodblock text-xl uppercase text-center">
                   Dieses Fass ist restlos ausverkauft
                 </div>
               )}
@@ -179,8 +294,8 @@ export default function ProductDetailView({ product, onAddToCart, onNavigateShop
                   <span>100% Cask Strength · Unfiltriert · Ohne Zuckerkulör</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RefreshCw className="w-4 h-4 text-[#2D6A4F]" />
-                  <span>100% PCR Estal Wild Glass & Spanischer Naturkork</span>
+                  <Leaf className="w-4 h-4 text-[#2D6A4F]" />
+                  <span>100% Estal Wild Glass aus Spanien & Naturkork</span>
                 </div>
               </div>
 
@@ -190,160 +305,174 @@ export default function ProductDetailView({ product, onAddToCart, onNavigateShop
 
         </div>
 
-        {/* 1. SECTION: TASTING NOTES DEEP-DIVE */}
+        {/* ------------------------------------------------------------- */}
+        {/* SENSORISCHES PROFIL (TASTING NOTES)                            */}
+        {/* ------------------------------------------------------------- */}
         <div className="mb-24 space-y-8">
           <div className="border-b border-[#E2DDD5] pb-4">
-            <span className="font-script text-3xl text-[#2D6A4F] block">Sensorik & Charakter</span>
+            <span className="font-script text-3xl text-[#2D6A4F] block">
+              Sensorische Verkostung
+            </span>
             <h2 className="font-woodblock text-4xl sm:text-5xl text-[#181F1C] tracking-wide uppercase">
-              Verkostungsnotizen des Einzelfasses
+              Tasting Notes von Ines Zager.
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white border border-[#D4C8B8] rounded-2xl p-7 space-y-3 shadow-xs">
-              <span className="font-woodblock text-2xl text-[#B85D2C] tracking-wider uppercase block">
-                01 · Nase (Nose)
+            <div className="bg-white p-8 rounded-3xl border border-[#D4C8B8] shadow-xs space-y-3">
+              <span className="font-craft-mono text-xs uppercase tracking-widest text-[#B85D2C] font-bold block">
+                01 · Nase
               </span>
-              <p className="text-[#3A4A40] text-base leading-relaxed font-normal">
+              <h3 className="font-woodblock text-2xl text-[#181F1C] uppercase">
+                Aromatik & Bukett
+              </h3>
+              <p className="text-[#3A4A40] text-sm sm:text-base font-normal leading-relaxed">
                 {product.tastingNotes.nose}
               </p>
             </div>
 
-            <div className="bg-white border border-[#D4C8B8] rounded-2xl p-7 space-y-3 shadow-xs">
-              <span className="font-woodblock text-2xl text-[#B85D2C] tracking-wider uppercase block">
-                02 · Gaumen (Palate)
+            <div className="bg-white p-8 rounded-3xl border border-[#D4C8B8] shadow-xs space-y-3">
+              <span className="font-craft-mono text-xs uppercase tracking-widest text-[#B85D2C] font-bold block">
+                02 · Gaumen
               </span>
-              <p className="text-[#3A4A40] text-base leading-relaxed font-normal">
+              <h3 className="font-woodblock text-2xl text-[#181F1C] uppercase">
+                Körper & Textur
+              </h3>
+              <p className="text-[#3A4A40] text-sm sm:text-base font-normal leading-relaxed">
                 {product.tastingNotes.palate}
               </p>
             </div>
 
-            <div className="bg-white border border-[#D4C8B8] rounded-2xl p-7 space-y-3 shadow-xs">
-              <span className="font-woodblock text-2xl text-[#B85D2C] tracking-wider uppercase block">
-                03 · Nachklang (Finish)
+            <div className="bg-white p-8 rounded-3xl border border-[#D4C8B8] shadow-xs space-y-3">
+              <span className="font-craft-mono text-xs uppercase tracking-widest text-[#B85D2C] font-bold block">
+                03 · Nachklang
               </span>
-              <p className="text-[#3A4A40] text-base leading-relaxed font-normal">
+              <h3 className="font-woodblock text-2xl text-[#181F1C] uppercase">
+                Finish & Tiefe
+              </h3>
+              <p className="text-[#3A4A40] text-sm sm:text-base font-normal leading-relaxed">
                 {product.tastingNotes.finish}
               </p>
             </div>
           </div>
         </div>
 
-        {/* 2. SECTION: DIE GESCHICHTE DER BRENNEREI & DIESES FASSES */}
-        <div className="mb-24 bg-white border border-[#D4C8B8] rounded-3xl p-8 sm:p-12 shadow-xs">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            
-            <div className="lg:col-span-7 space-y-5 text-left">
-              <span className="font-script text-3xl text-[#2D6A4F] block">Herkunft & Brennerei</span>
-              <h2 className="font-woodblock text-4xl sm:text-5xl text-[#181F1C] tracking-wide uppercase leading-tight">
-                {product.history.headline}
-              </h2>
-              <p className="text-[#3A4A40] text-lg font-normal leading-relaxed">
-                {product.history.text}
-              </p>
-              <div className="pt-2 text-xs font-craft-mono font-bold text-[#55695E]">
-                STANDORT: {product.distilleryLocation}
-              </div>
+        {/* ------------------------------------------------------------- */}
+        {/* HERKUNFT & DESTILLERIE GESCHICHTE                              */}
+        {/* ------------------------------------------------------------- */}
+        <div className="mb-24 bg-white border border-[#D4C8B8] rounded-3xl p-8 sm:p-12 shadow-xs grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          <div className="lg:col-span-7 space-y-4">
+            <span className="font-script text-3xl text-[#2D6A4F] block">
+              Brennerei & Terroir
+            </span>
+            <h2 className="font-woodblock text-4xl sm:text-5xl text-[#181F1C] uppercase tracking-wide leading-tight">
+              {product.history.headline}
+            </h2>
+            <p className="text-[#3A4A40] text-base sm:text-lg font-normal leading-relaxed">
+              {product.history.text}
+            </p>
+            <div className="pt-2 font-craft-mono text-xs text-[#55695E] space-y-1">
+              <p>📍 Standort: <strong>{product.distilleryLocation}</strong></p>
+              <p>🪵 Fasstyp: <strong>{product.caskType}</strong></p>
+              <p>⚖️ Limitierung: <strong>Streng limitiert auf {product.bottlesTotal} Flaschen</strong></p>
             </div>
+          </div>
 
-            <div className="lg:col-span-5">
-              <div className="rounded-2xl overflow-hidden shadow-md border border-[#E2DDD5] h-80">
-                <img
-                  src={product.history.image}
-                  alt={product.distillery}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+          <div className="lg:col-span-5">
+            <div className="rounded-2xl overflow-hidden border border-[#D4C8B8] shadow-md h-72 sm:h-84">
+              <img
+                src={product.history.image}
+                alt={product.distillery}
+                className="w-full h-full object-cover"
+              />
             </div>
-
           </div>
         </div>
 
-        {/* 3. SECTION: INES ZAGERS VOR-ORT UMWELT-AUDIT */}
-        <div className="mb-24 bg-[#E8EFEA] border border-[#C5D8CC] rounded-3xl p-8 sm:p-12 shadow-xs">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            
-            <div className="lg:col-span-5">
-              <div className="rounded-2xl overflow-hidden shadow-md border border-[#C5D8CC] h-80">
-                <img
-                  src={product.sustainability.image}
-                  alt="Ines Zager Vor-Ort Audit"
-                  className="w-full h-full object-cover"
-                />
-              </div>
+        {/* ------------------------------------------------------------- */}
+        {/* UMWELT-JURISTISCHES AUDIT                                     */}
+        {/* ------------------------------------------------------------- */}
+        <div className="mb-24 bg-[#FAF8F5] border border-[#D4C8B8] rounded-3xl p-8 sm:p-12 shadow-xs grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          <div className="lg:col-span-5 order-2 lg:order-1">
+            <div className="rounded-2xl overflow-hidden border border-[#D4C8B8] shadow-md h-72 sm:h-84">
+              <img
+                src={product.sustainability.image || product.sustainability.story}
+                alt="Audit vor Ort"
+                className="w-full h-full object-cover"
+              />
             </div>
+          </div>
 
-            <div className="lg:col-span-7 space-y-5 text-left">
-              <div className="flex items-center space-x-2 text-[#2D6A4F] text-xs font-craft-mono font-bold uppercase tracking-wider">
-                <Leaf className="w-5 h-5" />
-                <span>Vor-Ort Umwelt-Audit · Ines Zager</span>
-              </div>
-              <h2 className="font-woodblock text-4xl sm:text-5xl text-[#1B2B23] tracking-wide uppercase leading-tight">
-                {product.sustainability.headline}
-              </h2>
-              <p className="text-[#3A4A40] text-lg font-normal leading-relaxed">
-                {product.sustainability.story}
-              </p>
-            </div>
-
+          <div className="lg:col-span-7 space-y-4 order-1 lg:order-2">
+            <span className="font-script text-3xl text-[#2D6A4F] block">
+              Juristisches Nachhaltigkeits-Audit
+            </span>
+            <h2 className="font-woodblock text-4xl sm:text-5xl text-[#181F1C] uppercase tracking-wide leading-tight">
+              {product.sustainability.headline}
+            </h2>
+            <p className="text-[#3A4A40] text-base sm:text-lg font-normal leading-relaxed">
+              {product.sustainability.story}
+            </p>
+            <p className="text-xs font-craft-mono text-[#55695E]">
+              Auditiert und persönlich geprüft von Juristin Ines Zager vor Ort in Schottland.
+            </p>
           </div>
         </div>
 
-        {/* 4. SECTION: WEITERE EINZELFÄSSER ENTDECKEN */}
+        {/* ------------------------------------------------------------- */}
+        {/* WEITERE ABFÜLLUNGEN                                           */}
+        {/* ------------------------------------------------------------- */}
         <div className="space-y-8">
           <div className="flex items-center justify-between border-b border-[#E2DDD5] pb-4">
             <div>
-              <span className="font-script text-3xl text-[#2D6A4F] block">Kollektion</span>
-              <h2 className="font-woodblock text-4xl text-[#181F1C] tracking-wide uppercase">
-                Weitere handverlesene Abfüllungen
+              <span className="font-script text-3xl text-[#2D6A4F] block">
+                Entdeckungen
+              </span>
+              <h2 className="font-woodblock text-3xl sm:text-4xl text-[#181F1C] uppercase tracking-wide">
+                Weitere handverlesene Einzelfässer.
               </h2>
             </div>
-
             <button
               onClick={onNavigateShop}
-              className="inline-flex items-center space-x-2 font-woodblock text-xl tracking-wider uppercase text-[#B85D2C] hover:text-[#A04E24] transition-colors"
+              className="font-craft-mono text-xs font-bold text-[#B85D2C] hover:underline"
             >
-              <span>Alle Fässer im Shop</span>
-              <ArrowRight className="w-4 h-4" />
+              Alle im Shop ansehen →
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {otherProducts.map(other => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {otherProducts.slice(0, 3).map(other => (
               <div
                 key={other.id}
                 onClick={() => onSelectOtherProduct(other)}
-                className="bg-white border border-[#D4C8B8] rounded-2xl p-6 flex flex-col justify-between text-left shadow-xs hover:shadow-md transition-all duration-300 cursor-pointer group"
+                className="bg-white border border-[#D4C8B8] rounded-2xl p-6 shadow-xs hover:shadow-md transition-all cursor-pointer space-y-4 text-left group"
               >
-                <div>
-                  {/* Cinematic Integrated Bottle Stage */}
-                  <div className="h-64 relative flex items-center justify-center rounded-xl mb-4 p-4 overflow-hidden border border-[#D4C8B8] bg-neutral-900">
-                    <img
-                      src={other.cardBg}
-                      alt="Schottische Landschaft"
-                      className="absolute inset-0 w-full h-full object-cover filter brightness-[0.75] contrast-[1.10] blur-[1.5px] opacity-75 group-hover:scale-108 group-hover:opacity-85 transition-all duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/35" />
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(212,139,56,0.22)_0%,_transparent_65%)]" />
-
-                    <div className="relative z-10 h-full flex flex-col items-center justify-center">
-                      <img
-                        src={other.image}
-                        alt={other.name}
-                        className="max-h-[88%] w-auto object-contain drop-shadow-[0_15px_25px_rgba(0,0,0,0.7)] group-hover:scale-108 transition-transform duration-300"
-                      />
-                      <div className="w-20 h-2.5 bg-black/65 rounded-full blur-xs -mt-1 opacity-80" />
-                    </div>
-                  </div>
-
-                  <span className="font-script text-2xl text-[#2D6A4F]">{other.region}</span>
-                  <h4 className="font-woodblock text-2xl text-[#181F1C] uppercase mt-0.5">{other.name}</h4>
-                  <p className="font-craft-mono text-xs text-[#55695E] font-bold">VOL. {other.abv} · {other.caskType}</p>
+                <div className="h-48 rounded-xl bg-[#FAF8F5] border border-[#E2DDD5] flex items-center justify-center p-3 relative overflow-hidden">
+                  <img
+                    src={other.image}
+                    alt={other.name}
+                    className="max-h-full w-auto object-contain group-hover:scale-105 transition-transform"
+                  />
+                  {other.isUpcoming && (
+                    <span className="absolute top-2 right-2 px-2 py-0.5 bg-[#FAF0EB] text-[#B85D2C] text-[10px] font-craft-mono font-bold rounded">
+                      Release 17.09.
+                    </span>
+                  )}
                 </div>
 
-                <div className="pt-4 mt-4 border-t border-[#E2DDD5] flex items-center justify-between">
-                  <span className="font-woodblock text-2xl text-[#181F1C]">{other.price.toFixed(2)} €</span>
-                  <span className="text-xs font-woodblock uppercase tracking-wider text-[#B85D2C] group-hover:underline">
+                <div>
+                  <span className="font-script text-xl text-[#2D6A4F]">{other.region}</span>
+                  <h4 className="font-woodblock text-2xl text-[#181F1C] uppercase truncate group-hover:text-[#B85D2C] transition-colors">
+                    {other.name}
+                  </h4>
+                  <p className="text-xs text-[#55695E] font-craft-mono truncate mt-0.5">
+                    {other.caskType} · {other.abv}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-[#E2DDD5]">
+                  <span className="font-woodblock text-xl text-[#181F1C]">{other.price.toFixed(2)} €</span>
+                  <span className="font-craft-mono text-xs text-[#B85D2C] font-bold group-hover:underline">
                     Dossier öffnen →
                   </span>
                 </div>

@@ -76,7 +76,7 @@ export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct }) 
                 onClick={onOpenShop}
                 className="inline-flex items-center justify-center space-x-3 px-9 py-4.5 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-xl tracking-wider uppercase transition-all shadow-md hover:shadow-lg"
               >
-                <span>Die 4 Fässer entdecken</span>
+                <span>Die Fässer im Shop entdecken</span>
                 <ArrowRight className="w-5 h-5" />
               </button>
 

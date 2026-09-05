@@ -38,7 +38,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState(getTabFromUrl);
   const [selectedProduct, setSelectedProduct] = useState(PRODUCTS[0]);
   const [cartItems, setCartItems] = useState([
-    { product: PRODUCTS[0], quantity: 1 }
+    { product: PRODUCTS[4], quantity: 1 } // Tomatin 16
   ]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isPhilosophyOpen, setIsPhilosophyOpen] = useState(false);
@@ -68,11 +68,11 @@ export default function App() {
     const saved = localStorage.getItem('pure_whisky_contacts');
     if (saved) return JSON.parse(saved);
     return [
-      { email: 'm.weber@t-online.de', name: 'Martin Weber', caskInterest: 'Alte Jahrgänge (15+ Jahre)', source: 'newsletter', date: '01.09.2026' },
-      { email: 'claudia.schmidt@whisky-club.de', name: 'Claudia Schmidt', caskInterest: 'Rauchige Islay & Peated Fässer', source: 'newsletter', date: '31.08.2026' },
+      { email: 'm.weber@t-online.de', name: 'Martin Weber', caskInterest: 'Glenburgie 11Y (Vorab-Zuteilung 17.09.)', source: 'vorabzugriff-17september', date: '05.09.2026' },
+      { email: 'claudia.schmidt@whisky-club.de', name: 'Claudia Schmidt', caskInterest: 'Highland Park 18Y (Vorab-Zuteilung 17.09.)', source: 'vorabzugriff-17september', date: '04.09.2026' },
       { email: 'dr.hoffmann@kanzlei-nord.de', name: 'Dr. Michael Hoffmann', caskInterest: 'Alle Fässer (Highland & Island)', source: 'shop', date: '30.08.2026' },
-      { email: 'j.vogel@whisky-passion.com', name: 'Julia Vogel', caskInterest: 'Fruchtige Bourbon & Refill Fässer', source: 'newsletter', date: '28.08.2026' },
-      { email: 'kontakt@scholz-friese-webdesign.de', name: 'Scholz & Friese', caskInterest: 'Alle Fässer (Highland & Island)', source: 'shop', date: '01.09.2026' }
+      { email: 'j.vogel@whisky-passion.com', name: 'Julia Vogel', caskInterest: 'Aultmore 17Y (Vorab-Zuteilung 17.09.)', source: 'newsletter', date: '02.09.2026' },
+      { email: 'kontakt@scholz-friese-webdesign.de', name: 'Scholz & Friese', caskInterest: 'Fettercairn 15Y (Vorab-Zuteilung 17.09.)', source: 'shop', date: '01.09.2026' }
     ];
   });
 
@@ -117,6 +117,7 @@ export default function App() {
   };
 
   const handleAddToCart = (product) => {
+    if (product.isUpcoming) return;
     setCartItems((prev) => {
       const existing = prev.find((item) => item.product.id === product.id);
       if (existing) {
@@ -188,6 +189,7 @@ export default function App() {
           <ProductDetailView
             product={selectedProduct}
             onAddToCart={handleAddToCart}
+            onPreReserve={handleAddContact}
             onNavigateShop={() => handleNavClick('shop')}
             onNavigateHome={() => handleNavClick('home')}
             onSelectOtherProduct={handleOpenProductDetail}
@@ -198,6 +200,7 @@ export default function App() {
           <ShopView
             onOpenProduct={handleOpenProductDetail}
             onAddToCart={handleAddToCart}
+            onPreReserve={handleAddContact}
             onNavigateHome={() => handleNavClick('home')}
           />
         )}
@@ -227,7 +230,6 @@ export default function App() {
           />
         )}
 
-        {/* 100% RELIABLE ADMIN VIEW ON /admin */}
         {activeTab === 'admin' && (
           <AdminView
             blogPosts={blogPosts}
