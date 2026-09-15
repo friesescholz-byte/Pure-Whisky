@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ShoppingBag, Menu, X, ArrowRight, ChevronDown } from 'lucide-react';
 import { IMAGES, PRODUCTS } from '../data/pureWhiskyFullData';
 
-export default function Navbar({ activeTab, setActiveTab, onSelectProduct, cartItemsCount, setIsCartOpen }) {
+export default function Navbar({ activeTab, setActiveTab, onSelectProduct, cartItemsCount, setIsCartOpen, products = PRODUCTS }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
 
@@ -58,7 +58,7 @@ export default function Navbar({ activeTab, setActiveTab, onSelectProduct, cartI
                 activeTab === 'shop' || activeTab === 'product' ? 'text-[#B85D2C]' : 'text-[#181F1C] hover:text-[#B85D2C]'
               }`}
             >
-              <span>Die Fässer</span>
+              <span>Shop · Die Fässer</span>
               <ChevronDown className="w-4 h-4 text-[#55695E] group-hover:text-[#B85D2C] group-hover:rotate-180 transition-transform duration-200" />
               {(activeTab === 'shop' || activeTab === 'product') && (
                 <span className="absolute bottom-6 left-0 right-0 h-0.5 bg-[#B85D2C] rounded-full" />
@@ -70,7 +70,7 @@ export default function Navbar({ activeTab, setActiveTab, onSelectProduct, cartI
               
               <div className="pb-3 border-b border-[#E2DDD5] flex items-center justify-between">
                 <span className="font-woodblock text-sm uppercase tracking-wider text-[#181F1C]">
-                  Alle Abfüllungen ({PRODUCTS.length})
+                  Alle Abfüllungen ({products.length})
                 </span>
                 <button
                   onClick={() => { setActiveTab('shop'); setShopDropdownOpen(false); }}
@@ -81,7 +81,7 @@ export default function Navbar({ activeTab, setActiveTab, onSelectProduct, cartI
               </div>
 
               <div className="space-y-1.5 divide-y divide-[#FAF8F5]">
-                {PRODUCTS.map((prod) => (
+                {products.map((prod) => (
                   <button
                     key={prod.id}
                     onClick={() => {
@@ -204,7 +204,7 @@ export default function Navbar({ activeTab, setActiveTab, onSelectProduct, cartI
         <div className="lg:hidden bg-white border-b border-[#D4C8B8] px-6 py-8 space-y-4 text-left shadow-lg">
           {[
             { id: 'home', label: 'Startseite' },
-            { id: 'shop', label: 'Die Fässer (Alle Abfüllungen)' },
+            { id: 'shop', label: 'Shop · Die Fässer' },
             { id: 'about', label: 'Über Ines Zager' },
             { id: 'sustainability', label: 'Nachhaltigkeit & Audit' },
             { id: 'blog', label: 'Journal & Messen' },

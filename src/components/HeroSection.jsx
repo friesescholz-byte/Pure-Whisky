@@ -1,46 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { PRODUCTS, IMAGES, R2_BASE } from '../data/pureWhiskyFullData';
 
-export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct }) {
+export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct, products = PRODUCTS }) {
   // Show ONLY the 2 in-stock bottles + the 4 new September 17 releases (Total 6 bottles)
   // All using transparent cut-out images without background!
   const heroProducts = [
     // 2 in-stock casks
     { 
-      ...PRODUCTS.find(p => p.id === 'jura-15'), 
+      ...products.find(p => p.id === 'jura-15'), 
       image: `${R2_BASE}Produkte/Pure-Whisky04.webp`,
       tagText: 'Sofort lieferbar',
       isUpcoming: false
     },
     { 
-      ...PRODUCTS.find(p => p.id === 'glengarioch-11'), 
+      ...products.find(p => p.id === 'glengarioch-11'), 
       image: `${R2_BASE}Produkte/Pure-Whisky03.webp`,
       tagText: 'Sofort lieferbar',
       isUpcoming: false
     },
     // 4 new releases (Release 17. September 2026)
     { 
-      ...PRODUCTS.find(p => p.id === 'glenburgie-11'), 
+      ...products.find(p => p.id === 'glenburgie-11'), 
       image: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_01.webp`,
       tagText: 'Ab 17. September',
       isUpcoming: true
     },
     { 
-      ...PRODUCTS.find(p => p.id === 'fettercairn-15'), 
+      ...products.find(p => p.id === 'fettercairn-15'), 
       image: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_02.webp`,
       tagText: 'Ab 17. September',
       isUpcoming: true
     },
     { 
-      ...PRODUCTS.find(p => p.id === 'aultmore-17'), 
+      ...products.find(p => p.id === 'aultmore-17'), 
       image: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_03.webp`,
       tagText: 'Ab 17. September',
       isUpcoming: true
     },
     { 
-      ...PRODUCTS.find(p => p.id === 'highlandpark-18'), 
+      ...products.find(p => p.id === 'highlandpark-18'), 
       image: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_04.webp`,
       tagText: 'Ab 17. September',
       isUpcoming: true
@@ -48,16 +48,7 @@ export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct }) 
   ].filter(p => p && p.id);
 
   const [activeIdx, setActiveIdx] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-
-  // Constant smooth auto-rotation every 4.2 seconds
-  useEffect(() => {
-    if (isPaused || heroProducts.length === 0) return;
-    const interval = setInterval(() => {
-      setActiveIdx((prev) => (prev + 1) % heroProducts.length);
-    }, 4200);
-    return () => clearInterval(interval);
-  }, [isPaused, heroProducts.length]);
+  // Auto-rotation disabled per user request: rotation only happens via explicit mouse click!
 
   const handleNext = () => {
     setActiveIdx((prev) => (prev + 1) % heroProducts.length);

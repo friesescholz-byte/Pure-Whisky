@@ -4,9 +4,10 @@ import {
   Square, Users, BookOpen, Smartphone, Monitor, 
   CheckCircle2, AlertCircle, RefreshCw, X,
   ChevronDown, ChevronUp, Search, Upload, Mail, Image as ImageIcon, Play,
-  History, Clock, Check, FileText, UserMinus
+  History, Clock, Check, FileText, UserMinus, Package
 } from 'lucide-react';
 import { IMAGES } from '../data/pureWhiskyFullData';
+import InventoryManager from './InventoryManager';
 
 export default function AdminView({ 
   blogPosts, 
@@ -17,7 +18,11 @@ export default function AdminView({
   onDeleteContact,
   onBulkDeleteContacts,
   onNavigateHome,
-  onNavigateBlog
+  onNavigateBlog,
+  products = [],
+  onUpdateProduct,
+  onResetProducts,
+  onNavigateProduct
 }) {
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -26,8 +31,8 @@ export default function AdminView({
   const [passwordInput, setPasswordInput] = useState('');
   const [authError, setAuthError] = useState(false);
 
-  // Active Admin Tab: 'broadcast' | 'history' | 'crm' | 'journal'
-  const [adminTab, setAdminTab] = useState('broadcast');
+  // Active Admin Tab: 'inventory' | 'broadcast' | 'history' | 'crm' | 'journal'
+  const [adminTab, setAdminTab] = useState('inventory');
 
   // CRM Search & Source Filter & Selected CRM contacts for bulk actions
   const [crmSourceFilter, setCrmSourceFilter] = useState('all');
@@ -463,9 +468,24 @@ Ines Zager · PURE.WHISKY.`);
           </div>
         </div>
 
-        {/* 4 Main Tabs */}
+        {/* 5 Main Tabs */}
         <div className="flex items-center space-x-3 border-b border-[#E2DDD5] pb-4 mb-8 overflow-x-auto">
           
+          <button
+            onClick={() => setAdminTab('inventory')}
+            className={`px-6 py-3 rounded-xl font-woodblock text-lg tracking-wider uppercase transition-all flex items-center space-x-2 shrink-0 ${
+              adminTab === 'inventory' 
+                ? 'bg-[#B85D2C] text-white shadow-md' 
+                : 'bg-white border border-[#D4C8B8] text-[#181F1C] hover:bg-[#FAF8F5]'
+            }`}
+          >
+            <Package className="w-4 h-4" />
+            <span>Fässer & Preise (Shop)</span>
+            <span className="ml-1.5 px-2 py-0.5 bg-black/10 text-xs font-craft-mono font-bold rounded-full">
+              {products.length}
+            </span>
+          </button>
+
           <button
             onClick={() => setAdminTab('broadcast')}
             className={`px-6 py-3 rounded-xl font-woodblock text-lg tracking-wider uppercase transition-all flex items-center space-x-2 shrink-0 ${
@@ -476,7 +496,7 @@ Ines Zager · PURE.WHISKY.`);
           >
             <Send className="w-4 h-4" />
             <span>Newsletter & E-Mails versenden</span>
-            <span className="ml-1.5 px-2 py-0.5 bg-white/20 rounded-full text-xs font-craft-mono font-bold">
+            <span className="ml-1.5 px-2 py-0.5 bg-black/10 text-xs font-craft-mono font-bold rounded-full">
               {selectedEmails.length}
             </span>
           </button>
@@ -485,7 +505,7 @@ Ines Zager · PURE.WHISKY.`);
             onClick={() => setAdminTab('history')}
             className={`px-6 py-3 rounded-xl font-woodblock text-lg tracking-wider uppercase transition-all flex items-center space-x-2 shrink-0 ${
               adminTab === 'history' 
-                ? 'bg-[#181F1C] text-white shadow-md' 
+                ? 'bg-[#B85D2C] text-white shadow-md' 
                 : 'bg-white border border-[#D4C8B8] text-[#181F1C] hover:bg-[#FAF8F5]'
             }`}
           >
@@ -497,7 +517,7 @@ Ines Zager · PURE.WHISKY.`);
             onClick={() => setAdminTab('crm')}
             className={`px-6 py-3 rounded-xl font-woodblock text-lg tracking-wider uppercase transition-all flex items-center space-x-2 shrink-0 ${
               adminTab === 'crm' 
-                ? 'bg-[#181F1C] text-white shadow-md' 
+                ? 'bg-[#B85D2C] text-white shadow-md' 
                 : 'bg-white border border-[#D4C8B8] text-[#181F1C] hover:bg-[#FAF8F5]'
             }`}
           >
@@ -509,7 +529,7 @@ Ines Zager · PURE.WHISKY.`);
             onClick={() => setAdminTab('journal')}
             className={`px-6 py-3 rounded-xl font-woodblock text-lg tracking-wider uppercase transition-all flex items-center space-x-2 shrink-0 ${
               adminTab === 'journal' 
-                ? 'bg-[#181F1C] text-white shadow-md' 
+                ? 'bg-[#B85D2C] text-white shadow-md' 
                 : 'bg-white border border-[#D4C8B8] text-[#181F1C] hover:bg-[#FAF8F5]'
             }`}
           >
@@ -518,6 +538,18 @@ Ines Zager · PURE.WHISKY.`);
           </button>
 
         </div>
+
+        {/* ------------------------------------------------------------- */}
+        {/* TAB 0: FÄSSER & PREISE (SHOP / MOLLIE)                         */}
+        {/* ------------------------------------------------------------- */}
+        {adminTab === 'inventory' && (
+          <InventoryManager
+            products={products}
+            onUpdateProduct={onUpdateProduct}
+            onResetProducts={onResetProducts}
+            onNavigateProduct={onNavigateProduct}
+          />
+        )}
 
         {/* ------------------------------------------------------------- */}
         {/* TAB 1: E-MAIL VERSAND                                         */}

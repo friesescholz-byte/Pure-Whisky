@@ -472,72 +472,247 @@ export const PHILOSOPHY_PILLARS = [
 export const BLOG_POSTS = [
   {
     id: 1,
-    title: 'Fass-Audits im Foggie Moss & Morayshire: Erste Proben der Herbst-Releases',
-    date: '02. Sep. 2026',
+    title: 'PURE.WHISKY. ist auf der InterWhisky 2024 in Wiesbaden!',
+    date: '12. Nov. 2024',
     category: 'Messe',
     author: 'Ines Zager',
-    image: IMAGES.scotland_distillery,
+    image: IMAGES.messe_interwhisky,
     images: [
-      IMAGES.scotland_distillery,
-      IMAGES.ines_testing,
-      IMAGES.scotland_coast
+      IMAGES.messe_interwhisky,
+      IMAGES.messe_bottlemarket,
+      IMAGES.andre_session
     ],
     videoUrl: '',
-    excerpt: 'Direkt aus den schottischen Highlands: Exklusive Einblicke in die Fassproben für den Release am 17. September 2026 – von Glenburgie bis Highland Park.',
-    content: `Liebe Whisky-Freunde,
+    excerpt: 'Besuchen Sie uns vom 15. bis 17. November 2024 im Kurhaus Wiesbaden. Erleben Sie unsere exklusiven Single Cask Abfüllungen in Fassstärke.',
+    content: `PURE.WHISKY. ist auf der InterWhisky 2024 in Wiesbaden!
 
-in den letzten zwei Wochen war ich wieder intensiv in Schottland unterwegs. Mein Weg führte mich von den geschützten Tälern von Morayshire über das neblige Foggie Moss bis hinauf zu den rauen Orkney-Inseln. 
+Besuchen Sie uns vom 15. bis 17. November 2024 im traditionsreichen Kurhaus Wiesbaden. 
 
-Dort habe ich vier außergewöhnliche Einzelfässer auditiert und für unsere Herbst-Zuteilung am 17. September 2026 versiegelt:
+Erleben Sie unsere exklusiven Single Cask Abfüllungen in nativer Fassstärke und probieren Sie unsere ersten drei limitierten Releases persönlich vor Ort. 
 
-1. Ein vollmundiges Glenburgie 11 Jahre First Fill Oloroso Barrique (59,2% vol.) mit intensiven Rosinen- und Schokoladennoten.
-2. Ein tropisch-fruchtiges Fettercairn 15 Jahre Rivesaltes Barrique (59,9% vol.), gekühlt mit dem legendären Cairngorms-Quellwasser.
-3. Ein seltenes Aultmore 17 Jahre im Red Wine Barrique Finish (54,5% vol.) mit nur 156 Flaschen.
-4. Ein monumentales Highland Park 18 Jahre First Fill Bourbon Barrel (54,3% vol.) mit maritimem Heidetorf.
-
-Jedes Fass wurde vor Ort auf Quellenschutz, Reifung und aromatische Balance geprüft. Der Vorab-Zugriff für unser Fass-Depot startet pünktlich am 17. September.`
+Ich freue mich auf den persönlichen Austausch mit Ihnen und spannende Fachgespräche über Fassreifung, schottische Brennereien und nachhaltige Whiskyproduktion!`
   },
   {
     id: 2,
-    title: 'PURE.WHISKY. auf der Bottle Market Bremen & InterWhisky Wiesbaden',
-    date: '28. Aug. 2026',
+    title: 'Zu Gast bei Andre Lautensack, Whisky Evening – oder 2 Quasselstrippen unter sich',
+    date: '12. Nov. 2024',
+    category: 'Tasting',
+    author: 'Ines Zager',
+    image: IMAGES.andre_session,
+    images: [
+      IMAGES.andre_session,
+      IMAGES.tasting_springbank,
+      IMAGES.ines_portrait
+    ],
+    videoUrl: 'https://www.youtube.com/watch?v=N_4Z0DgVRts',
+    excerpt: 'Am Montag war ich beim André Lautensack, Whisky Evening, im schönen Schleusingen in Thüringen zu Gast um die Idee hinter Pure.Whisky. vorzustellen.',
+    content: `Am Montag war ich beim André Lautensack, Whisky Evening, im schönen Schleusingen in Thüringen zu Gast um die Idee hinter Pure.Whisky. vorzustellen und meine ersten Abfüllungen zu verkosten – und natürlich konnten wir beiden Quasselstrippen uns nicht kurz fassen. 🤣
+
+Wir haben ausführlich über meine Motivation, die Unabhängigkeit als Abfüllerin, Fassstärken und das sensorische Profil der ersten Fässer gesprochen.
+
+Schaut gerne mal rein in das vollständige Video auf YouTube: 
+https://youtu.be/N_4Z0DgVRts?si=1FD11Day3vrb54vd`
+  },
+  {
+    id: 3,
+    title: 'Das erste Mal …. Messe',
+    date: '12. Nov. 2024',
     category: 'Messe',
     author: 'Ines Zager',
     image: IMAGES.messe_bottlemarket,
     images: [
       IMAGES.messe_bottlemarket,
       IMAGES.messe_interwhisky,
-      IMAGES.andre_session
+      IMAGES.ines_barrel
     ],
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    excerpt: 'Treffen Sie mich persönlich im November auf der Messe Bremen und im Dezember in Wiesbaden. Mit dabei: Unsere neuen Einzelfass-Abfüllungen.',
-    content: `Der persönliche Austausch mit Ihnen ist mir das Wichtigste. Nach Monaten der Fasssuche und sensorischen Prüfungen freue ich mich riesig darauf, Ihnen die neuen Abfüllungen persönlich einzuschenken.
+    videoUrl: '',
+    excerpt: 'Bottlemarket Bremen 2024 It’s a wrap! Am Wochenende konnte ich das erste Mal die Idee hinter Pure.Whisky. und meine ersten 3 Abfüllungen präsentieren.',
+    content: `Bottlemarket Bremen 2024 It’s a wrap!
 
-Besuchen Sie mich an folgenden Terminen:
-• Bottle Market Bremen (Halle 7, Stand C-14): 18. – 20. November 2026
-• InterWhisky Wiesbaden (Kurhaus Wiesbaden): 02. – 04. Dezember 2026
+Am Wochenende konnte ich das erste Mal die Idee hinter Pure.Whisky. und meine ersten 3 Abfüllungen auf einer Messe, dem @bottlemarket_bremen präsentieren. 
 
-Bringen Sie Zeit und Neugier mit. Ich freue mich auf intensive Fachgespräche über Fassstärken, Holzarten und nachhaltigen Brennereibetrieb.`
+Und ich bin überwältigt über das durchgängig überragend positive Feedback für meinen kleinen Ein-Frau-Betrieb. 😊
+
+Vielen Dank an alle, die verkostet, zugehört, nachgehakt und vor allem weiterempfohlen haben. Gerade am Samstag war ich echt gerührt von der Wirkung von Mund-zu-Mund-Propaganda.
+
+DANKE. 🩷🫶`
   },
   {
-    id: 3,
-    title: 'Frauen im Whisky: Masterclass mit Rachel Vaughn Jones (Compass Box)',
-    date: '15. Aug. 2026',
-    category: 'Tasting',
+    id: 4,
+    title: 'PURE.WHISKY. ist auf dem Bottlemarket 2024!',
+    date: '16. Okt. 2024',
+    category: 'Messe',
+    author: 'Ines Zager',
+    image: IMAGES.messe_bottlemarket,
+    images: [
+      IMAGES.messe_bottlemarket,
+      IMAGES.ines_portrait
+    ],
+    videoUrl: '',
+    excerpt: 'Vom 18. bis 20. Oktober 2024 in der Messe Bremen: PURE.WHISKY. feiert Messe-Premiere auf dem Bottlemarket!',
+    content: `PURE.WHISKY. ist auf dem Bottlemarket 2024!
+
+Vom 18. bis 20. Oktober 2024 in der Messe Bremen. 
+
+Kommen Sie vorbei und verkosten Sie unsere ersten Einzelfass-Abfüllungen direkt am Stand! Ich freue mich auf Ihren Besuch in Halle 7.`
+  },
+  {
+    id: 5,
+    title: 'First Release!',
+    date: '11. Apr. 2024',
+    category: 'Abfüllungen',
     author: 'Ines Zager',
     image: IMAGES.tasting_springbank,
     images: [
       IMAGES.tasting_springbank,
-      IMAGES.ines_portrait,
-      IMAGES.frauenperspektive
+      IMAGES.ardmore_label,
+      IMAGES.mission
     ],
     videoUrl: '',
-    excerpt: 'Über die OurWhisky Foundation durfte ich eine intensive Mentoring-Session mit Rachel Vaughn Jones in Glasgow erleben.',
-    content: `Als Mentee der renommierten weltweiten OurWhisky Foundation hatte ich das Privileg, mehrere Tage mit Rachel Vaughn Jones, Marketing Director der innovativen Blend-Pioniere Compass Box, zusammenzuarbeiten.
+    excerpt: 'Er ist da! Meine allererste Abfüllung: Ardmore 11 Jahre alt, Ex-Laphroaig Oloroso Sherry Quarter Cask Reifung.',
+    content: `Er ist da! Meine allererste Abfüllung!
 
-Wir sprachen ausführlich über sensorische Schwellenwerte, das Vertrauen in den eigenen Gaumen und die Bedeutung von 100% Transparenz bei Single Cask Abfüllungen.
+Ardmore, 11 Jahre alt, Ex-Laphroaig Oloroso Sherry Quarter Cask Reifung (56,7% vol.).
 
-Diese wertvollen Impulse fließen unmittelbar in jede Fassauswahl von PURE.WHISKY. ein.`
+Und da ich natürlich etwas voreingenommen bin, wenn es um mein eigenes Produkt geht, lasse ich doch gerne diese wunderbaren Frauen aus Glasgow zu Wort kommen, die sich für ein spontanes morgendliches Tasting unmittelbar nach einer Tour in der Springbank Brennerei bereit erklärt haben.
+
+Vielen Dank an Melanie, Jen und Naomi für das ehrliche, enthusiastische Feedback zu diesem rauchig-würzigen Einzelfass!`
+  },
+  {
+    id: 6,
+    title: 'TV Reportage „Whiskyboom auf Islay“',
+    date: '13. Jan. 2024',
+    category: 'Medien',
+    author: 'Ines Zager',
+    image: IMAGES.ines_islay,
+    images: [
+      IMAGES.ines_islay,
+      IMAGES.scotland_coast,
+      IMAGES.ines_portrait
+    ],
+    videoUrl: '',
+    excerpt: 'Vielleicht habt ihr mich gestern im Fernsehen erkannt. Bericht über die Schattenseiten des Whiskybooms auf Islay in der Arte Reportage.',
+    content: `TV Reportage „Whiskyboom auf Islay“
+
+Vielleicht habt ihr mich gestern im Fernsehen erkannt.
+
+Im Oktober letzten Jahres habe ich in Rachel MacNeills Residential Course der Islay Whisky Academy gemeinsam mit Whiskyliebhabern aus der ganzen Welt meinen Whiskyhorizont erweitern können. Dabei wurden wir von einem deutschen Kamerateam begleitet.
+
+In der daraus entstandenen Arte Reportage wird über die „Schattenseiten des Whiskybooms auf Islay“ berichtet: Die vorhandenen neun Brennereien erweitern kontinuierlich ihre Produktionskapazitäten. Fünf weitere sind geplant und zum Teil bereits im Bau. Die vorhandene Infrastruktur ist überlastet, die Bewohner genervt.
+
+Die Reportage ist in der Mediathek abrufbar:
+https://www.zdf.de/arte/arte-re/page-video-artede-re-whisky-boom-mit-schattenseiten-100.html`
+  },
+  {
+    id: 7,
+    title: 'Über mich',
+    date: '12. Jan. 2024',
+    category: 'Intro',
+    author: 'Ines Zager',
+    image: IMAGES.ines_portrait,
+    images: [
+      IMAGES.ines_portrait,
+      IMAGES.ines_barrel,
+      IMAGES.ines_testing
+    ],
+    videoUrl: '',
+    excerpt: 'Seit gut 20 Jahren bereise ich die Welt auf der Jagd nach den spannendsten Flaschen für meine stetig wachsende Privatsammlung.',
+    content: `Ines Zager
+
+Seit gut 20 Jahren bereise ich die Welt auf der Jagd nach den spannendsten Flaschen für meine stetig wachsende Privatsammlung. Als dann 2020 Covid-19 zuschlug und ein persönlicher Austausch nicht mehr möglich war, startete ich einen Instagram Whisky-Blog, um mit der Whisky-Community in Verbindung zu bleiben und veranstaltete gelegentlich private Zoom-Verkostungen. So erfuhr ich auch von der Möglichkeit, in Fässer zu investieren, und fing an, Fässer zum Spaß zu kaufen.
+
+Mit einem wachsenden Fassportfolio und Netzwerk, in der Mitte des Lebens angekommen und wie so viele mit dem Sinn des Lebens hadernd, beschloss ich 2023, volles Risiko zu gehen. Ich fuhr meine Karriere als auf Umwelt-, Genehmigungs- und Energierecht spezialisierte Juristin, tätig für große Energiekonzerne, auf Teilzeit zurück, um mir meinen Lebenstraum zu erfüllen in der Whiskyindustrie zu arbeiten. Dafür gründete ich mein eigenes Unternehmen, das strikt meinen persönlichen Werten verpflichtet ist.
+
+Bis dato war ich als Mutter von zwei Jungs und einem sicheren, gut bezahlten Job, der mir zudem viel Spaß machte, nicht mutig genug gewesen etwas Neues zu beginnen. Heute, in meinen Vierzigern, mit fast 20 Jahren Berufserfahrung, einer langen Liste von privaten und beruflichen Erfolgen und Misserfolgen, habe ich jetzt das Selbstvertrauen gewonnen, das zu tun, was ich schon immer tun wollte.`
+  },
+  {
+    id: 8,
+    title: 'Frauenperspektive?',
+    date: '11. Jan. 2024',
+    category: 'Philosophie',
+    author: 'Ines Zager',
+    image: IMAGES.frauenperspektive,
+    images: [
+      IMAGES.frauenperspektive,
+      IMAGES.ines_portrait,
+      IMAGES.tasting_springbank
+    ],
+    videoUrl: '',
+    excerpt: 'Oder: Was mache ich anders? Ich könnte jetzt schreiben: „PURE.WHISKY. verbindet individuellen Whiskygenuss mit einem Nachhaltigkeitsversprechen und einer frischen Perspektive.“',
+    content: `Oder: Was mache ich anders?
+
+Ich könnte jetzt schreiben: „PURE.WHISKY. verbindet individuellen Whiskygenuss mit einem Nachhaltigkeitsversprechen und einer frischen, jungen, weiblichen Perspektive.“
+
+Tatsächlich bin ich eine der sehr wenigen weiblichen unabhängige Whiskyabfüllerinnen auf dem europäischen Markt. Und wohl mit Anfang 40 recht frisch hinter den Ohren. Ein denkbar kaum erwähnenswerter Umstand auf den mich aber meine vor allem weibliche! Whiskyfreunde unisono aufmerksam gemacht haben.
+
+Frauen schmecken und riechen statistisch belegt oft nuancierter. Für mich zählt aber vor allem die kompromisslose sensorische Qualität im Glas – fernab verstaubter Klischees.`
+  },
+  {
+    id: 9,
+    title: 'Meine Mission',
+    date: '11. Jan. 2024',
+    category: 'Mission',
+    author: 'Ines Zager',
+    image: IMAGES.mission,
+    images: [
+      IMAGES.mission,
+      IMAGES.ines_barrel,
+      IMAGES.scotland_distillery
+    ],
+    videoUrl: '',
+    excerpt: 'Was treibt mich an? Als unabhängiger Abfüller erwirbt PURE.WHISKY. einzelne Fässer bekannter Brennereien und füllt diese unberührt in Fassstärke ab.',
+    content: `Was treibt mich an?
+
+Als unabhängiger Abfüller erwirbt PURE.WHISKY. einzelne Fässer bekannter Brennereien und füllt diese unter eigenen Namen ohne weitere Verarbeitung/ – behandlung ab. Das heißt der Whisky wird direkt aus dem Fass, nicht kühlgefiltert, ungefärbt und unverdünnt in die verkaufsfertigen Flaschen abgefüllt. 
+
+Dieser so genannte “Singlecaskwhisky” in Fassstärke ermöglicht nicht nur ein Whiskyerlebnis so nah am Fass und bei wenigen hundert Flaschen pro Abfüllung so exklusiv als möglich, sondern auch gerade Single Malts von Brennereien zu kosten, die weitgehend für Blends wie z.B. Johnnie Walker produzieren und daher keine und nur sehr eingeschränkt eigenständige Single Malts anbieten.
+
+Der Fokus der Abfüllungen liegt dabei auf Brennereien, die bereits gute Schritte Richtung Nachhaltigkeit unternommen haben. Auch PURE.WHISKY. gestaltet sämtliche Prozesse so nachhaltig als möglich und legt diese transparent offen.`
+  },
+  {
+    id: 10,
+    title: 'Der Look',
+    date: '11. Jan. 2024',
+    category: 'Packaging',
+    author: 'Ines Zager',
+    image: IMAGES.wild_glass,
+    images: [
+      IMAGES.wild_glass,
+      IMAGES.naturkork,
+      IMAGES.biopolymer_kapsel,
+      IMAGES.saatenpapier_label
+    ],
+    videoUrl: '',
+    excerpt: 'Viele nachhaltige Bausteine: Abgefüllt wird in eine 100% recycelte Flasche aus spanischem Wild Glass mit unbehandeltem Naturkork.',
+    content: `Viele nachhaltige Bausteine
+
+Abgefüllt wird in eine 100% recycelte Flasche, der man ihre vorherigen Leben in schönster Weise ansieht. 
+
+Der Stopper besteht aus einem einzelnem unbehandelten Stück Kork, geschnitten in örtlichen Wäldern von einem spanischen Familienunternehmen in 5. Generation bzw. einem Korkgranulat-Aktivkohle-Gemisch.
+
+Der Kapselverschluss ist aus 100% abbaubarem Biopolymer gefertigt – gänzlich ohne giftige Weichmacher oder fossiles Plastik.`
+  },
+  {
+    id: 11,
+    title: 'Mein Versprechen',
+    date: '11. Jan. 2024',
+    category: 'Versprechen',
+    author: 'Ines Zager',
+    image: IMAGES.versprechen,
+    images: [
+      IMAGES.versprechen,
+      IMAGES.ines_portrait,
+      IMAGES.ines_barrel
+    ],
+    videoUrl: '',
+    excerpt: 'Qualität und Nachhaltigkeit: PURE.WHISKY. hat es sich zum Ziel gesetzt, dass “pure” Whiskyvergnügen wie kein anderer unabhängiger Abfüller zu bieten.',
+    content: `Qualität und Nachhaltigkeit
+
+PURE.WHISKY. hat es sich zum Ziel gesetzt, das “pure” Whiskyvergnügen wie kein anderer unabhängiger Abfüller zu bieten.
+
+Das bedeutet nicht nur mein persönliches Qualitätsversprechen bezüglich jeder einzelnen Abfüllung, sondern Genuss mit gutem Gewissen.
+
+Jedes einzelne Fass, jede Brennerei, eingesetzte Materialien, jeder Geschäftspartner, etc. werden von mir persönlich nicht nur hinsichtlich der Qualität der Leistung, sondern auch hinsichtlich der Erfüllung bestimmter Nachhaltigkeitskriterien ausgewählt.`
   }
 ];
 
@@ -590,8 +765,8 @@ export const FAQ_DATA = [
     a: 'Der Verkauf und die Zustellung von Spirituosen erfolgen ausschließlich an Personen ab 18 Jahren. Im Checkout bestätigen Sie Ihre Volljährigkeit, und bei der Zustellung durch DHL GoGreen erfolgt eine kurze Alters- und Sichtprüfung.'
   },
   {
-    q: 'Wie hoch sind die Versandkosten und wie schnell wird geliefert?',
-    a: 'Wir versenden versichert und klimaneutral mit DHL GoGreen innerhalb von 2–4 Werktagen. Innerhalb Deutschlands betragen die Versandkosten pauschal 6,90 € – ab 150 € Bestellwert liefern wir versandkostenfrei.'
+    q: 'Wie hoch sind die Versandkosten und wie läuft der Versand ab?',
+    a: 'Wir versenden versichert und klimaneutral mit DHL GoGreen inklusive 18+ Alterssichtprüfung. Der Versand erfolgt innerhalb von 2–4 Werktagen nach Bestellung bzw. Zahlungseingang. Die Versandkosten betragen pauschal 6,90 € innerhalb Deutschlands.'
   },
   {
     q: 'Welche Zahlungsmethoden stehen im Shop zur Verfügung?',

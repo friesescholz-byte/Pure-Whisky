@@ -57,11 +57,46 @@ export default function App() {
     return () => window.removeEventListener('popstate', handleUrlSync);
   }, []);
 
-  // Persistent Blog Posts
+  // Persistent Products & Pricing (Mollie-ready & Admin editable)
+  const [products, setProducts] = useState(() => {
+    const saved = localStorage.getItem('pure_whisky_products_v1');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse saved products:', e);
+      }
+    }
+    return PRODUCTS;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('pure_whisky_products_v1', JSON.stringify(products));
+  }, [products]);
+
+  const handleUpdateProduct = (updatedProduct) => {
+    setProducts(prev => prev.map(p => p.id === updatedProduct.id ? updatedProduct : p));
+    if (selectedProduct && selectedProduct.id === updatedProduct.id) {
+      setSelectedProduct(updatedProduct);
+    }
+  };
+
+  const handleResetProducts = () => {
+    if (window.confirm('Möchten Sie alle Fässer, Preise und Verfügbarkeiten auf die Standardwerte zurücksetzen?')) {
+      setProducts(PRODUCTS);
+      localStorage.removeItem('pure_whisky_products_v1');
+    }
+  };
+
+  // Persistent Blog Posts (v2 uses the 11 authentic articles from Ines Zager)
   const [blogPosts, setBlogPosts] = useState(() => {
-    const saved = localStorage.getItem('pure_whisky_posts');
+    const saved = localStorage.getItem('pure_whisky_posts_v2');
     return saved ? JSON.parse(saved) : BLOG_POSTS;
   });
+
+  useEffect(() => {
+    localStorage.setItem('pure_whisky_posts_v2', JSON.stringify(blogPosts));
+  }, [blogPosts]);
 
   // Persistent Contacts CRM
   const [contacts, setContacts] = useState(() => {
@@ -75,10 +110,6 @@ export default function App() {
       { email: 'kontakt@scholz-friese-webdesign.de', name: 'Scholz & Friese', caskInterest: 'Fettercairn 15Y (Vorab-Zuteilung 17.09.)', source: 'shop', date: '01.09.2026' }
     ];
   });
-
-  useEffect(() => {
-    localStorage.setItem('pure_whisky_posts', JSON.stringify(blogPosts));
-  }, [blogPosts]);
 
   useEffect(() => {
     localStorage.setItem('pure_whisky_contacts', JSON.stringify(contacts));
@@ -182,6 +213,7 @@ export default function App() {
         onSelectProduct={handleOpenProductDetail}
         cartItemsCount={totalCartCount}
         setIsCartOpen={setIsCartOpen}
+        products={products}
       />
 
       <main className="flex-grow">
@@ -193,6 +225,7 @@ export default function App() {
             onNavigateShop={() => handleNavClick('shop')}
             onNavigateHome={() => handleNavClick('home')}
             onSelectOtherProduct={handleOpenProductDetail}
+            products={products}
           />
         )}
 
@@ -202,6 +235,7 @@ export default function App() {
             onAddToCart={handleAddToCart}
             onPreReserve={handleAddContact}
             onNavigateHome={() => handleNavClick('home')}
+            products={products}
           />
         )}
 
@@ -241,6 +275,10 @@ export default function App() {
             onBulkDeleteContacts={handleBulkDeleteContacts}
             onNavigateHome={() => handleNavClick('home')}
             onNavigateBlog={() => handleNavClick('blog')}
+            products={products}
+            onUpdateProduct={handleUpdateProduct}
+            onResetProducts={handleResetProducts}
+            onNavigateProduct={handleOpenProductDetail}
           />
         )}
 
@@ -250,6 +288,7 @@ export default function App() {
               onOpenShop={() => handleNavClick('shop')}
               onOpenAbout={() => handleNavClick('about')}
               onOpenProduct={handleOpenProductDetail}
+              products={products}
             />
             <PillarsStrip />
             <CaskSelectionTrust

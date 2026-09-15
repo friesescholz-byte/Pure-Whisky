@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ShoppingBag, Plus, Minus, Trash2, ArrowRight } from 'lucide-react';
+import { X, ShoppingBag, Plus, Minus, Trash2, ArrowRight, ShieldCheck } from 'lucide-react';
 
 export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantity, onRemoveItem }) {
   const [ageConfirmed, setAgeConfirmed] = useState(false);
@@ -7,7 +7,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
   if (!isOpen) return null;
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-  const shipping = subtotal >= 150 ? 0 : 6.90;
+  const shipping = 6.90;
   const total = subtotal + shipping;
 
   return (
@@ -62,16 +62,14 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
             )}
 
             {cartItems.length > 0 && (
-              <div className="p-4 rounded-xl bg-[#E8EFEA] border border-[#C5D8CC] text-xs text-[#1B2B23] space-y-2">
-                <div className="flex justify-between font-bold">
-                  <span>Kostenloser Versand ab 150 €:</span>
-                  <span className="text-[#2D6A4F]">
-                    {subtotal >= 150 ? 'Erreicht! (0,00 €)' : `Noch ${(150 - subtotal).toFixed(2)} €`}
-                  </span>
+              <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#E2DDD5] text-xs text-[#3A4A40] space-y-1">
+                <div className="flex items-center space-x-2 font-bold text-[#181F1C]">
+                  <ShieldCheck className="w-4 h-4 text-[#2D6A4F]" />
+                  <span>Versicherter DHL GoGreen Versand</span>
                 </div>
-                <div className="w-full h-2 bg-[#C5D8CC] rounded-full overflow-hidden">
-                  <div className="h-full bg-[#2D6A4F]" style={{ width: `${Math.min(100, (subtotal / 150) * 100)}%` }} />
-                </div>
+                <p className="text-[11px] text-[#55695E]">
+                  Versand innerhalb von 2–4 Werktagen · Pauschal 6,90 € inkl. Alterssichtprüfung (ab 18 Jahren).
+                </p>
               </div>
             )}
           </div>
@@ -96,7 +94,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
                 </div>
                 <div className="flex justify-between">
                   <span>Versand (DHL GoGreen):</span>
-                  <span className="font-semibold text-[#181F1C]">{shipping === 0 ? 'Kostenlos' : `${shipping.toFixed(2)} €`}</span>
+                  <span className="font-semibold text-[#181F1C]">{shipping.toFixed(2)} €</span>
                 </div>
                 <div className="flex justify-between font-serif text-lg text-[#181F1C] font-bold pt-2 border-t border-[#E2DDD5]">
                   <span>Gesamtbetrag:</span>

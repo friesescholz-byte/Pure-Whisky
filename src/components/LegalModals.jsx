@@ -50,8 +50,8 @@ export default function LegalModals({ activeModal, onClose }) {
         <div className="space-y-4 text-xs sm:text-sm text-[#D8D2C2] leading-relaxed">
           <p><strong>Versandinformationen:</strong></p>
           <p>• Verkauf und Versand nur an Personen ab 18 Jahren (Altersprüfung bei Zustellung).</p>
-          <p>• Deutschlandweiter Versand: 6,90 € (Kostenfrei ab 150 € Bestellwert).</p>
-          <p>• Zustellung: 2 – 4 Werktage mit versichertem DHL GoGreen Versand.</p>
+          <p>• Deutschlandweiter Versand: 6,90 € pauschal (inkl. Alterssichtprüfung ab 18 Jahren).</p>
+          <p>• Versand: Innerhalb von 2 – 4 Werktagen mit versichertem DHL GoGreen Versand.</p>
           <p><strong>Zahlungsarten:</strong></p>
           <p>PayPal, Apple Pay, Google Pay, Kreditkarte (Visa, Mastercard, Amex), Klarna Sofortüberweisung.</p>
         </div>

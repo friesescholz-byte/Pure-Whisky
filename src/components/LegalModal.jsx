@@ -72,8 +72,8 @@ Für alle Bestellungen über unseren Online-Shop durch Verbraucher und Unternehm
 
 § 4 Preise, Versandkosten & Lieferung
 (1) Alle angegebenen Preise verstehen sich in Euro inklusive der gesetzlichen Mehrwertsteuer.
-(2) Der Versand erfolgt versichert und klimaneutral mit DHL GoGreen innerhalb Deutschlands für pauschal 6,90 €. Ab einem Bestellwert von 150,00 € liefern wir versandkostenfrei.
-(3) Die Lieferzeit beträgt in der Regel 2 bis 4 Werktage nach Zahlungseingang.
+(2) Der Versand erfolgt versichert und klimaneutral mit DHL GoGreen innerhalb Deutschlands für pauschal 6,90 € (inkl. Alterssichtprüfung ab 18 Jahren).
+(3) Der Versand erfolgt innerhalb von 2 bis 4 Werktagen nach Zahlungseingang.
 
 § 5 Zahlungsarten
 Ihnen stehen folgende Zahlungsarten zur Verfügung: PayPal, Kreditkarte (Visa, Mastercard, American Express), Apple Pay, Google Pay, Klarna Sofortüberweisung und Vorkasse.`
@@ -101,9 +101,8 @@ Das Widerrufsrecht besteht nicht bei Verträgen zur Lieferung von versiegelten W
 Wir versenden alle Bestellungen bruchsicher und klimaneutral mit DHL GoGreen inklusive 18+ Alterssichtprüfung bei Zustellung.
 
 Versandkosten:
-• Innerhalb Deutschlands: 6,90 € pauschal
-• Ab 150,00 € Bestellwert: Kostenfreier Versand
-• Lieferzeit: 2–4 Werktage
+• Innerhalb Deutschlands: 6,90 € pauschal (inkl. Alterssichtprüfung ab 18 Jahren)
+• Versand: Innerhalb von 2–4 Werktagen nach Zahlungseingang
 
 Zahlungsarten:
 • PayPal

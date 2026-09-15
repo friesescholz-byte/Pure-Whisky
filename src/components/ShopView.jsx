@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Search, X, CheckCircle2 } from 'lucide-react';
 import { PRODUCTS } from '../data/pureWhiskyFullData';
 
-export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onNavigateHome }) {
+export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onNavigateHome, products = PRODUCTS }) {
   const [regionFilter, setRegionFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -13,7 +13,7 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
   const [reserveSuccess, setReserveSuccess] = useState(false);
 
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter(p => {
+    return products.filter(p => {
       if (regionFilter !== 'all' && p.region.toLowerCase() !== regionFilter.toLowerCase()) return false;
       if (searchQuery.trim() !== '') {
         const q = searchQuery.toLowerCase();
@@ -24,7 +24,7 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
       }
       return true;
     });
-  }, [regionFilter, searchQuery]);
+  }, [products, regionFilter, searchQuery]);
 
   const handleOpenReserveModal = (product, e) => {
     if (e) e.stopPropagation();
@@ -62,10 +62,10 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
         {/* Page Title */}
         <div className="mb-12 space-y-2">
           <span className="font-script text-3xl text-[#2D6A4F] block">
-            Exklusive Einzelfässer
+            PURE.WHISKY. Shop
           </span>
           <h1 className="font-woodblock text-5xl sm:text-6xl lg:text-7xl text-[#181F1C] tracking-wide uppercase">
-            Alle aktuellen Abfüllungen.
+            Die Fässer · Alle Abfüllungen.
           </h1>
           <p className="text-[#3A4A40] text-lg sm:text-xl max-w-2xl font-normal leading-relaxed">
             Unverdünnt in Fassstärke, unfiltriert und frei von Farbstoffen. Abgefüllt in 100% recyceltes Wild Glass.

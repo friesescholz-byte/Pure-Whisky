@@ -8,7 +8,8 @@ export default function ProductDetailView({
   onPreReserve, 
   onNavigateShop, 
   onNavigateHome, 
-  onSelectOtherProduct 
+  onSelectOtherProduct,
+  products = PRODUCTS 
 }) {
   const [selectedImageIdx, setSelectedImageIdx] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -21,7 +22,7 @@ export default function ProductDetailView({
 
   if (!product) return null;
 
-  const otherProducts = PRODUCTS.filter(p => p.id !== product.id);
+  const otherProducts = products.filter(p => p.id !== product.id);
   const gallery = product.galleryImages || [product.image];
   const activeImage = gallery[selectedImageIdx] || product.image;
 
@@ -69,7 +70,7 @@ export default function ProductDetailView({
         <div className="flex items-center space-x-2 text-xs font-craft-mono font-bold text-[#55695E] mb-8">
           <button onClick={onNavigateHome} className="hover:text-[#181F1C]">Startseite</button>
           <ChevronRight className="w-3.5 h-3.5 text-[#D4C8B8]" />
-          <button onClick={onNavigateShop} className="hover:text-[#181F1C]">Die Fässer</button>
+          <button onClick={onNavigateShop} className="hover:text-[#181F1C]">Shop · Die Fässer</button>
           <ChevronRight className="w-3.5 h-3.5 text-[#D4C8B8]" />
           <span className="text-[#B85D2C] truncate">{product.name}</span>
         </div>
@@ -295,7 +296,7 @@ export default function ProductDetailView({
               <div className="pt-2 border-t border-[#E2DDD5] space-y-2 text-xs font-craft-mono text-[#55695E] font-bold">
                 <div className="flex items-center space-x-2">
                   <ShieldCheck className="w-4 h-4 text-[#2D6A4F]" />
-                  <span>Klimaneutraler DHL GoGreen Versand (2–4 Werktage)</span>
+                  <span>Klimaneutraler DHL GoGreen Versand (Versand innerhalb von 2–4 Werktagen)</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Droplets className="w-4 h-4 text-[#B85D2C]" />
