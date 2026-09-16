@@ -1,10 +1,10 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { 
   Lock, Unlock, Plus, Trash2, Edit3, Send, Paperclip, CheckSquare, 
   Square, Users, BookOpen, Smartphone, Monitor, 
   CheckCircle2, AlertCircle, RefreshCw, X,
   ChevronDown, ChevronUp, Search, Upload, Mail, Image as ImageIcon, Play,
-  History, Clock, Check, FileText, UserMinus, Package
+  History, Clock, Check, FileText, UserMinus, Package, Star, Link
 } from 'lucide-react';
 import { IMAGES } from '../data/pureWhiskyFullData';
 import InventoryManager from './InventoryManager';
@@ -70,8 +70,12 @@ export default function AdminView({
 
   const [selectedHistoryCampaign, setSelectedHistoryCampaign] = useState(null);
 
-  // Blog Post Form State
+  // Blog Post Form State & Auto-scroll Ref
+  const blogEditorRef = useRef(null);
   const [isEditingPost, setIsEditingPost] = useState(false);
+  const [imageUrlInput, setImageUrlInput] = useState('');
+  const [blogSaveSuccess, setBlogSaveSuccess] = useState('');
+  const [isCompressingImages, setIsCompressingImages] = useState(false);
   const [currentPostForm, setCurrentPostForm] = useState({
     id: null,
     title: '',
@@ -204,37 +208,112 @@ Ines Zager · PURE.WHISKY.`);
     }
   };
 
-  // Blog Multiple Images Upload
-  const handleMultipleBlogImagesUpload = (e) => {
+  // Blog Image Compression to guarantee zero crash and fast saving
+  const compressImageFile = (file) => {
+    return new Promise((resolve) => {
+      // If SVG or tiny, read directly
+      if (file.type === 'image/svg+xml' || file.size < 120 * 1024) {
+        const r = new FileReader();
+        r.onload = () => resolve(r.result);
+        r.onerror = () => resolve('');
+        r.readAsDataURL(file);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 1600;
+          let w = img.width;
+          let h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          // Export as clean JPEG 82% quality (shrinks 10MB phone photo to ~150KB)
+          const compressed = canvas.toDataURL('image/jpeg', 0.82);
+          resolve(compressed);
+        };
+        img.onerror = () => resolve(e.target.result);
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Blog Multiple Images Upload (with auto-compression)
+  const handleMultipleBlogImagesUpload = async (e) => {
     const files = Array.from(e.target.files);
     if (files.length > 0) {
-      files.forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          setCurrentPostForm((prev) => {
-            const currentImages = prev.images || (prev.image ? [prev.image] : []);
-            return {
-              ...prev,
-              images: [...currentImages, reader.result]
-            };
-          });
-        };
-        reader.readAsDataURL(file);
-      });
+      setIsCompressingImages(true);
+      try {
+        const compressedList = await Promise.all(files.map(compressImageFile));
+        const valid = compressedList.filter(Boolean);
+        setCurrentPostForm((prev) => {
+          const currentImages = prev.images || (prev.image ? [prev.image] : []);
+          return {
+            ...prev,
+            images: [...currentImages, ...valid]
+          };
+        });
+      } finally {
+        setIsCompressingImages(false);
+      }
     }
   };
 
+  // Add Image via direct URL (e.g. Cloudflare R2 link)
+  const handleAddImageUrl = () => {
+    const trimmed = imageUrlInput.trim();
+    if (!trimmed) return;
+    setCurrentPostForm((prev) => {
+      const currentImages = prev.images || (prev.image ? [prev.image] : []);
+      return {
+        ...prev,
+        images: [...currentImages, trimmed]
+      };
+    });
+    setImageUrlInput('');
+  };
+
+  // Promote an image to position 0 (Hauptbild)
+  const handleSetPrimaryBlogImage = (indexToPromote) => {
+    setCurrentPostForm((prev) => {
+      const currentImages = [...(prev.images || (prev.image ? [prev.image] : []))];
+      if (indexToPromote <= 0 || indexToPromote >= currentImages.length) return prev;
+      const [promoted] = currentImages.splice(indexToPromote, 1);
+      currentImages.unshift(promoted);
+      return {
+        ...prev,
+        images: currentImages
+      };
+    });
+  };
+
+  // Remove single image from gallery
   const handleRemoveBlogImage = (indexToRemove) => {
     setCurrentPostForm((prev) => {
       const currentImages = prev.images || (prev.image ? [prev.image] : []);
       const updated = currentImages.filter((_, idx) => idx !== indexToRemove);
       return {
         ...prev,
-        images: updated.length > 0 ? updated : []
+        images: updated
       };
     });
   };
 
+  // Start Edit Post with smooth auto-scroll to editor
   const handleStartEditPost = (post) => {
     const resolvedImages = post.images && post.images.length > 0 
       ? post.images 
@@ -252,6 +331,9 @@ Ines Zager · PURE.WHISKY.`);
       content: post.content || ''
     });
     setIsEditingPost(true);
+    setTimeout(() => {
+      blogEditorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   };
 
   const handleFileUploadAttachment = (e) => {
@@ -1137,8 +1219,11 @@ Ines Zager · PURE.WHISKY.`);
                       content: ''
                     });
                     setIsEditingPost(true);
+                    setTimeout(() => {
+                      blogEditorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
                   }}
-                  className="px-6 py-3 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-sm tracking-wider uppercase transition-all shadow-md flex items-center space-x-2"
+                  className="px-6 py-3 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-sm tracking-wider uppercase transition-all shadow-md flex items-center space-x-2 hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Neuen Beitrag schreiben</span>
@@ -1146,29 +1231,49 @@ Ines Zager · PURE.WHISKY.`);
               )}
             </div>
 
+            {/* Success Alert Banner */}
+            {blogSaveSuccess && (
+              <div className="p-4 rounded-2xl bg-[#E8EFEA] border border-[#C5D8CC] text-[#2D6A4F] flex items-center space-x-3 shadow-xs">
+                <CheckCircle2 className="w-5 h-5 shrink-0" />
+                <span className="text-sm font-bold">{blogSaveSuccess}</span>
+              </div>
+            )}
+
             {isEditingPost && (
-              <div className="bg-white border-2 border-[#B85D2C] rounded-3xl p-8 shadow-xl space-y-6">
+              <div ref={blogEditorRef} className="bg-white border-2 border-[#B85D2C] rounded-3xl p-6 sm:p-8 shadow-xl space-y-6 scroll-mt-28">
                 <div className="flex items-center justify-between border-b border-[#E2DDD5] pb-4">
-                  <h3 className="font-woodblock text-2xl uppercase text-[#181F1C]">
-                    {currentPostForm.id ? 'Beitrag bearbeiten' : 'Neuen Journal-Beitrag veröffentlichen'}
-                  </h3>
-                  <button onClick={() => setIsEditingPost(false)} className="p-2 rounded-full hover:bg-[#FAF8F5]">
-                    <X className="w-5 h-5" />
+                  <div>
+                    <h3 className="font-woodblock text-2xl uppercase text-[#181F1C]">
+                      {currentPostForm.id ? 'Beitrag bearbeiten' : 'Neuen Journal-Beitrag veröffentlichen'}
+                    </h3>
+                    <p className="text-xs text-[#55695E] pt-0.5">
+                      Hauptbild, Bildergalerie (Slider), Video und Inhalt pflegen.
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => setIsEditingPost(false)} 
+                    className="group p-2.5 rounded-full bg-[#FAF8F5] border border-[#D4C8B8] text-stone-500 hover:text-[#181F1C] hover:border-[#B85D2C] hover:bg-white transition-all duration-300 shadow-xs hover:scale-105 active:scale-95"
+                    title="Schließen"
+                  >
+                    <X className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" />
                   </button>
                 </div>
 
                 <form onSubmit={(e) => {
                   e.preventDefault();
-                  const primaryImage = currentPostForm.images && currentPostForm.images.length > 0 
-                    ? currentPostForm.images[0] 
-                    : IMAGES.scotland_coast;
+                  const validImages = (currentPostForm.images || []).filter(Boolean);
+                  const primaryImage = validImages.length > 0 
+                    ? validImages[0] 
+                    : (currentPostForm.image || IMAGES.scotland_coast);
 
                   onSaveBlogPost({
                     ...currentPostForm,
                     image: primaryImage,
-                    images: currentPostForm.images && currentPostForm.images.length > 0 ? currentPostForm.images : [primaryImage]
+                    images: validImages.length > 0 ? validImages : [primaryImage]
                   });
                   setIsEditingPost(false);
+                  setBlogSaveSuccess('Beitrag erfolgreich gespeichert!');
+                  setTimeout(() => setBlogSaveSuccess(''), 4000);
                 }} className="space-y-6">
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -1205,31 +1310,66 @@ Ines Zager · PURE.WHISKY.`);
                   </div>
 
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
                       <label className="font-craft-mono text-xs uppercase tracking-wider text-[#55695E] font-bold">
-                        Bildergalerie (Mehrere Bilder für den Slider auswählen)
+                        Bildergalerie & Hauptbild
                       </label>
-                      <label className="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-white border border-[#D4C8B8] font-woodblock text-xs uppercase tracking-wider text-[#B85D2C] hover:bg-[#E2DDD5] cursor-pointer transition-all shadow-xs">
+                      <label className="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-white border border-[#D4C8B8] font-woodblock text-xs uppercase tracking-wider text-[#B85D2C] hover:bg-[#E2DDD5] cursor-pointer transition-all shadow-xs hover:scale-[1.02] active:scale-[0.98]">
                         <Upload className="w-3.5 h-3.5" />
-                        <span>+ Bilder vom PC hinzufügen</span>
-                        <input type="file" multiple accept="image/*" onChange={handleMultipleBlogImagesUpload} className="hidden" />
+                        <span>{isCompressingImages ? 'Bilder werden optimiert...' : '+ Bilder vom PC hinzufügen'}</span>
+                        <input type="file" multiple accept="image/*" disabled={isCompressingImages} onChange={handleMultipleBlogImagesUpload} className="hidden" />
                       </label>
                     </div>
 
+                    {/* Quick URL Input for Cloudflare R2 / Web images */}
+                    <div className="flex items-center space-x-2 bg-[#FAF8F5] p-2 rounded-2xl border border-[#D4C8B8]">
+                      <div className="relative flex-1">
+                        <Link className="w-3.5 h-3.5 text-[#55695E] absolute left-3 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="url"
+                          value={imageUrlInput}
+                          onChange={(e) => setImageUrlInput(e.target.value)}
+                          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddImageUrl(); }}}
+                          placeholder="Oder Bild-URL / Cloudflare R2 Link einfügen..."
+                          className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#D4C8B8] bg-white text-xs text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleAddImageUrl}
+                        className="px-4 py-2 rounded-xl bg-[#181F1C] hover:bg-black text-white text-xs font-woodblock uppercase tracking-wider transition-colors shrink-0"
+                      >
+                        + Hinzufügen
+                      </button>
+                    </div>
+
                     {currentPostForm.images && currentPostForm.images.length > 0 ? (
-                      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 p-4 rounded-2xl border border-[#D4C8B8] bg-[#FAF8F5]">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3 p-4 rounded-2xl border border-[#D4C8B8] bg-[#FAF8F5]">
                         {currentPostForm.images.map((imgUrl, idx) => (
-                          <div key={idx} className="relative group rounded-xl overflow-hidden border border-[#D4C8B8] bg-white aspect-video shadow-xs">
+                          <div key={idx} className="relative group rounded-xl overflow-hidden border border-[#D4C8B8] bg-white aspect-video shadow-xs flex items-center justify-center">
                             <img src={imgUrl} alt={`Bild ${idx + 1}`} className="w-full h-full object-cover" />
-                            {idx === 0 && (
-                              <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black/70 text-white text-[9px] font-craft-mono rounded">
-                                Hauptbild
+                            
+                            {idx === 0 ? (
+                              <span className="absolute bottom-1.5 left-1.5 px-2 py-0.5 bg-[#2D6A4F] text-white text-[10px] font-craft-mono font-bold rounded shadow-sm flex items-center space-x-1">
+                                <Star className="w-2.5 h-2.5 fill-white" />
+                                <span>Hauptbild</span>
                               </span>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleSetPrimaryBlogImage(idx)}
+                                className="absolute bottom-1.5 left-1.5 px-2 py-0.5 bg-black/75 hover:bg-[#2D6A4F] text-white text-[10px] font-craft-mono rounded opacity-0 group-hover:opacity-100 transition-all flex items-center space-x-1 shadow-sm"
+                                title="Dieses Bild als Titelbild an erste Stelle setzen"
+                              >
+                                <Star className="w-2.5 h-2.5" />
+                                <span>Als Hauptbild</span>
+                              </button>
                             )}
+
                             <button
                               type="button"
                               onClick={() => handleRemoveBlogImage(idx)}
-                              className="absolute top-1 right-1 w-6 h-6 rounded-full bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center shadow-md transition-all"
+                              className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center shadow-md transition-all opacity-85 hover:opacity-100"
                               title="Dieses Bild entfernen"
                             >
                               <X className="w-3.5 h-3.5" />
@@ -1239,7 +1379,7 @@ Ines Zager · PURE.WHISKY.`);
                       </div>
                     ) : (
                       <div className="p-6 text-center rounded-2xl border-2 border-dashed border-[#D4C8B8] text-xs text-[#55695E]">
-                        Noch keine Bilder hinzugefügt. Klicke auf <strong>+ Bilder vom PC hinzufügen</strong>.
+                        Noch keine Bilder hinterlegt. Laden Sie ein Bild vom PC hoch oder fügen Sie eine URL ein.
                       </div>
                     )}
                   </div>

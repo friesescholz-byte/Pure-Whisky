@@ -71,7 +71,11 @@ export default function App() {
   });
 
   useEffect(() => {
-    localStorage.setItem('pure_whisky_products_v2', JSON.stringify(products));
+    try {
+      localStorage.setItem('pure_whisky_products_v2', JSON.stringify(products));
+    } catch (e) {
+      console.warn('Could not save products to localStorage:', e);
+    }
   }, [products]);
 
   const handleUpdateProduct = (updatedProduct) => {
@@ -84,19 +88,32 @@ export default function App() {
   const handleResetProducts = () => {
     if (window.confirm('Möchten Sie alle Fässer, Preise und Verfügbarkeiten auf die Standardwerte zurücksetzen?')) {
       setProducts(PRODUCTS);
-      localStorage.removeItem('pure_whisky_products_v2');
-      localStorage.removeItem('pure_whisky_products_v1');
+      try {
+        localStorage.removeItem('pure_whisky_products_v2');
+        localStorage.removeItem('pure_whisky_products_v1');
+      } catch (e) {
+        console.error(e);
+      }
     }
   };
 
   // Persistent Blog Posts (v3 uses authentic articles with clean single primary images)
   const [blogPosts, setBlogPosts] = useState(() => {
-    const saved = localStorage.getItem('pure_whisky_posts_v3');
-    return saved ? JSON.parse(saved) : BLOG_POSTS;
+    try {
+      const saved = localStorage.getItem('pure_whisky_posts_v3');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.error('Failed to parse blog posts from localStorage:', e);
+    }
+    return BLOG_POSTS;
   });
 
   useEffect(() => {
-    localStorage.setItem('pure_whisky_posts_v3', JSON.stringify(blogPosts));
+    try {
+      localStorage.setItem('pure_whisky_posts_v3', JSON.stringify(blogPosts));
+    } catch (e) {
+      console.warn('LocalStorage limit exceeded when saving blog posts:', e);
+    }
   }, [blogPosts]);
 
   // Persistent Contacts CRM

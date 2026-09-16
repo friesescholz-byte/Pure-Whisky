@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Calendar, User, ChevronLeft, ChevronRight, Play, ExternalLink } from 'lucide-react';
+import { X, Calendar, User, ChevronLeft, ChevronRight, Play, ExternalLink, Maximize2, Minimize2 } from 'lucide-react';
 
 export default function BlogPostModal({ post, onClose }) {
   if (!post) return null;
@@ -10,6 +10,7 @@ export default function BlogPostModal({ post, onClose }) {
     : [post.image || 'https://pub-b33108412309406a9a941ddc51e9a5b9.r2.dev/Pure-Whisky/ines-zager-islay-natur.webp'];
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [fitMode, setFitMode] = useState('contain'); // 'contain' (vollständig sichtbar) | 'cover' (formatfüllend)
 
   const handleNext = () => {
     setActiveImageIndex((prev) => (prev + 1) % images.length);
@@ -36,52 +37,75 @@ export default function BlogPostModal({ post, onClose }) {
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="group absolute top-4 right-4 z-20 w-11 h-11 rounded-full bg-white/95 border border-[#D4C8B8] flex items-center justify-center text-[#181F1C] hover:bg-[#181F1C] hover:text-white hover:border-[#181F1C] hover:rotate-90 hover:scale-105 active:scale-95 transition-all duration-300 shadow-md cursor-pointer"
+          className="group absolute top-4 right-4 z-30 w-11 h-11 rounded-full bg-white/95 border border-[#D4C8B8] flex items-center justify-center text-[#181F1C] hover:bg-[#181F1C] hover:text-white hover:border-[#181F1C] hover:rotate-90 hover:scale-105 active:scale-95 transition-all duration-300 shadow-md cursor-pointer"
           title="Schließen"
         >
           <X className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
         </button>
 
-        {/* 1. MULTI-IMAGE CAROUSEL / SLIDER */}
-        <div className="relative h-72 sm:h-96 w-full bg-[#181F1C] overflow-hidden rounded-t-3xl">
+        {/* 1. MULTI-IMAGE CAROUSEL / SLIDER (OPTIMIERT FÜR HOCHKANT & QUERFORMAT) */}
+        <div className="relative h-80 sm:h-[420px] md:h-[460px] w-full bg-[#141A17] overflow-hidden rounded-t-3xl flex items-center justify-center select-none">
+          {/* Ambient blurred backdrop so portrait images look intentional and aesthetic without ugly black borders */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center blur-2xl scale-125 opacity-35 transition-all duration-700 pointer-events-none"
+            style={{ backgroundImage: `url(${images[activeImageIndex]})` }}
+          />
+          <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+
+          {/* Foreground Crisp Image (100% visible from top to bottom) */}
           <img
+            key={activeImageIndex}
             src={images[activeImageIndex]}
             alt={`${post.title} - Bild ${activeImageIndex + 1}`}
-            className="w-full h-full object-cover transition-all duration-500"
+            className={`relative z-10 transition-all duration-500 ${
+              fitMode === 'contain'
+                ? 'max-h-full max-w-full w-auto h-auto object-contain p-2 sm:p-4 drop-shadow-[0_12px_30px_rgba(0,0,0,0.6)]'
+                : 'w-full h-full object-cover'
+            }`}
           />
 
           {/* Category Badge */}
-          <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-black/60 backdrop-blur-md text-white text-xs font-craft-mono font-bold rounded-lg">
+          <div className="absolute top-4 left-4 z-20 px-3 py-1 bg-black/60 backdrop-blur-md text-white text-xs font-craft-mono font-bold rounded-lg shadow-sm">
             {post.category}
           </div>
+
+          {/* Aspect Ratio / Fit Toggle */}
+          <button
+            onClick={() => setFitMode(prev => prev === 'contain' ? 'cover' : 'contain')}
+            className="absolute bottom-4 right-4 z-20 px-3 py-1.5 rounded-full bg-black/55 hover:bg-black/85 text-white text-[11px] font-craft-mono font-bold backdrop-blur-md border border-white/20 transition-all flex items-center space-x-1.5 shadow-md hover:scale-105 active:scale-95"
+            title={fitMode === 'contain' ? 'Formatfüllend vergrößern' : 'Ganzes Bild einpassen'}
+          >
+            {fitMode === 'contain' ? <Maximize2 className="w-3.5 h-3.5" /> : <Minimize2 className="w-3.5 h-3.5" />}
+            <span className="hidden sm:inline">{fitMode === 'contain' ? 'Vollbild' : 'Einpassen'}</span>
+          </button>
 
           {/* Carousel Arrows (only if multiple images) */}
           {images.length > 1 && (
             <>
               <button
                 onClick={handlePrev}
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-sm transition-all shadow-lg"
+                className="group absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/50 hover:bg-black/85 border border-white/20 text-white flex items-center justify-center backdrop-blur-md transition-all shadow-xl hover:scale-110 active:scale-95 cursor-pointer"
                 title="Vorheriges Bild"
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-6 h-6 transition-transform duration-200 group-hover:-translate-x-0.5" />
               </button>
 
               <button
                 onClick={handleNext}
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-sm transition-all shadow-lg"
+                className="group absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/50 hover:bg-black/85 border border-white/20 text-white flex items-center justify-center backdrop-blur-md transition-all shadow-xl hover:scale-110 active:scale-95 cursor-pointer"
                 title="Nächstes Bild"
               >
-                <ChevronRight className="w-6 h-6" />
+                <ChevronRight className="w-6 h-6 transition-transform duration-200 group-hover:translate-x-0.5" />
               </button>
 
               {/* Dots & Counter */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center space-x-2 bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full">
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center space-x-2 bg-black/55 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10 shadow-lg">
                 {images.map((_, idx) => (
                   <button
                     key={idx}
                     onClick={() => setActiveImageIndex(idx)}
-                    className={`w-2 h-2 rounded-full transition-all ${
-                      idx === activeImageIndex ? 'bg-white w-5' : 'bg-white/50'
+                    className={`h-2 rounded-full transition-all ${
+                      idx === activeImageIndex ? 'bg-white w-5' : 'bg-white/50 w-2 hover:bg-white/80'
                     }`}
                   />
                 ))}
