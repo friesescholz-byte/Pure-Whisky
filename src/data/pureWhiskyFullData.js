@@ -477,11 +477,7 @@ export const BLOG_POSTS = [
     category: 'Messe',
     author: 'Ines Zager',
     image: IMAGES.messe_interwhisky,
-    images: [
-      IMAGES.messe_interwhisky,
-      IMAGES.messe_bottlemarket,
-      IMAGES.andre_session
-    ],
+    images: [IMAGES.messe_interwhisky],
     videoUrl: '',
     excerpt: 'Besuchen Sie uns vom 15. bis 17. November 2024 im Kurhaus Wiesbaden. Erleben Sie unsere exklusiven Single Cask Abfüllungen in Fassstärke.',
     content: `PURE.WHISKY. ist auf der InterWhisky 2024 in Wiesbaden!
@@ -499,11 +495,7 @@ Ich freue mich auf den persönlichen Austausch mit Ihnen und spannende Fachgespr
     category: 'Tasting',
     author: 'Ines Zager',
     image: IMAGES.andre_session,
-    images: [
-      IMAGES.andre_session,
-      IMAGES.tasting_springbank,
-      IMAGES.ines_portrait
-    ],
+    images: [IMAGES.andre_session],
     videoUrl: 'https://www.youtube.com/watch?v=N_4Z0DgVRts',
     excerpt: 'Am Montag war ich beim André Lautensack, Whisky Evening, im schönen Schleusingen in Thüringen zu Gast um die Idee hinter Pure.Whisky. vorzustellen.',
     content: `Am Montag war ich beim André Lautensack, Whisky Evening, im schönen Schleusingen in Thüringen zu Gast um die Idee hinter Pure.Whisky. vorzustellen und meine ersten Abfüllungen zu verkosten – und natürlich konnten wir beiden Quasselstrippen uns nicht kurz fassen. 🤣
@@ -520,11 +512,7 @@ https://youtu.be/N_4Z0DgVRts?si=1FD11Day3vrb54vd`
     category: 'Messe',
     author: 'Ines Zager',
     image: IMAGES.messe_bottlemarket,
-    images: [
-      IMAGES.messe_bottlemarket,
-      IMAGES.messe_interwhisky,
-      IMAGES.ines_barrel
-    ],
+    images: [IMAGES.messe_bottlemarket],
     videoUrl: '',
     excerpt: 'Bottlemarket Bremen 2024 It’s a wrap! Am Wochenende konnte ich das erste Mal die Idee hinter Pure.Whisky. und meine ersten 3 Abfüllungen präsentieren.',
     content: `Bottlemarket Bremen 2024 It’s a wrap!
@@ -544,10 +532,7 @@ DANKE. 🩷🫶`
     category: 'Messe',
     author: 'Ines Zager',
     image: IMAGES.messe_bottlemarket,
-    images: [
-      IMAGES.messe_bottlemarket,
-      IMAGES.ines_portrait
-    ],
+    images: [IMAGES.messe_bottlemarket],
     videoUrl: '',
     excerpt: 'Vom 18. bis 20. Oktober 2024 in der Messe Bremen: PURE.WHISKY. feiert Messe-Premiere auf dem Bottlemarket!',
     content: `PURE.WHISKY. ist auf dem Bottlemarket 2024!
@@ -563,11 +548,7 @@ Kommen Sie vorbei und verkosten Sie unsere ersten Einzelfass-Abfüllungen direkt
     category: 'Abfüllungen',
     author: 'Ines Zager',
     image: IMAGES.tasting_springbank,
-    images: [
-      IMAGES.tasting_springbank,
-      IMAGES.ardmore_label,
-      IMAGES.mission
-    ],
+    images: [IMAGES.tasting_springbank],
     videoUrl: '',
     excerpt: 'Er ist da! Meine allererste Abfüllung: Ardmore 11 Jahre alt, Ex-Laphroaig Oloroso Sherry Quarter Cask Reifung.',
     content: `Er ist da! Meine allererste Abfüllung!
@@ -585,11 +566,7 @@ Vielen Dank an Melanie, Jen und Naomi für das ehrliche, enthusiastische Feedbac
     category: 'Medien',
     author: 'Ines Zager',
     image: IMAGES.ines_islay,
-    images: [
-      IMAGES.ines_islay,
-      IMAGES.scotland_coast,
-      IMAGES.ines_portrait
-    ],
+    images: [IMAGES.ines_islay],
     videoUrl: '',
     excerpt: 'Vielleicht habt ihr mich gestern im Fernsehen erkannt. Bericht über die Schattenseiten des Whiskybooms auf Islay in der Arte Reportage.',
     content: `TV Reportage „Whiskyboom auf Islay“
@@ -610,11 +587,7 @@ https://www.zdf.de/arte/arte-re/page-video-artede-re-whisky-boom-mit-schattensei
     category: 'Intro',
     author: 'Ines Zager',
     image: IMAGES.ines_portrait,
-    images: [
-      IMAGES.ines_portrait,
-      IMAGES.ines_barrel,
-      IMAGES.ines_testing
-    ],
+    images: [IMAGES.ines_portrait],
     videoUrl: '',
     excerpt: 'Seit gut 20 Jahren bereise ich die Welt auf der Jagd nach den spannendsten Flaschen für meine stetig wachsende Privatsammlung.',
     content: `Ines Zager
@@ -632,11 +605,7 @@ Bis dato war ich als Mutter von zwei Jungs und einem sicheren, gut bezahlten Job
     category: 'Philosophie',
     author: 'Ines Zager',
     image: IMAGES.frauenperspektive,
-    images: [
-      IMAGES.frauenperspektive,
-      IMAGES.ines_portrait,
-      IMAGES.tasting_springbank
-    ],
+    images: [IMAGES.frauenperspektive],
     videoUrl: '',
     excerpt: 'Oder: Was mache ich anders? Ich könnte jetzt schreiben: „PURE.WHISKY. verbindet individuellen Whiskygenuss mit einem Nachhaltigkeitsversprechen und einer frischen Perspektive.“',
     content: `Oder: Was mache ich anders?
@@ -654,11 +623,7 @@ Frauen schmecken und riechen statistisch belegt oft nuancierter. Für mich zähl
     category: 'Mission',
     author: 'Ines Zager',
     image: IMAGES.mission,
-    images: [
-      IMAGES.mission,
-      IMAGES.ines_barrel,
-      IMAGES.scotland_distillery
-    ],
+    images: [IMAGES.mission],
     videoUrl: '',
     excerpt: 'Was treibt mich an? Als unabhängiger Abfüller erwirbt PURE.WHISKY. einzelne Fässer bekannter Brennereien und füllt diese unberührt in Fassstärke ab.',
     content: `Was treibt mich an?
@@ -676,12 +641,7 @@ Der Fokus der Abfüllungen liegt dabei auf Brennereien, die bereits gute Schritt
     category: 'Packaging',
     author: 'Ines Zager',
     image: IMAGES.wild_glass,
-    images: [
-      IMAGES.wild_glass,
-      IMAGES.naturkork,
-      IMAGES.biopolymer_kapsel,
-      IMAGES.saatenpapier_label
-    ],
+    images: [IMAGES.wild_glass],
     videoUrl: '',
     excerpt: 'Viele nachhaltige Bausteine: Abgefüllt wird in eine 100% recycelte Flasche aus spanischem Wild Glass mit unbehandeltem Naturkork.',
     content: `Viele nachhaltige Bausteine
@@ -699,11 +659,7 @@ Der Kapselverschluss ist aus 100% abbaubarem Biopolymer gefertigt – gänzlich 
     category: 'Versprechen',
     author: 'Ines Zager',
     image: IMAGES.versprechen,
-    images: [
-      IMAGES.versprechen,
-      IMAGES.ines_portrait,
-      IMAGES.ines_barrel
-    ],
+    images: [IMAGES.versprechen],
     videoUrl: '',
     excerpt: 'Qualität und Nachhaltigkeit: PURE.WHISKY. hat es sich zum Ziel gesetzt, dass “pure” Whiskyvergnügen wie kein anderer unabhängiger Abfüller zu bieten.',
     content: `Qualität und Nachhaltigkeit

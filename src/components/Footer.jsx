@@ -43,7 +43,7 @@ export default function Footer({ onOpenLegal, setActiveTab }) {
             </h4>
             <ul className="space-y-2 text-base font-normal">
               <li><button onClick={() => { setActiveTab('home'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="hover:text-[#B85D2C] transition-colors">Startseite</button></li>
-              <li><button onClick={() => { setActiveTab('shop'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="hover:text-[#B85D2C] transition-colors">Shop · Die Fässer</button></li>
+              <li><button onClick={() => { setActiveTab('shop'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="hover:text-[#B85D2C] transition-colors">Shop</button></li>
               <li><button onClick={() => { setActiveTab('about'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="hover:text-[#B85D2C] transition-colors">Über Ines Zager</button></li>
               <li><button onClick={() => { setActiveTab('sustainability'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="hover:text-[#B85D2C] transition-colors">Nachhaltigkeit & Audit</button></li>
               <li><button onClick={() => { setActiveTab('blog'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="hover:text-[#B85D2C] transition-colors">Journal & Messen</button></li>

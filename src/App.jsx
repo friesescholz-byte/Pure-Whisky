@@ -59,7 +59,7 @@ export default function App() {
 
   // Persistent Products & Pricing (Mollie-ready & Admin editable)
   const [products, setProducts] = useState(() => {
-    const saved = localStorage.getItem('pure_whisky_products_v1');
+    const saved = localStorage.getItem('pure_whisky_products_v2');
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -71,7 +71,7 @@ export default function App() {
   });
 
   useEffect(() => {
-    localStorage.setItem('pure_whisky_products_v1', JSON.stringify(products));
+    localStorage.setItem('pure_whisky_products_v2', JSON.stringify(products));
   }, [products]);
 
   const handleUpdateProduct = (updatedProduct) => {
@@ -84,18 +84,19 @@ export default function App() {
   const handleResetProducts = () => {
     if (window.confirm('Möchten Sie alle Fässer, Preise und Verfügbarkeiten auf die Standardwerte zurücksetzen?')) {
       setProducts(PRODUCTS);
+      localStorage.removeItem('pure_whisky_products_v2');
       localStorage.removeItem('pure_whisky_products_v1');
     }
   };
 
-  // Persistent Blog Posts (v2 uses the 11 authentic articles from Ines Zager)
+  // Persistent Blog Posts (v3 uses authentic articles with clean single primary images)
   const [blogPosts, setBlogPosts] = useState(() => {
-    const saved = localStorage.getItem('pure_whisky_posts_v2');
+    const saved = localStorage.getItem('pure_whisky_posts_v3');
     return saved ? JSON.parse(saved) : BLOG_POSTS;
   });
 
   useEffect(() => {
-    localStorage.setItem('pure_whisky_posts_v2', JSON.stringify(blogPosts));
+    localStorage.setItem('pure_whisky_posts_v3', JSON.stringify(blogPosts));
   }, [blogPosts]);
 
   // Persistent Contacts CRM

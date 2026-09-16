@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   Package, Tag, Check, Edit2, RotateCcw, Eye, 
   CheckCircle2, AlertCircle, Search, SlidersHorizontal, 
-  Code, Sparkles, ArrowUpRight, DollarSign, Archive, Clock
+  Code, Sparkles, ArrowUpRight, DollarSign, Archive, Clock, Calendar
 } from 'lucide-react';
 
 export default function InventoryManager({ 
@@ -17,12 +17,13 @@ export default function InventoryManager({
   const [showMollieModal, setShowMollieModal] = useState(false);
   const [saveSuccessMsg, setSaveSuccessMsg] = useState('');
 
-  // Quick edit form state
+  // Edit form state
   const [formState, setFormState] = useState({
     price: 0,
     originalPrice: '',
     stock: 0,
     status: 'available', // 'available' | 'upcoming' | 'soldout'
+    releaseDate: '17. September 2026',
     badge: '',
     abv: '',
     caskType: '',
@@ -30,20 +31,26 @@ export default function InventoryManager({
   });
 
   const handleOpenEdit = (p) => {
+    const isSoldOut = p.soldOut === true || (p.isAvailable === false && !p.isUpcoming);
+    const isUpcoming = p.isUpcoming === true;
     let initialStatus = 'available';
-    if (p.isUpcoming) initialStatus = 'upcoming';
-    else if (p.soldOut) initialStatus = 'soldout';
+    if (isUpcoming) initialStatus = 'upcoming';
+    else if (isSoldOut) initialStatus = 'soldout';
+
+    const pReleaseDate = p.releaseDate || '17. September 2026';
+    const remaining = p.stock !== undefined ? p.stock : (p.bottlesRemaining !== undefined ? p.bottlesRemaining : (isSoldOut ? 0 : 48));
 
     setEditingProduct(p);
     setFormState({
       price: p.price,
       originalPrice: p.originalPrice || '',
-      stock: p.stock !== undefined ? p.stock : (p.soldOut ? 0 : 48),
+      stock: remaining,
       status: initialStatus,
-      badge: p.badge || (p.isUpcoming ? 'Release 17. Sept. 2026' : (p.soldOut ? 'Ausverkauft' : 'Sofort lieferbar')),
+      releaseDate: pReleaseDate,
+      badge: p.badge || (isUpcoming ? `Release am ${pReleaseDate} · Vorabzugriff` : (isSoldOut ? 'Ausverkauft · Sammler-Archiv' : 'Sofort lieferbar')),
       abv: p.abv || '',
       caskType: p.caskType || '',
-      bottleCount: p.bottleCount || ''
+      bottleCount: p.bottleCount || (p.bottlesTotal ? `${p.bottlesTotal} Flaschen` : '')
     });
   };
 
@@ -55,15 +62,21 @@ export default function InventoryManager({
     const numericStock = parseInt(formState.stock, 10) || 0;
     const isSoldOut = formState.status === 'soldout' || numericStock === 0;
     const isUpcoming = formState.status === 'upcoming';
+    const isAvailable = !isSoldOut && !isUpcoming;
+    const releaseDateVal = formState.releaseDate.trim() || '17. September 2026';
 
     const updated = {
       ...editingProduct,
       price: numericPrice,
       originalPrice: formState.originalPrice ? parseFloat(formState.originalPrice) : null,
       stock: numericStock,
-      soldOut: isSoldOut,
+      bottlesRemaining: isSoldOut ? 0 : numericStock,
+      status: formState.status,
+      isAvailable: isAvailable,
       isUpcoming: isUpcoming,
-      badge: formState.badge.trim(),
+      soldOut: isSoldOut,
+      releaseDate: releaseDateVal,
+      badge: formState.badge.trim() || (isUpcoming ? `Release am ${releaseDateVal} · Vorabzugriff` : (isSoldOut ? 'Ausverkauft · Sammler-Archiv' : 'Sofort lieferbar')),
       abv: formState.abv.trim(),
       caskType: formState.caskType.trim(),
       bottleCount: formState.bottleCount.trim()
@@ -71,23 +84,35 @@ export default function InventoryManager({
 
     onUpdateProduct(updated);
     setEditingProduct(null);
-    setSaveSuccessMsg(`"${updated.name}" erfolgreich aktualisiert!`);
-    setTimeout(() => setSaveSuccessMsg(''), 3500);
+    setSaveSuccessMsg(`"${updated.name}" erfolgreich aktualisiert! Status: ${isAvailable ? 'Sofort lieferbar' : isUpcoming ? `Vorab-Zugriff (ab ${releaseDateVal})` : 'Ausverkauft'}`);
+    setTimeout(() => setSaveSuccessMsg(''), 4000);
   };
 
-  // Quick Status Toggle directly from row
+  // Quick Status Toggle directly from table row
   const handleQuickStatusChange = (product, newStatus) => {
     const isUpcoming = newStatus === 'upcoming';
     const isSoldOut = newStatus === 'soldout';
+    const isAvailable = newStatus === 'available';
+    const releaseDateVal = product.releaseDate || '17. September 2026';
+    const remaining = isSoldOut ? 0 : (product.bottlesRemaining > 0 ? product.bottlesRemaining : (product.stock || 48));
+
     const updated = {
       ...product,
-      isUpcoming,
+      status: newStatus,
+      isAvailable: isAvailable,
+      isUpcoming: isUpcoming,
       soldOut: isSoldOut,
-      badge: isUpcoming ? 'Release 17. Sept. 2026' : (isSoldOut ? 'Ausverkauft' : 'Sofort lieferbar')
+      releaseDate: releaseDateVal,
+      stock: remaining,
+      bottlesRemaining: remaining,
+      badge: isUpcoming 
+        ? `Release am ${releaseDateVal} · Vorabzugriff` 
+        : (isSoldOut ? 'Ausverkauft · Sammler-Archiv' : 'Sofort lieferbar')
     };
+
     onUpdateProduct(updated);
-    setSaveSuccessMsg(`Status für "${product.name}" auf ${newStatus === 'available' ? 'Sofort lieferbar' : newStatus === 'upcoming' ? 'Vorab-Zugriff' : 'Ausverkauft'} geändert!`);
-    setTimeout(() => setSaveSuccessMsg(''), 3000);
+    setSaveSuccessMsg(`Status für "${product.name}" auf "${isAvailable ? 'Sofort lieferbar' : isUpcoming ? `Vorab-Zugriff (ab ${releaseDateVal})` : 'Ausverkauft'}" geändert!`);
+    setTimeout(() => setSaveSuccessMsg(''), 3500);
   };
 
   // Filtered products
@@ -100,27 +125,40 @@ export default function InventoryManager({
     
     if (!matchesSearch) return false;
 
-    if (statusFilter === 'available') return !p.isUpcoming && !p.soldOut;
-    if (statusFilter === 'upcoming') return p.isUpcoming;
-    if (statusFilter === 'soldout') return p.soldOut;
+    const isSoldOut = p.soldOut === true || (p.isAvailable === false && !p.isUpcoming);
+    const isUpcoming = p.isUpcoming === true;
+    const isAvailable = !isSoldOut && !isUpcoming;
+
+    if (statusFilter === 'available') return isAvailable;
+    if (statusFilter === 'upcoming') return isUpcoming;
+    if (statusFilter === 'soldout') return isSoldOut;
     return true;
   });
 
   // KPI Calculations
   const totalCount = products.length;
-  const availableCount = products.filter(p => !p.isUpcoming && !p.soldOut).length;
-  const upcomingCount = products.filter(p => p.isUpcoming).length;
-  const soldOutCount = products.filter(p => p.soldOut).length;
-  const avgPrice = (products.reduce((acc, p) => acc + p.price, 0) / (totalCount || 1)).toFixed(2);
+  const availableCount = products.filter(p => {
+    const isSoldOut = p.soldOut === true || (p.isAvailable === false && !p.isUpcoming);
+    const isUpcoming = p.isUpcoming === true;
+    return !isSoldOut && !isUpcoming;
+  }).length;
+  const upcomingCount = products.filter(p => p.isUpcoming === true).length;
+  const soldOutCount = products.filter(p => p.soldOut === true || (p.isAvailable === false && !p.isUpcoming)).length;
+  const avgPrice = (products.reduce((acc, p) => acc + (p.price || 0), 0) / (totalCount || 1)).toFixed(2);
 
   // Mollie Orders API Payload Spec
+  const activeProductsForMollie = products.filter(p => {
+    const isSoldOut = p.soldOut === true || (p.isAvailable === false && !p.isUpcoming);
+    return !isSoldOut && !p.isUpcoming;
+  });
+
   const mollieSamplePayload = {
     amount: {
       currency: 'EUR',
-      value: (products.find(p => !p.isUpcoming && !p.soldOut)?.price || 139).toFixed(2)
+      value: (activeProductsForMollie[0]?.price || 139).toFixed(2)
     },
     orderNumber: 'PW-ORD-839210',
-    lines: products.filter(p => !p.isUpcoming && !p.soldOut).map(p => ({
+    lines: activeProductsForMollie.map(p => ({
       type: 'physical',
       sku: 'SKU-' + p.id.toUpperCase(),
       name: p.fullName,
@@ -164,7 +202,7 @@ export default function InventoryManager({
               </span>
             </div>
             <p className="text-sm text-[#55695E] pt-1">
-              Passen Sie Verkaufspreise, Streichpreise, Verfügbarkeiten und Lagerbestände direkt an. Änderungen sind sofort live im Shop sichtbar.
+              Passen Sie Verkaufspreise, Streichpreise, Verfügbarkeiten, Release-Daten und Lagerbestände direkt an. Änderungen sind sofort live im Shop sichtbar.
             </p>
           </div>
 
@@ -223,13 +261,13 @@ export default function InventoryManager({
 
           <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200">
             <span className="text-xs font-craft-mono uppercase text-amber-800 block font-bold">
-              Vorab-Zugriff (17. Sept)
+              Vorab-Zugriff
             </span>
             <span className="font-woodblock text-2xl sm:text-3xl text-amber-900 mt-1 block">
               {upcomingCount}
             </span>
             <span className="text-xs text-amber-700 mt-0.5 block">
-              Newsletter-Reservierung
+              Freies Release-Datum
             </span>
           </div>
 
@@ -291,15 +329,17 @@ export default function InventoryManager({
                 <th className="py-4 px-6">Fass / Produkt</th>
                 <th className="py-4 px-6">Region & Fass-Typ</th>
                 <th className="py-4 px-6">Verkaufspreis</th>
-                <th className="py-4 px-6">Status</th>
+                <th className="py-4 px-6">Status & Release-Datum</th>
                 <th className="py-4 px-6">Lager / Flaschen</th>
                 <th className="py-4 px-6 text-right">Aktionen</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#E2DDD5]">
               {filteredProducts.map((p) => {
-                const isUpcoming = p.isUpcoming;
-                const isSoldOut = p.soldOut;
+                const isSoldOut = p.soldOut === true || (p.isAvailable === false && !p.isUpcoming);
+                const isUpcoming = p.isUpcoming === true;
+                const releaseDateVal = p.releaseDate || '17. September 2026';
+                const remaining = p.stock !== undefined ? p.stock : (p.bottlesRemaining !== undefined ? p.bottlesRemaining : (isSoldOut ? 0 : 48));
 
                 return (
                   <tr key={p.id} className="hover:bg-[#FAF8F5]/60 transition-colors group">
@@ -318,7 +358,7 @@ export default function InventoryManager({
                             {p.name}
                           </div>
                           <div className="text-xs text-[#55695E] font-craft-mono">
-                            {p.distillery} · {p.ageYears} Jahre · {p.abv}
+                            {p.distillery} · {p.ageYears || p.age} · {p.abv}
                           </div>
                         </div>
                       </div>
@@ -364,11 +404,16 @@ export default function InventoryManager({
                           }`}
                         >
                           <option value="available">🟢 Sofort lieferbar</option>
-                          <option value="upcoming">🟡 Vorab-Zugriff (17.09.)</option>
+                          <option value="upcoming">🟡 Vorab-Zugriff ({p.releaseDate || '17.09.'})</option>
                           <option value="soldout">⚪ Ausverkauft</option>
                         </select>
                       </div>
-                      {p.badge && (
+                      {isUpcoming && (
+                        <span className="text-[11px] text-[#B85D2C] block font-craft-mono mt-1 font-bold">
+                          Release: {releaseDateVal}
+                        </span>
+                      )}
+                      {p.badge && !isUpcoming && (
                         <span className="text-[11px] text-[#55695E] block font-craft-mono mt-1">
                           Badge: "{p.badge}"
                         </span>
@@ -378,10 +423,10 @@ export default function InventoryManager({
                     {/* Bottle count / stock */}
                     <td className="py-4 px-6">
                       <div className="text-xs font-craft-mono text-[#181F1C]">
-                        {p.bottleCount || 'Limitiert'}
+                        {p.bottleCount || (p.bottlesTotal ? `${p.bottlesTotal} Flaschen` : 'Limitiert')}
                       </div>
                       <div className="text-[11px] text-[#55695E]">
-                        {isSoldOut ? '0 Flaschen' : (p.stock !== undefined ? `${p.stock} im Depot` : 'Voll verfügbar')}
+                        {isSoldOut ? '0 Flaschen (Ausverkauft)' : `${remaining} Flaschen vorrätig`}
                       </div>
                     </td>
 
@@ -391,7 +436,7 @@ export default function InventoryManager({
                         <button
                           onClick={() => handleOpenEdit(p)}
                           className="px-3 py-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#E2DDD5] border border-[#D4C8B8] text-xs font-craft-mono font-bold text-[#181F1C] transition-colors flex items-center space-x-1.5"
-                          title="Preis und Details bearbeiten"
+                          title="Preis, Release-Datum und Details bearbeiten"
                         >
                           <Edit2 className="w-3.5 h-3.5 text-[#B85D2C]" />
                           <span>Bearbeiten</span>
@@ -444,8 +489,120 @@ export default function InventoryManager({
             </div>
 
             <form onSubmit={handleSaveEdit} className="space-y-5">
+              {/* Status & Stock */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Price */}
+                <div>
+                  <label className="block text-xs font-craft-mono uppercase text-[#55695E] font-bold mb-1.5">
+                    Verfügbarkeits-Status *
+                  </label>
+                  <select
+                    value={formState.status}
+                    onChange={(e) => {
+                      const newStatus = e.target.value;
+                      let autoBadge = formState.badge;
+                      if (newStatus === 'upcoming') autoBadge = `Release am ${formState.releaseDate || '17. September 2026'}`;
+                      else if (newStatus === 'soldout') autoBadge = 'Ausverkauft';
+                      else autoBadge = 'Sofort lieferbar';
+                      setFormState({ ...formState, status: newStatus, badge: autoBadge });
+                    }}
+                    className="w-full px-4 py-2.5 bg-[#FAF8F5] border border-[#D4C8B8] rounded-xl text-sm font-bold text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
+                  >
+                    <option value="available">🟢 Sofort lieferbar (Im Shop kaufbar)</option>
+                    <option value="upcoming">🟡 Vorab-Zugriff (Newsletter-Reservierung)</option>
+                    <option value="soldout">⚪ Ausverkauft (Archiviert)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-craft-mono uppercase text-[#55695E] font-bold mb-1.5">
+                    Lagerbestand (Flaschenanzahl)
+                  </label>
+                  <input
+                    type="number"
+                    value={formState.stock}
+                    onChange={(e) => setFormState({ ...formState, stock: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-[#FAF8F5] border border-[#D4C8B8] rounded-xl text-sm font-bold text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
+                  />
+                  <span className="text-[11px] text-[#55695E] mt-1 block">
+                    Bei 0 Flaschen wird das Fass automatisch als ausverkauft markiert
+                  </span>
+                </div>
+              </div>
+
+              {/* DYNAMIC RELEASE DATE FIELD - FREI KONFIGURIERBAR */}
+              <div className={`p-4 rounded-2xl border transition-colors ${formState.status === 'upcoming' ? 'bg-amber-50/60 border-amber-300' : 'bg-[#FAF8F5] border-[#D4C8B8]'}`}>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-craft-mono uppercase text-[#181F1C] font-bold flex items-center space-x-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-[#B85D2C]" />
+                    <span>Freies Release-Datum für Vorabzugriff</span>
+                  </label>
+                  {formState.status === 'upcoming' && (
+                    <span className="px-2 py-0.5 bg-[#B85D2C] text-white text-[10px] font-craft-mono font-bold rounded-md">
+                      Aktiv
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    value={formState.releaseDate}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setFormState({ 
+                        ...formState, 
+                        releaseDate: val,
+                        badge: formState.status === 'upcoming' ? `Release am ${val}` : formState.badge
+                      });
+                    }}
+                    placeholder="z.B. 17. September 2026 oder 25.10.2026"
+                    className="flex-1 px-4 py-2.5 bg-white border border-[#D4C8B8] rounded-xl text-sm font-bold text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
+                  />
+                  <input
+                    type="date"
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        const d = new Date(e.target.value);
+                        const formatted = d.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
+                        setFormState({
+                          ...formState,
+                          releaseDate: formatted,
+                          badge: formState.status === 'upcoming' ? `Release am ${formatted}` : formState.badge
+                        });
+                      }
+                    }}
+                    className="px-3 py-2.5 bg-white border border-[#D4C8B8] rounded-xl text-xs text-[#55695E] cursor-pointer"
+                    title="Datum aus Kalender wählen"
+                  />
+                </div>
+
+                {/* Quick Presets */}
+                <div className="flex items-center space-x-2 mt-2 pt-2 border-t border-amber-200/50 flex-wrap gap-1.5">
+                  <span className="text-[11px] font-craft-mono text-[#55695E]">Vorlagen:</span>
+                  {[
+                    '17. September 2026',
+                    '1. Oktober 2026',
+                    '15. November 2026',
+                    'Herbst 2026'
+                  ].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setFormState({
+                        ...formState,
+                        releaseDate: preset,
+                        badge: formState.status === 'upcoming' ? `Release am ${preset}` : formState.badge
+                      })}
+                      className="px-2.5 py-1 rounded-lg bg-white border border-[#D4C8B8] text-[11px] font-craft-mono hover:bg-[#E2DDD5] text-[#181F1C] transition-colors"
+                    >
+                      {preset}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Price & Original Price */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-craft-mono uppercase text-[#55695E] font-bold mb-1.5">
                     Verkaufspreis (€) *
@@ -464,11 +621,10 @@ export default function InventoryManager({
                     </span>
                   </div>
                   <span className="text-[11px] text-[#55695E] mt-1 block">
-                    Wird direkt an Mollie übermittelt (inkl. 19% MwSt.)
+                    Wird live im Shop & Mollie angewendet (inkl. 19% MwSt.)
                   </span>
                 </div>
 
-                {/* Original Price / UVP */}
                 <div>
                   <label className="block text-xs font-craft-mono uppercase text-[#55695E] font-bold mb-1.5">
                     Streichpreis (€, optional)
@@ -487,47 +643,7 @@ export default function InventoryManager({
                     </span>
                   </div>
                   <span className="text-[11px] text-[#55695E] mt-1 block">
-                    Wird durchgestrichen neben dem Preis angezeigt
-                  </span>
-                </div>
-              </div>
-
-              {/* Status & Stock */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-craft-mono uppercase text-[#55695E] font-bold mb-1.5">
-                    Verfügbarkeits-Status *
-                  </label>
-                  <select
-                    value={formState.status}
-                    onChange={(e) => {
-                      const newStatus = e.target.value;
-                      let autoBadge = formState.badge;
-                      if (newStatus === 'upcoming') autoBadge = 'Release 17. Sept. 2026';
-                      else if (newStatus === 'soldout') autoBadge = 'Ausverkauft';
-                      else autoBadge = 'Sofort lieferbar';
-                      setFormState({ ...formState, status: newStatus, badge: autoBadge });
-                    }}
-                    className="w-full px-4 py-2.5 bg-[#FAF8F5] border border-[#D4C8B8] rounded-xl text-sm font-bold text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
-                  >
-                    <option value="available">🟢 Sofort lieferbar (Im Shop kaufbar)</option>
-                    <option value="upcoming">🟡 Vorab-Zugriff (Release 17. September)</option>
-                    <option value="soldout">⚪ Ausverkauft (Archiviert)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-craft-mono uppercase text-[#55695E] font-bold mb-1.5">
-                    Lagerbestand (Flaschenanzahl)
-                  </label>
-                  <input
-                    type="number"
-                    value={formState.stock}
-                    onChange={(e) => setFormState({ ...formState, stock: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-[#FAF8F5] border border-[#D4C8B8] rounded-xl text-sm font-bold text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
-                  />
-                  <span className="text-[11px] text-[#55695E] mt-1 block">
-                    Bei 0 wird das Fass automatisch als ausverkauft markiert
+                    Erscheint durchgestrichen als unverbindliche Preisempfehlung
                   </span>
                 </div>
               </div>
@@ -542,7 +658,7 @@ export default function InventoryManager({
                     type="text"
                     value={formState.badge}
                     onChange={(e) => setFormState({ ...formState, badge: e.target.value })}
-                    placeholder="z.B. Release 17. Sept. 2026"
+                    placeholder="z.B. Release am 17. September 2026"
                     className="w-full px-4 py-2.5 bg-[#FAF8F5] border border-[#D4C8B8] rounded-xl text-sm text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
                   />
                 </div>

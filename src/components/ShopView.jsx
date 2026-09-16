@@ -62,10 +62,10 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
         {/* Page Title */}
         <div className="mb-12 space-y-2">
           <span className="font-script text-3xl text-[#2D6A4F] block">
-            PURE.WHISKY. Shop
+            PURE.WHISKY.
           </span>
           <h1 className="font-woodblock text-5xl sm:text-6xl lg:text-7xl text-[#181F1C] tracking-wide uppercase">
-            Die Fässer · Alle Abfüllungen.
+            Shop
           </h1>
           <p className="text-[#3A4A40] text-lg sm:text-xl max-w-2xl font-normal leading-relaxed">
             Unverdünnt in Fassstärke, unfiltriert und frei von Farbstoffen. Abgefüllt in 100% recyceltes Wild Glass.
@@ -111,6 +111,12 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16">
           {filteredProducts.map(product => {
             const displayBottle = product.cutoutImage || product.image;
+            const isSoldOut = product.soldOut === true || (product.isAvailable === false && !product.isUpcoming);
+            const isUpcoming = product.isUpcoming === true;
+            const isAvailable = !isSoldOut && !isUpcoming;
+            const remaining = product.stock !== undefined ? product.stock : (product.bottlesRemaining !== undefined ? product.bottlesRemaining : (isSoldOut ? 0 : 48));
+            const total = product.bottlesTotal || (product.bottleCount ? parseInt(product.bottleCount) : 240);
+            const releaseDateStr = product.releaseDate || '17. September 2026';
 
             return (
               <div
@@ -162,18 +168,18 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
 
                     {/* PROMINENT LARGE STOCK / AVAILABILITY STATUS DISPLAY */}
                     <div className="pt-2 pb-1">
-                      {product.isAvailable ? (
-                        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-[#E8EFEA] border border-[#C5D8CC]">
-                          <span className="w-2.5 h-2.5 rounded-full bg-[#2D6A4F] shrink-0 animate-pulse" />
-                          <span className="font-woodblock text-sm sm:text-base text-[#2D6A4F] uppercase tracking-wider">
-                            Noch {product.bottlesRemaining} von {product.bottlesTotal} Flaschen vorrätig
-                          </span>
-                        </div>
-                      ) : product.isUpcoming ? (
+                      {isUpcoming ? (
                         <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-[#FAF0EB] border border-[#F2DDD2]">
                           <span className="w-2.5 h-2.5 rounded-full bg-[#B85D2C] shrink-0" />
                           <span className="font-woodblock text-sm sm:text-base text-[#B85D2C] uppercase tracking-wider">
-                            Release am 17. September · {product.bottlesTotal} Flaschen
+                            Release am {releaseDateStr} · {total} Flaschen
+                          </span>
+                        </div>
+                      ) : isAvailable ? (
+                        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-[#E8EFEA] border border-[#C5D8CC]">
+                          <span className="w-2.5 h-2.5 rounded-full bg-[#2D6A4F] shrink-0 animate-pulse" />
+                          <span className="font-woodblock text-sm sm:text-base text-[#2D6A4F] uppercase tracking-wider">
+                            Noch {remaining} von {total} Flaschen vorrätig
                           </span>
                         </div>
                       ) : (
@@ -187,7 +193,7 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
                     </div>
 
                     <p className="text-base text-[#2E3D35] font-normal leading-relaxed pt-1">
-                      {product.tastingNotes.nose}
+                      {product.tastingNotes?.nose}
                     </p>
                   </div>
                 </div>
@@ -211,14 +217,14 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
                       Dossier
                     </button>
 
-                    {product.isUpcoming ? (
+                    {isUpcoming ? (
                       <button
                         onClick={(e) => handleOpenReserveModal(product, e)}
                         className="px-6 py-3 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-sm"
                       >
                         Vorabzugriff
                       </button>
-                    ) : product.isAvailable ? (
+                    ) : isAvailable ? (
                       <button
                         onClick={() => onAddToCart(product)}
                         className="px-6 py-3 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-sm"
@@ -279,7 +285,7 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
                 </div>
 
                 <p className="text-sm text-[#3A4A40] leading-relaxed">
-                  Tragen Sie sich unverbindlich ein, um die Benachrichtigung am 17. September vor dem offiziellen Verkauf zu erhalten.
+                  Tragen Sie sich unverbindlich ein, um die Benachrichtigung {preReserveProduct.releaseDate ? `am ${preReserveProduct.releaseDate}` : 'am 17. September'} vor dem offiziellen Verkauf zu erhalten.
                 </p>
 
                 <form onSubmit={handleReserveSubmit} className="space-y-3">
@@ -303,7 +309,7 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
                     type="submit"
                     className="w-full py-4 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-md mt-2"
                   >
-                    Für Vorabzugriff vormerken
+                    Für Vorabzugriff ({preReserveProduct.releaseDate ? `ab ${preReserveProduct.releaseDate}` : 'ab 17.09.'}) vormerken
                   </button>
                 </form>
               </div>

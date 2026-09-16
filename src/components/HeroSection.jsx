@@ -6,46 +6,34 @@ import { PRODUCTS, IMAGES, R2_BASE } from '../data/pureWhiskyFullData';
 export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct, products = PRODUCTS }) {
   // Show ONLY the 2 in-stock bottles + the 4 new September 17 releases (Total 6 bottles)
   // All using transparent cut-out images without background!
-  const heroProducts = [
-    // 2 in-stock casks
-    { 
-      ...products.find(p => p.id === 'jura-15'), 
-      image: `${R2_BASE}Produkte/Pure-Whisky04.webp`,
-      tagText: 'Sofort lieferbar',
-      isUpcoming: false
-    },
-    { 
-      ...products.find(p => p.id === 'glengarioch-11'), 
-      image: `${R2_BASE}Produkte/Pure-Whisky03.webp`,
-      tagText: 'Sofort lieferbar',
-      isUpcoming: false
-    },
-    // 4 new releases (Release 17. September 2026)
-    { 
-      ...products.find(p => p.id === 'glenburgie-11'), 
-      image: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_01.webp`,
-      tagText: 'Ab 17. September',
-      isUpcoming: true
-    },
-    { 
-      ...products.find(p => p.id === 'fettercairn-15'), 
-      image: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_02.webp`,
-      tagText: 'Ab 17. September',
-      isUpcoming: true
-    },
-    { 
-      ...products.find(p => p.id === 'aultmore-17'), 
-      image: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_03.webp`,
-      tagText: 'Ab 17. September',
-      isUpcoming: true
-    },
-    { 
-      ...products.find(p => p.id === 'highlandpark-18'), 
-      image: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_04.webp`,
-      tagText: 'Ab 17. September',
-      isUpcoming: true
+  const heroConfig = [
+    { id: 'jura-15', defaultImage: `${R2_BASE}Produkte/Pure-Whisky04.webp` },
+    { id: 'glengarioch-11', defaultImage: `${R2_BASE}Produkte/Pure-Whisky03.webp` },
+    { id: 'glenburgie-11', defaultImage: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_01.webp` },
+    { id: 'fettercairn-15', defaultImage: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_02.webp` },
+    { id: 'aultmore-17', defaultImage: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_03.webp` },
+    { id: 'highlandpark-18', defaultImage: `${R2_BASE}Produkte-2026/Pure-Whisky-Fass_04.webp` }
+  ];
+
+  const heroProducts = heroConfig.map(item => {
+    const p = products.find(prod => prod.id === item.id) || {};
+    const isSoldOut = p.soldOut === true || (p.isAvailable === false && !p.isUpcoming);
+    const isUpcoming = p.isUpcoming === true;
+    let tag = 'Sofort lieferbar';
+    if (isUpcoming) {
+      tag = p.releaseDate ? `Ab ${p.releaseDate}` : 'Ab 17. September';
+    } else if (isSoldOut) {
+      tag = 'Ausverkauft';
     }
-  ].filter(p => p && p.id);
+    return {
+      ...p,
+      image: item.defaultImage,
+      tagText: tag,
+      isUpcoming,
+      soldOut: isSoldOut,
+      isAvailable: !isSoldOut && !isUpcoming
+    };
+  }).filter(p => p && p.id);
 
   const [activeIdx, setActiveIdx] = useState(0);
   // Auto-rotation disabled per user request: rotation only happens via explicit mouse click!

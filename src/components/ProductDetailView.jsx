@@ -22,6 +22,13 @@ export default function ProductDetailView({
 
   if (!product) return null;
 
+  const isSoldOut = product.soldOut === true || (product.isAvailable === false && !product.isUpcoming);
+  const isUpcoming = product.isUpcoming === true;
+  const isAvailable = !isSoldOut && !isUpcoming;
+  const remaining = product.stock !== undefined ? product.stock : (product.bottlesRemaining !== undefined ? product.bottlesRemaining : (isSoldOut ? 0 : 48));
+  const total = product.bottlesTotal || (product.bottleCount ? parseInt(product.bottleCount) : 240);
+  const releaseDateStr = product.releaseDate || '17. September 2026';
+
   const otherProducts = products.filter(p => p.id !== product.id);
   const gallery = product.galleryImages || [product.image];
   const activeImage = gallery[selectedImageIdx] || product.image;
@@ -70,7 +77,7 @@ export default function ProductDetailView({
         <div className="flex items-center space-x-2 text-xs font-craft-mono font-bold text-[#55695E] mb-8">
           <button onClick={onNavigateHome} className="hover:text-[#181F1C]">Startseite</button>
           <ChevronRight className="w-3.5 h-3.5 text-[#D4C8B8]" />
-          <button onClick={onNavigateShop} className="hover:text-[#181F1C]">Shop · Die Fässer</button>
+          <button onClick={onNavigateShop} className="hover:text-[#181F1C]">Shop</button>
           <ChevronRight className="w-3.5 h-3.5 text-[#D4C8B8]" />
           <span className="text-[#B85D2C] truncate">{product.name}</span>
         </div>
@@ -172,40 +179,40 @@ export default function ProductDetailView({
                 </div>
 
                 <div className="text-right font-craft-mono text-xs font-bold">
-                  {product.isAvailable ? (
-                    <div className="text-right">
-                      <span className="text-[#2D6A4F] text-sm block font-woodblock uppercase">
-                        🟢 Noch {product.bottlesRemaining} von {product.bottlesTotal} Flaschen
-                      </span>
-                      <span className="text-[11px] text-[#55695E] mt-0.5 block">Streng limitiertes Einzelfass</span>
-                    </div>
-                  ) : product.isUpcoming ? (
+                  {isUpcoming ? (
                     <div className="text-right">
                       <span className="text-[#B85D2C] text-sm block font-woodblock uppercase">
-                        Release am 17. September 2026
+                        Release am {releaseDateStr}
                       </span>
-                      <span className="text-[11px] text-[#55695E] mt-0.5 block">Vorab-Zuteilung: {product.bottlesTotal} Flaschen</span>
+                      <span className="text-[11px] text-[#55695E] mt-0.5 block">Vorab-Zuteilung: {total} Flaschen</span>
+                    </div>
+                  ) : isAvailable ? (
+                    <div className="text-right">
+                      <span className="text-[#2D6A4F] text-sm block font-woodblock uppercase">
+                        🟢 Noch {remaining} von {total} Flaschen
+                      </span>
+                      <span className="text-[11px] text-[#55695E] mt-0.5 block">Streng limitiertes Einzelfass</span>
                     </div>
                   ) : (
                     <div className="text-right">
                       <span className="text-rose-600 text-sm block font-woodblock uppercase">
                         🔴 Ausverkauft
                       </span>
-                      <span className="text-[11px] text-[#55695E] mt-0.5 block">Sammler-Archiv ({product.bottlesTotal} Flaschen)</span>
+                      <span className="text-[11px] text-[#55695E] mt-0.5 block">Sammler-Archiv ({total} Flaschen)</span>
                     </div>
                   )}
                 </div>
               </div>
 
               {/* Purchase / Reserve Controls */}
-              {product.isUpcoming ? (
+              {isUpcoming ? (
                 <div className="space-y-4">
                   <div className="p-4 rounded-2xl bg-[#FAF0EB] border border-[#F2DDD2] space-y-2">
                     <span className="font-craft-mono text-xs uppercase tracking-wider text-[#B85D2C] font-bold">
                       Exklusiver Vorab-Zugriff für Fass-Depot Abonnenten
                     </span>
                     <p className="text-xs text-[#3A4A40] leading-relaxed">
-                      Dieses Einzelfass kommt am <strong>17. September 2026</strong> in den Verkauf. Tragen Sie sich jetzt ein, um Ihren persönlichen Bestell-Link vor allen anderen zu erhalten.
+                      Dieses Einzelfass kommt am <strong>{releaseDateStr}</strong> in den Verkauf. Tragen Sie sich jetzt ein, um Ihren persönlichen Bestell-Link vor allen anderen zu erhalten.
                     </p>
                   </div>
 
@@ -216,7 +223,7 @@ export default function ProductDetailView({
                         Erfolgreich vorgemerkt!
                       </h4>
                       <p className="text-xs text-[#3A4A40]">
-                        Vielen Dank! Wir senden Ihnen am 17. September 2026 pünktlich den exklusiven Zuteilungs-Link für <strong>{product.name}</strong> per E-Mail.
+                        Vielen Dank! Wir senden Ihnen am {releaseDateStr} pünktlich den exklusiven Zuteilungs-Link für <strong>{product.name}</strong> per E-Mail.
                       </p>
                     </div>
                   ) : (
@@ -244,12 +251,12 @@ export default function ProductDetailView({
                         className="w-full py-4 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-md flex items-center justify-center space-x-2"
                       >
                         <Bell className="w-4 h-4" />
-                        <span>Für Vorabzugriff am 17.09. vormerken</span>
+                        <span>Für Vorabzugriff ({releaseDateStr}) vormerken</span>
                       </button>
                     </form>
                   )}
                 </div>
-              ) : product.isAvailable ? (
+              ) : isAvailable ? (
                 <div className="space-y-4">
                   <div className="flex items-center space-x-4">
                     {/* Quantity Selector */}
