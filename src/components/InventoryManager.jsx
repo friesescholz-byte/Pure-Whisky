@@ -323,16 +323,16 @@ export default function InventoryManager({
       {/* Products List (Responsive Desktop Table & Mobile Touch Cards) */}
       <div className="bg-white border border-[#D4C8B8] rounded-3xl overflow-hidden shadow-xs">
         
-        {/* DESKTOP TABLE (Komplett ohne horizontales Scrollen, Region & Fass-Typ entfernt) */}
-        <div className="hidden md:block overflow-x-auto">
-          <table className="w-full text-left text-sm text-[#181F1C]">
+        {/* DESKTOP TABLE (table-fixed 100% Breite, exakte Spalten-Prozente, 0px horizontales Scrollen) */}
+        <div className="hidden md:block">
+          <table className="w-full table-fixed text-left text-sm text-[#181F1C]">
             <thead className="bg-[#FAF8F5] border-b border-[#E2DDD5] text-xs font-craft-mono uppercase text-[#55695E] tracking-wider">
               <tr>
-                <th className="py-4 px-5">Fass / Produkt</th>
-                <th className="py-4 px-5 whitespace-nowrap">Verkaufspreis</th>
-                <th className="py-4 px-5 whitespace-nowrap">Status & Release-Datum</th>
-                <th className="py-4 px-5 whitespace-nowrap">Lager / Flaschen</th>
-                <th className="py-4 px-5 text-right whitespace-nowrap">Aktionen</th>
+                <th className="py-3.5 px-4 w-[31%]">Fass / Produkt</th>
+                <th className="py-3.5 px-3 w-[16%]">Verkaufspreis</th>
+                <th className="py-3.5 px-3 w-[24%]">Status & Release</th>
+                <th className="py-3.5 px-3 w-[15%]">Lager / Flaschen</th>
+                <th className="py-3.5 px-4 w-[14%] text-right">Aktionen</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#E2DDD5]">
@@ -344,51 +344,51 @@ export default function InventoryManager({
 
                 return (
                   <tr key={p.id} className="hover:bg-[#FAF8F5]/60 transition-colors group">
-                    {/* Bottle thumbnail & Name */}
-                    <td className="py-4 px-5">
-                      <div className="flex items-center space-x-3.5">
-                        <div className="w-12 h-14 rounded-xl bg-[#FAF8F5] border border-[#D4C8B8] p-1 flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
+                    {/* Bottle thumbnail & Name (31%) */}
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center space-x-3 min-w-0">
+                        <div className="w-10 h-13 rounded-xl bg-[#FAF8F5] border border-[#D4C8B8] p-1 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
                           <img 
                             src={p.image} 
                             alt={p.name} 
                             className="h-full w-full object-contain" 
                           />
                         </div>
-                        <div className="min-w-0">
-                          <div className="font-bold text-[#181F1C] text-base group-hover:text-[#B85D2C] transition-colors truncate">
+                        <div className="min-w-0 flex-1">
+                          <div className="font-bold text-[#181F1C] text-sm sm:text-base group-hover:text-[#B85D2C] transition-colors truncate" title={p.name}>
                             {p.name}
                           </div>
-                          <div className="text-xs text-[#55695E] font-craft-mono truncate">
+                          <div className="text-[11px] sm:text-xs text-[#55695E] font-craft-mono truncate" title={`${p.distillery} · ${p.ageYears || p.age} · ${p.abv}`}>
                             {p.distillery} · {p.ageYears || p.age} · {p.abv}
                           </div>
                         </div>
                       </div>
                     </td>
 
-                    {/* Price */}
-                    <td className="py-4 px-5 whitespace-nowrap">
-                      <div className="flex items-baseline space-x-2">
-                        <span className="font-woodblock text-xl text-[#181F1C]">
+                    {/* Price (16%) */}
+                    <td className="py-3.5 px-3">
+                      <div className="flex items-baseline space-x-1.5 flex-wrap">
+                        <span className="font-woodblock text-lg sm:text-xl text-[#181F1C]">
                           {p.price.toFixed(2)} €
                         </span>
                         {p.originalPrice && (
-                          <span className="text-xs text-stone-400 line-through">
+                          <span className="text-[11px] text-stone-400 line-through">
                             {p.originalPrice.toFixed(2)} €
                           </span>
                         )}
                       </div>
-                      <span className="text-[11px] text-[#55695E] block font-craft-mono">
+                      <span className="text-[10px] sm:text-[11px] text-[#55695E] block font-craft-mono">
                         inkl. 19% MwSt.
                       </span>
                     </td>
 
-                    {/* Status Pill & Quick Change */}
-                    <td className="py-4 px-5">
-                      <div className="flex items-center space-x-2">
+                    {/* Status Pill & Quick Change (24%) */}
+                    <td className="py-3.5 px-3">
+                      <div className="w-full max-w-[175px]">
                         <select
                           value={isUpcoming ? 'upcoming' : (isSoldOut ? 'soldout' : 'available')}
                           onChange={(e) => handleQuickStatusChange(p, e.target.value)}
-                          className={`px-2.5 py-1.5 rounded-lg text-xs font-craft-mono font-bold border focus:outline-none transition-all cursor-pointer hover:border-[#B85D2C] ${
+                          className={`w-full px-2 py-1.5 rounded-lg text-xs font-craft-mono font-bold border focus:outline-none transition-all cursor-pointer hover:border-[#B85D2C] truncate ${
                             isUpcoming
                               ? 'bg-amber-50 text-amber-900 border-amber-300'
                               : isSoldOut
@@ -397,48 +397,48 @@ export default function InventoryManager({
                           }`}
                         >
                           <option value="available">🟢 Sofort lieferbar</option>
-                          <option value="upcoming">🟡 Vorab-Zugriff ({p.releaseDate || '17.09.'})</option>
+                          <option value="upcoming">🟡 Vorab-Zugriff</option>
                           <option value="soldout">⚪ Ausverkauft</option>
                         </select>
                       </div>
                       {isUpcoming && (
-                        <span className="text-[11px] text-[#B85D2C] block font-craft-mono mt-1 font-bold whitespace-nowrap">
+                        <span className="text-[11px] text-[#B85D2C] block font-craft-mono mt-1 font-bold truncate">
                           Release: {releaseDateVal}
                         </span>
                       )}
                       {p.badge && !isUpcoming && (
-                        <span className="text-[11px] text-[#55695E] block font-craft-mono mt-1 truncate max-w-[200px]">
-                          Badge: "{p.badge}"
+                        <span className="text-[10px] text-[#55695E] block font-craft-mono mt-0.5 truncate" title={p.badge}>
+                          {p.badge}
                         </span>
                       )}
                     </td>
 
-                    {/* Bottle count / stock */}
-                    <td className="py-4 px-5 whitespace-nowrap">
-                      <div className="text-xs font-craft-mono text-[#181F1C]">
+                    {/* Bottle count / stock (15%) */}
+                    <td className="py-3.5 px-3">
+                      <div className="text-xs font-craft-mono text-[#181F1C] font-bold truncate">
                         {p.bottleCount || (p.bottlesTotal ? `${p.bottlesTotal} Flaschen` : 'Limitiert')}
                       </div>
-                      <div className="text-[11px] text-[#55695E]">
-                        {isSoldOut ? '0 Flaschen (Ausverkauft)' : `${remaining} Flaschen vorrätig`}
+                      <div className="text-[11px] text-[#55695E] truncate">
+                        {isSoldOut ? 'Ausverkauft (0)' : `${remaining} vorrätig`}
                       </div>
                     </td>
 
-                    {/* Actions */}
-                    <td className="py-4 px-5 text-right whitespace-nowrap">
-                      <div className="flex items-center justify-end space-x-2">
+                    {/* Actions (14%) */}
+                    <td className="py-3.5 px-4 text-right">
+                      <div className="flex items-center justify-end space-x-1.5">
                         <button
                           onClick={() => handleOpenEdit(p)}
-                          className="px-3.5 py-1.5 rounded-xl bg-[#FAF8F5] hover:bg-[#E2DDD5] border border-[#D4C8B8] text-xs font-craft-mono font-bold text-[#181F1C] hover:border-[#B85D2C] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center space-x-1.5 shadow-2xs cursor-pointer"
+                          className="px-2.5 py-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#E2DDD5] border border-[#D4C8B8] text-xs font-craft-mono font-bold text-[#181F1C] hover:border-[#B85D2C] transition-all hover:scale-[1.02] active:scale-[0.98] inline-flex items-center space-x-1 shadow-2xs cursor-pointer shrink-0"
                           title="Preis, Release-Datum und Details bearbeiten"
                         >
-                          <Edit2 className="w-3.5 h-3.5 text-[#B85D2C]" />
-                          <span>Bearbeiten</span>
+                          <Edit2 className="w-3.5 h-3.5 text-[#B85D2C] shrink-0" />
+                          <span>Edit</span>
                         </button>
 
                         {onNavigateProduct && (
                           <button
                             onClick={() => onNavigateProduct(p)}
-                            className="p-1.5 rounded-xl bg-[#FAF8F5] hover:bg-[#E2DDD5] border border-[#D4C8B8] text-xs text-[#55695E] hover:text-[#181F1C] hover:border-[#B85D2C] transition-all hover:scale-105 active:scale-95 shadow-2xs cursor-pointer"
+                            className="p-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#E2DDD5] border border-[#D4C8B8] text-xs text-[#55695E] hover:text-[#181F1C] hover:border-[#B85D2C] transition-all hover:scale-105 active:scale-95 shadow-2xs cursor-pointer shrink-0"
                             title="Im Shop ansehen"
                           >
                             <Eye className="w-3.5 h-3.5" />

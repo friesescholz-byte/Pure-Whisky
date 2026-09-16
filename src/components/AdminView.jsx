@@ -515,7 +515,7 @@ Ines Zager · PURE.WHISKY.`);
   // -------------------------------------------------------------
   return (
     <div className="pt-24 sm:pt-28 pb-36 min-h-screen bg-[#FAF8F5] text-left">
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Bar */}
         <div className="bg-white border border-[#D4C8B8] rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-xs mb-6 sm:mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
