@@ -239,7 +239,7 @@ export default function AboutView({ onNavigateShop, onNavigateHome, onOpenSustai
             Erlebe die Haltung im Glas
           </span>
           <h2 className="font-woodblock text-4xl sm:text-5xl text-[#181F1C] tracking-wide uppercase max-w-2xl mx-auto">
-            Entdecke die aktuellen 4 handverlesenen Einzelfässer.
+            Entdecke die aktuellen handverlesenen Einzelfässer.
           </h2>
           <p className="text-[#3A4A40] text-lg max-w-xl mx-auto font-normal leading-relaxed">
             Streng limitiert, unverdünnt in nativer Fassstärke abgefüllt in 100% PCR Wild Glass.

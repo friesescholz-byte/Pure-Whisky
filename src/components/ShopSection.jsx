@@ -13,7 +13,7 @@ export default function ShopSection({ onOpenProduct, onAddToCart, onOpenShop }) 
               Boutique Abfüllungen
             </span>
             <h2 className="font-woodblock text-4xl sm:text-5xl lg:text-6xl text-[#181F1C] tracking-wide uppercase">
-              Die aktuellen 4 Einzelfässer.
+              Die aktuellen Einzelfässer.
             </h2>
             <p className="text-[#3A4A40] text-lg font-normal leading-relaxed">
               Jede Edition ist ein unberührtes Unikat. Reifung in traditionellen Eichenfässern, 

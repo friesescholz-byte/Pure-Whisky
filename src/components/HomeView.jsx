@@ -141,7 +141,7 @@ export default function HomeView({ setActiveTab, onSelectProduct, onSelectPillar
               Limitierte Auflage
             </div>
             <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#F6F4EE]">
-              Unsere 4 Single Cask Abfüllungen
+              Unsere Single Cask Abfüllungen
             </h2>
           </div>
           <button
