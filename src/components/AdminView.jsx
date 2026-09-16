@@ -514,29 +514,29 @@ Ines Zager · PURE.WHISKY.`);
   // AUTHENTICATED DASHBOARD
   // -------------------------------------------------------------
   return (
-    <div className="pt-28 pb-36 min-h-screen bg-[#FAF8F5] text-left">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+    <div className="pt-24 sm:pt-28 pb-36 min-h-screen bg-[#FAF8F5] text-left">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
         
         {/* Header Bar */}
-        <div className="bg-white border border-[#D4C8B8] rounded-3xl p-6 sm:p-8 shadow-xs mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="bg-white border border-[#D4C8B8] rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-xs mb-6 sm:mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="space-y-1">
-            <div className="flex items-center space-x-3">
-              <span className="font-woodblock text-3xl sm:text-4xl text-[#181F1C] tracking-wide uppercase">
+            <div className="flex items-center space-x-3 flex-wrap gap-2">
+              <span className="font-woodblock text-2xl sm:text-3xl lg:text-4xl text-[#181F1C] tracking-wide uppercase">
                 PURE.WHISKY. Verwaltungszentrale
               </span>
               <span className="px-3 py-1 bg-[#E8EFEA] border border-[#C5D8CC] text-[#2D6A4F] font-craft-mono text-xs font-bold rounded-full">
                 Angemeldet
               </span>
             </div>
-            <p className="text-sm text-[#55695E]">
+            <p className="text-xs sm:text-sm text-[#55695E]">
               E-Mail Kampagnen, Versand-Historie, Kunden-CRM und Journal-Verwaltung.
             </p>
           </div>
 
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto justify-between sm:justify-end">
             <button
               onClick={onNavigateBlog}
-              className="px-4 py-2 rounded-xl bg-[#FAF8F5] border border-[#D4C8B8] text-xs font-craft-mono font-bold text-[#181F1C] hover:bg-[#E2DDD5] transition-colors"
+              className="px-3.5 sm:px-4 py-2 rounded-xl bg-[#FAF8F5] border border-[#D4C8B8] text-xs font-craft-mono font-bold text-[#181F1C] hover:bg-[#E2DDD5] transition-colors"
             >
               Live-Journal ansehen →
             </button>
@@ -550,12 +550,12 @@ Ines Zager · PURE.WHISKY.`);
           </div>
         </div>
 
-        {/* 5 Main Tabs */}
-        <div className="flex items-center space-x-3 border-b border-[#E2DDD5] pb-4 mb-8 overflow-x-auto">
+        {/* 5 Main Tabs (Responsive scrollable tab bar) */}
+        <div className="flex items-center space-x-2 sm:space-x-3 border-b border-[#E2DDD5] pb-3 sm:pb-4 mb-6 sm:mb-8 overflow-x-auto select-none">
           
           <button
             onClick={() => setAdminTab('inventory')}
-            className={`px-6 py-3 rounded-xl font-woodblock text-lg tracking-wider uppercase transition-all flex items-center space-x-2 shrink-0 ${
+            className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-woodblock text-sm sm:text-base md:text-lg tracking-wider uppercase transition-all flex items-center space-x-2 shrink-0 cursor-pointer ${
               adminTab === 'inventory' 
                 ? 'bg-[#B85D2C] text-white shadow-md' 
                 : 'bg-white border border-[#D4C8B8] text-[#181F1C] hover:bg-[#FAF8F5]'
@@ -563,60 +563,60 @@ Ines Zager · PURE.WHISKY.`);
           >
             <Package className="w-4 h-4" />
             <span>Fässer & Preise (Shop)</span>
-            <span className="ml-1.5 px-2 py-0.5 bg-black/10 text-xs font-craft-mono font-bold rounded-full">
+            <span className="ml-1 px-2 py-0.5 bg-black/10 text-xs font-craft-mono font-bold rounded-full">
               {products.length}
             </span>
           </button>
 
           <button
             onClick={() => setAdminTab('broadcast')}
-            className={`px-6 py-3 rounded-xl font-woodblock text-lg tracking-wider uppercase transition-all flex items-center space-x-2 shrink-0 ${
+            className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-woodblock text-sm sm:text-base md:text-lg tracking-wider uppercase transition-all flex items-center space-x-2 shrink-0 cursor-pointer ${
               adminTab === 'broadcast' 
                 ? 'bg-[#B85D2C] text-white shadow-md' 
                 : 'bg-white border border-[#D4C8B8] text-[#181F1C] hover:bg-[#FAF8F5]'
             }`}
           >
             <Send className="w-4 h-4" />
-            <span>Newsletter & E-Mails versenden</span>
-            <span className="ml-1.5 px-2 py-0.5 bg-black/10 text-xs font-craft-mono font-bold rounded-full">
+            <span>Newsletter & E-Mails</span>
+            <span className="ml-1 px-2 py-0.5 bg-black/10 text-xs font-craft-mono font-bold rounded-full">
               {selectedEmails.length}
             </span>
           </button>
 
           <button
             onClick={() => setAdminTab('history')}
-            className={`px-6 py-3 rounded-xl font-woodblock text-lg tracking-wider uppercase transition-all flex items-center space-x-2 shrink-0 ${
+            className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-woodblock text-sm sm:text-base md:text-lg tracking-wider uppercase transition-all flex items-center space-x-2 shrink-0 cursor-pointer ${
               adminTab === 'history' 
                 ? 'bg-[#B85D2C] text-white shadow-md' 
                 : 'bg-white border border-[#D4C8B8] text-[#181F1C] hover:bg-[#FAF8F5]'
             }`}
           >
             <History className="w-4 h-4" />
-            <span>Versendete E-Mails ({sentCampaigns.length})</span>
+            <span>Versendet ({sentCampaigns.length})</span>
           </button>
 
           <button
             onClick={() => setAdminTab('crm')}
-            className={`px-6 py-3 rounded-xl font-woodblock text-lg tracking-wider uppercase transition-all flex items-center space-x-2 shrink-0 ${
+            className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-woodblock text-sm sm:text-base md:text-lg tracking-wider uppercase transition-all flex items-center space-x-2 shrink-0 cursor-pointer ${
               adminTab === 'crm' 
                 ? 'bg-[#B85D2C] text-white shadow-md' 
                 : 'bg-white border border-[#D4C8B8] text-[#181F1C] hover:bg-[#FAF8F5]'
             }`}
           >
             <Users className="w-4 h-4" />
-            <span>Kunden-Kontakte & Fass-Depot ({totalUniqueCount})</span>
+            <span>Kunden ({totalUniqueCount})</span>
           </button>
 
           <button
             onClick={() => setAdminTab('journal')}
-            className={`px-6 py-3 rounded-xl font-woodblock text-lg tracking-wider uppercase transition-all flex items-center space-x-2 shrink-0 ${
+            className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-woodblock text-sm sm:text-base md:text-lg tracking-wider uppercase transition-all flex items-center space-x-2 shrink-0 cursor-pointer ${
               adminTab === 'journal' 
                 ? 'bg-[#B85D2C] text-white shadow-md' 
                 : 'bg-white border border-[#D4C8B8] text-[#181F1C] hover:bg-[#FAF8F5]'
             }`}
           >
             <BookOpen className="w-4 h-4" />
-            <span>Blog- & Journal-Artikel ({blogPosts.length})</span>
+            <span>Journal ({blogPosts.length})</span>
           </button>
 
         </div>
@@ -1194,9 +1194,9 @@ Ines Zager · PURE.WHISKY.`);
         {/* ------------------------------------------------------------- */}
         {adminTab === 'journal' && (
           <div className="space-y-8">
-            <div className="bg-white border border-[#D4C8B8] rounded-3xl p-6 shadow-xs flex items-center justify-between">
+            <div className="bg-white border border-[#D4C8B8] rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <h2 className="font-woodblock text-3xl text-[#181F1C] uppercase tracking-wide">
+                <h2 className="font-woodblock text-2xl sm:text-3xl text-[#181F1C] uppercase tracking-wide">
                   Journal- & Blog-Beiträge
                 </h2>
                 <p className="text-xs text-[#55695E]">

@@ -320,18 +320,19 @@ export default function InventoryManager({
         </div>
       </div>
 
-      {/* Products List Table */}
+      {/* Products List (Responsive Desktop Table & Mobile Touch Cards) */}
       <div className="bg-white border border-[#D4C8B8] rounded-3xl overflow-hidden shadow-xs">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[1100px] text-left text-sm text-[#181F1C]">
+        
+        {/* DESKTOP TABLE (Komplett ohne horizontales Scrollen, Region & Fass-Typ entfernt) */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full text-left text-sm text-[#181F1C]">
             <thead className="bg-[#FAF8F5] border-b border-[#E2DDD5] text-xs font-craft-mono uppercase text-[#55695E] tracking-wider">
               <tr>
-                <th className="py-4 px-6 min-w-[280px]">Fass / Produkt</th>
-                <th className="py-4 px-6 min-w-[200px]">Region & Fass-Typ</th>
-                <th className="py-4 px-6 min-w-[150px]">Verkaufspreis</th>
-                <th className="py-4 px-6 min-w-[230px]">Status & Release-Datum</th>
-                <th className="py-4 px-6 min-w-[150px]">Lager / Flaschen</th>
-                <th className="py-4 px-6 min-w-[160px] text-right whitespace-nowrap">Aktionen</th>
+                <th className="py-4 px-5">Fass / Produkt</th>
+                <th className="py-4 px-5 whitespace-nowrap">Verkaufspreis</th>
+                <th className="py-4 px-5 whitespace-nowrap">Status & Release-Datum</th>
+                <th className="py-4 px-5 whitespace-nowrap">Lager / Flaschen</th>
+                <th className="py-4 px-5 text-right whitespace-nowrap">Aktionen</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#E2DDD5]">
@@ -344,7 +345,7 @@ export default function InventoryManager({
                 return (
                   <tr key={p.id} className="hover:bg-[#FAF8F5]/60 transition-colors group">
                     {/* Bottle thumbnail & Name */}
-                    <td className="py-4 px-6">
+                    <td className="py-4 px-5">
                       <div className="flex items-center space-x-3.5">
                         <div className="w-12 h-14 rounded-xl bg-[#FAF8F5] border border-[#D4C8B8] p-1 flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
                           <img 
@@ -353,27 +354,19 @@ export default function InventoryManager({
                             className="h-full w-full object-contain" 
                           />
                         </div>
-                        <div>
-                          <div className="font-bold text-[#181F1C] text-base group-hover:text-[#B85D2C] transition-colors">
+                        <div className="min-w-0">
+                          <div className="font-bold text-[#181F1C] text-base group-hover:text-[#B85D2C] transition-colors truncate">
                             {p.name}
                           </div>
-                          <div className="text-xs text-[#55695E] font-craft-mono">
+                          <div className="text-xs text-[#55695E] font-craft-mono truncate">
                             {p.distillery} · {p.ageYears || p.age} · {p.abv}
                           </div>
                         </div>
                       </div>
                     </td>
 
-                    {/* Region & Cask */}
-                    <td className="py-4 px-6">
-                      <div className="text-xs text-[#181F1C] font-bold">{p.region}</div>
-                      <div className="text-xs text-[#55695E] truncate max-w-xs" title={p.caskType}>
-                        {p.caskType}
-                      </div>
-                    </td>
-
                     {/* Price */}
-                    <td className="py-4 px-6">
+                    <td className="py-4 px-5 whitespace-nowrap">
                       <div className="flex items-baseline space-x-2">
                         <span className="font-woodblock text-xl text-[#181F1C]">
                           {p.price.toFixed(2)} €
@@ -390,7 +383,7 @@ export default function InventoryManager({
                     </td>
 
                     {/* Status Pill & Quick Change */}
-                    <td className="py-4 px-6">
+                    <td className="py-4 px-5">
                       <div className="flex items-center space-x-2">
                         <select
                           value={isUpcoming ? 'upcoming' : (isSoldOut ? 'soldout' : 'available')}
@@ -409,19 +402,19 @@ export default function InventoryManager({
                         </select>
                       </div>
                       {isUpcoming && (
-                        <span className="text-[11px] text-[#B85D2C] block font-craft-mono mt-1 font-bold">
+                        <span className="text-[11px] text-[#B85D2C] block font-craft-mono mt-1 font-bold whitespace-nowrap">
                           Release: {releaseDateVal}
                         </span>
                       )}
                       {p.badge && !isUpcoming && (
-                        <span className="text-[11px] text-[#55695E] block font-craft-mono mt-1">
+                        <span className="text-[11px] text-[#55695E] block font-craft-mono mt-1 truncate max-w-[200px]">
                           Badge: "{p.badge}"
                         </span>
                       )}
                     </td>
 
                     {/* Bottle count / stock */}
-                    <td className="py-4 px-6">
+                    <td className="py-4 px-5 whitespace-nowrap">
                       <div className="text-xs font-craft-mono text-[#181F1C]">
                         {p.bottleCount || (p.bottlesTotal ? `${p.bottlesTotal} Flaschen` : 'Limitiert')}
                       </div>
@@ -431,11 +424,11 @@ export default function InventoryManager({
                     </td>
 
                     {/* Actions */}
-                    <td className="py-4 px-6 text-right whitespace-nowrap">
+                    <td className="py-4 px-5 text-right whitespace-nowrap">
                       <div className="flex items-center justify-end space-x-2">
                         <button
                           onClick={() => handleOpenEdit(p)}
-                          className="px-3.5 py-1.5 rounded-xl bg-[#FAF8F5] hover:bg-[#E2DDD5] border border-[#D4C8B8] text-xs font-craft-mono font-bold text-[#181F1C] hover:border-[#B85D2C] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center space-x-1.5 shadow-2xs"
+                          className="px-3.5 py-1.5 rounded-xl bg-[#FAF8F5] hover:bg-[#E2DDD5] border border-[#D4C8B8] text-xs font-craft-mono font-bold text-[#181F1C] hover:border-[#B85D2C] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center space-x-1.5 shadow-2xs cursor-pointer"
                           title="Preis, Release-Datum und Details bearbeiten"
                         >
                           <Edit2 className="w-3.5 h-3.5 text-[#B85D2C]" />
@@ -445,7 +438,7 @@ export default function InventoryManager({
                         {onNavigateProduct && (
                           <button
                             onClick={() => onNavigateProduct(p)}
-                            className="p-1.5 rounded-xl bg-[#FAF8F5] hover:bg-[#E2DDD5] border border-[#D4C8B8] text-xs text-[#55695E] hover:text-[#181F1C] hover:border-[#B85D2C] transition-all hover:scale-105 active:scale-95 shadow-2xs"
+                            className="p-1.5 rounded-xl bg-[#FAF8F5] hover:bg-[#E2DDD5] border border-[#D4C8B8] text-xs text-[#55695E] hover:text-[#181F1C] hover:border-[#B85D2C] transition-all hover:scale-105 active:scale-95 shadow-2xs cursor-pointer"
                             title="Im Shop ansehen"
                           >
                             <Eye className="w-3.5 h-3.5" />
@@ -458,6 +451,103 @@ export default function InventoryManager({
               })}
             </tbody>
           </table>
+        </div>
+
+        {/* MOBILE CARD VIEW (< md, optimiert für Touchscreens & 100% ohne horizontales Scrollen) */}
+        <div className="md:hidden divide-y divide-[#E2DDD5]">
+          {filteredProducts.map((p) => {
+            const isSoldOut = p.soldOut === true || (p.isAvailable === false && !p.isUpcoming);
+            const isUpcoming = p.isUpcoming === true;
+            const releaseDateVal = p.releaseDate || '17. September 2026';
+            const remaining = p.stock !== undefined ? p.stock : (p.bottlesRemaining !== undefined ? p.bottlesRemaining : (isSoldOut ? 0 : 48));
+
+            return (
+              <div key={p.id} className="p-4 space-y-4 hover:bg-[#FAF8F5]/50 transition-colors">
+                {/* Header: Bottle thumbnail, Name & Price */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center space-x-3 min-w-0">
+                    <div className="w-13 h-16 rounded-xl bg-[#FAF8F5] border border-[#D4C8B8] p-1 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
+                      <img 
+                        src={p.image} 
+                        alt={p.name} 
+                        className="h-full w-full object-contain" 
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-bold text-[#181F1C] text-base leading-tight truncate">
+                        {p.name}
+                      </div>
+                      <div className="text-xs text-[#55695E] font-craft-mono mt-0.5 truncate">
+                        {p.distillery} · {p.ageYears || p.age} · {p.abv}
+                      </div>
+                      <div className="text-xs text-[#55695E] mt-0.5">
+                        {isSoldOut ? '0 Flaschen (Ausverkauft)' : `${remaining} Flaschen vorrätig`}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="text-right shrink-0">
+                    <span className="font-woodblock text-xl text-[#181F1C] block">
+                      {p.price.toFixed(2)} €
+                    </span>
+                    <span className="text-[10px] text-[#55695E] block font-craft-mono">
+                      inkl. MwSt.
+                    </span>
+                  </div>
+                </div>
+
+                {/* Quick Status Dropdown */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-craft-mono uppercase text-[#55695E] font-bold">
+                      Status & Freigabe:
+                    </span>
+                    {isUpcoming && (
+                      <span className="text-[11px] font-craft-mono text-[#B85D2C] font-bold">
+                        ab {releaseDateVal}
+                      </span>
+                    )}
+                  </div>
+                  <select
+                    value={isUpcoming ? 'upcoming' : (isSoldOut ? 'soldout' : 'available')}
+                    onChange={(e) => handleQuickStatusChange(p, e.target.value)}
+                    className={`w-full px-3 py-2 rounded-xl text-xs font-craft-mono font-bold border focus:outline-none transition-all cursor-pointer ${
+                      isUpcoming
+                        ? 'bg-amber-50 text-amber-900 border-amber-300'
+                        : isSoldOut
+                        ? 'bg-stone-100 text-stone-700 border-stone-300'
+                        : 'bg-emerald-50 text-emerald-900 border-emerald-300'
+                    }`}
+                  >
+                    <option value="available">🟢 Sofort lieferbar (Im Shop kaufbar)</option>
+                    <option value="upcoming">🟡 Vorab-Zugriff (Release am {releaseDateVal})</option>
+                    <option value="soldout">⚪ Ausverkauft (Archiviert)</option>
+                  </select>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center space-x-2 pt-1">
+                  <button
+                    onClick={() => handleOpenEdit(p)}
+                    className="flex-1 py-2.5 px-4 rounded-xl bg-[#FAF8F5] hover:bg-[#E2DDD5] border border-[#D4C8B8] text-xs font-craft-mono font-bold text-[#181F1C] hover:border-[#B85D2C] transition-all flex items-center justify-center space-x-2 shadow-2xs cursor-pointer"
+                  >
+                    <Edit2 className="w-3.5 h-3.5 text-[#B85D2C]" />
+                    <span>Preis & Details bearbeiten</span>
+                  </button>
+
+                  {onNavigateProduct && (
+                    <button
+                      onClick={() => onNavigateProduct(p)}
+                      className="p-2.5 rounded-xl bg-[#FAF8F5] hover:bg-[#E2DDD5] border border-[#D4C8B8] text-[#55695E] hover:text-[#181F1C] hover:border-[#B85D2C] transition-all shadow-2xs cursor-pointer"
+                      title="Im Shop ansehen"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
