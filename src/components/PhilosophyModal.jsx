@@ -23,9 +23,10 @@ export default function PhilosophyModal({ isOpen, onClose }) {
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900"
+            className="group p-2.5 rounded-full bg-white border border-[#D4C8B8] text-[#55695E] hover:text-white hover:bg-[#181F1C] hover:border-[#181F1C] hover:rotate-90 hover:scale-105 active:scale-95 transition-all duration-300 shadow-xs cursor-pointer"
+            aria-label="Schließen"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 transition-transform duration-300" />
           </button>
         </div>
 

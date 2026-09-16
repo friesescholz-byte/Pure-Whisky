@@ -253,9 +253,10 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
             
             <button
               onClick={() => setPreReserveProduct(null)}
-              className="absolute top-6 right-6 p-2 rounded-full hover:bg-[#FAF8F5] text-[#181F1C]"
+              className="group absolute top-6 right-6 p-2.5 rounded-full bg-[#FAF8F5] border border-[#D4C8B8] text-stone-500 hover:text-[#181F1C] hover:border-[#B85D2C] hover:bg-white transition-all duration-300 shadow-xs hover:scale-105 active:scale-95"
+              title="Schließen"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" />
             </button>
 
             {reserveSuccess ? (

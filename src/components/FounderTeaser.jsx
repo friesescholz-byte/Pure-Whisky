@@ -46,9 +46,9 @@ export default function FounderTeaser({ onOpenAbout, onOpenShop }) {
 
                 <button
                   onClick={onOpenShop}
-                  className="inline-flex items-center justify-center space-x-2 px-8 py-4 rounded-lg bg-[#E8EFEA] hover:bg-[#D8E4DC] text-[#181F1C] font-woodblock text-xl tracking-wider uppercase transition-all"
+                  className="inline-flex items-center justify-center space-x-2 px-8 py-4 rounded-lg bg-[#E8EFEA] hover:bg-[#D8E4DC] text-[#181F1C] font-woodblock text-xl tracking-wider uppercase transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
-                  <span>Die 4 Fässer im Shop</span>
+                  <span>Die Fässer im Shop</span>
                 </button>
               </div>
 

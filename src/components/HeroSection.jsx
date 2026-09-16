@@ -96,7 +96,7 @@ export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct, pr
             <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
               <button
                 onClick={onOpenShop}
-                className="inline-flex items-center justify-center space-x-3 px-9 py-4.5 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-xl tracking-wider uppercase transition-all shadow-md hover:shadow-lg"
+                className="inline-flex items-center justify-center space-x-3 px-9 py-4.5 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-xl tracking-wider uppercase transition-all shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
               >
                 <span>Die Fässer im Shop entdecken</span>
                 <ArrowRight className="w-5 h-5" />
@@ -104,7 +104,7 @@ export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct, pr
 
               <button
                 onClick={onOpenAbout}
-                className="inline-flex items-center justify-center px-8 py-4.5 rounded-lg bg-white hover:bg-[#F2EFE9] border border-[#D4C8B8] text-[#181F1C] font-woodblock text-xl tracking-wider uppercase transition-all shadow-xs"
+                className="inline-flex items-center justify-center px-8 py-4.5 rounded-lg bg-white hover:bg-[#F2EFE9] border border-[#D4C8B8] text-[#181F1C] font-woodblock text-xl tracking-wider uppercase transition-all shadow-xs hover:scale-[1.02] active:scale-[0.98]"
               >
                 <span>Über Ines Zager & Haltung</span>
               </button>
@@ -212,18 +212,18 @@ export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct, pr
               {/* Clean Minimalist Arrows */}
               <button
                 onClick={(e) => { e.stopPropagation(); handlePrev(); }}
-                className="absolute left-0 sm:left-2 top-1/2 -translate-y-1/2 z-40 p-2 text-[#2D6A4F] hover:text-[#B85D2C] hover:scale-120 transition-all duration-200 focus:outline-none cursor-pointer"
+                className="group absolute -left-2 sm:left-1 top-1/2 -translate-y-1/2 z-40 p-3 sm:p-3.5 rounded-full bg-white/80 hover:bg-white border border-[#D4C8B8] hover:border-[#B85D2C] text-[#2D6A4F] hover:text-[#B85D2C] shadow-sm hover:shadow-md hover:scale-110 active:scale-95 transition-all duration-300 focus:outline-none cursor-pointer backdrop-blur-xs"
                 aria-label="Vorherige Flasche"
               >
-                <ChevronLeft className="w-9 h-9 sm:w-11 sm:h-11 drop-shadow-sm" strokeWidth={1.8} />
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-300 group-hover:-translate-x-0.5" strokeWidth={2.2} />
               </button>
 
               <button
                 onClick={(e) => { e.stopPropagation(); handleNext(); }}
-                className="absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 z-40 p-2 text-[#2D6A4F] hover:text-[#B85D2C] hover:scale-120 transition-all duration-200 focus:outline-none cursor-pointer"
+                className="group absolute -right-2 sm:right-1 top-1/2 -translate-y-1/2 z-40 p-3 sm:p-3.5 rounded-full bg-white/80 hover:bg-white border border-[#D4C8B8] hover:border-[#B85D2C] text-[#2D6A4F] hover:text-[#B85D2C] shadow-sm hover:shadow-md hover:scale-110 active:scale-95 transition-all duration-300 focus:outline-none cursor-pointer backdrop-blur-xs"
                 aria-label="Nächste Flasche"
               >
-                <ChevronRight className="w-9 h-9 sm:w-11 sm:h-11 drop-shadow-sm" strokeWidth={1.8} />
+                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-300 group-hover:translate-x-0.5" strokeWidth={2.2} />
               </button>
 
             </div>

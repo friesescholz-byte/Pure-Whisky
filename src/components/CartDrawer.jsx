@@ -22,8 +22,12 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
               <ShoppingBag className="w-5 h-5 text-[#B85D2C]" />
               <h2 className="font-serif text-2xl text-[#181F1C] font-normal">Ihr Warenkorb</h2>
             </div>
-            <button onClick={onClose} className="p-2 rounded-lg bg-neutral-100 text-neutral-600 hover:text-neutral-900">
-              <X className="w-5 h-5" />
+            <button 
+              onClick={onClose} 
+              className="group p-2 rounded-full bg-white border border-[#D4C8B8] text-stone-500 hover:text-[#181F1C] hover:border-[#B85D2C] transition-all duration-300 shadow-xs hover:scale-105 active:scale-95"
+              title="Warenkorb schließen"
+            >
+              <X className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" />
             </button>
           </div>
 
@@ -35,8 +39,8 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
               </div>
             ) : (
               cartItems.map((item) => (
-                <div key={item.product.id} className="p-4 rounded-xl bg-[#FAF8F5] border border-[#E2DDD5] flex items-center space-x-4">
-                  <img src={item.product.image} alt={item.product.name} className="w-12 h-20 object-contain" />
+                <div key={item.product.id} className="p-4 rounded-xl bg-[#FAF8F5] border border-[#E2DDD5] flex items-center space-x-4 hover:border-[#D4C8B8] transition-colors">
+                  <img src={item.product.image} alt={item.product.name} className="w-12 h-20 object-contain drop-shadow-xs" />
                   
                   <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-bold text-[#181F1C] truncate">{item.product.name}</h4>
@@ -44,17 +48,29 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
                     <p className="text-sm text-[#B85D2C] font-serif font-bold mt-1">{(item.product.price * item.quantity).toFixed(2)} €</p>
                   </div>
 
-                  <div className="flex items-center space-x-1.5 bg-white border border-[#D4C8B8] rounded-lg p-1">
-                    <button onClick={() => onUpdateQuantity(item.product.id, item.quantity - 1)} className="p-1 text-neutral-600 hover:text-neutral-900">
+                  <div className="flex items-center space-x-1 bg-white border border-[#D4C8B8] rounded-lg p-1 shadow-2xs">
+                    <button 
+                      onClick={() => onUpdateQuantity(item.product.id, item.quantity - 1)} 
+                      className="p-1 text-neutral-500 hover:text-neutral-900 hover:bg-[#FAF8F5] rounded transition-all hover:scale-110 active:scale-90"
+                      title="Anzahl verringern"
+                    >
                       <Minus className="w-3.5 h-3.5" />
                     </button>
-                    <span className="text-sm text-[#181F1C] px-2 font-bold">{item.quantity}</span>
-                    <button onClick={() => onUpdateQuantity(item.product.id, item.quantity + 1)} className="p-1 text-neutral-600 hover:text-neutral-900">
+                    <span className="text-sm text-[#181F1C] px-2 font-bold select-none">{item.quantity}</span>
+                    <button 
+                      onClick={() => onUpdateQuantity(item.product.id, item.quantity + 1)} 
+                      className="p-1 text-neutral-500 hover:text-neutral-900 hover:bg-[#FAF8F5] rounded transition-all hover:scale-110 active:scale-90"
+                      title="Anzahl erhöhen"
+                    >
                       <Plus className="w-3.5 h-3.5" />
                     </button>
                   </div>
 
-                  <button onClick={() => onRemoveItem(item.product.id)} className="text-neutral-400 hover:text-rose-600">
+                  <button 
+                    onClick={() => onRemoveItem(item.product.id)} 
+                    className="p-1.5 text-neutral-400 hover:text-rose-600 hover:scale-115 active:scale-90 transition-all rounded-lg"
+                    title="Aus dem Warenkorb entfernen"
+                  >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -105,9 +121,9 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
               <button
                 disabled={!ageConfirmed}
                 onClick={() => alert('Vielen Dank für Ihre Bestellung bei PURE.WHISKY.!')}
-                className={`w-full py-4.5 rounded-lg text-xs uppercase tracking-widest font-bold flex items-center justify-center space-x-2 transition-all ${
+                className={`w-full py-4.5 rounded-lg text-xs uppercase tracking-widest font-bold flex items-center justify-center space-x-2 transition-all duration-200 ${
                   ageConfirmed
-                    ? 'bg-[#B85D2C] hover:bg-[#A04E24] text-white shadow-md'
+                    ? 'bg-[#B85D2C] hover:bg-[#A04E24] text-white shadow-md hover:scale-[1.01] active:scale-[0.99] cursor-pointer'
                     : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
                 }`}
               >

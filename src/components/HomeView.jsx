@@ -33,7 +33,7 @@ export default function HomeView({ setActiveTab, onSelectProduct, onSelectPillar
                 onClick={() => setActiveTab('shop')}
                 className="px-8 py-4 rounded-full bg-[#D4A359] text-[#0B0E14] font-bold text-xs uppercase tracking-wider hover:bg-[#E9C68A] hover:shadow-[0_0_25px_rgba(212,163,89,0.4)] transition-all flex items-center gap-2"
               >
-                <span>Shop besuchen (4 Fässer)</span>
+                <span>Shop besuchen</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 

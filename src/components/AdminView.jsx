@@ -56,7 +56,7 @@ export default function AdminView({
         date: '31.08.2026, 14:15 Uhr',
         subject: 'Willkommen im PURE.WHISKY. Fass-Depot · Erste Einblicke',
         sender: 'PURE.WHISKY. <noreply@scholz-friese-webdesign.de>',
-        body: 'Vielen Dank für Ihre Registrierung im exklusiven PURE.WHISKY. Fass-Depot.\n\nIn Kürze erhalten Sie die ersten sensorischen Verkostungsnotizen unserer 4 nativer Einzelfass-Abfüllungen.',
+        body: 'Vielen Dank für Ihre Registrierung im exklusiven PURE.WHISKY. Fass-Depot.\n\nIn Kürze erhalten Sie die ersten sensorischen Verkostungsnotizen unserer nativen Einzelfass-Abfüllungen.',
         recipients: ['m.weber@t-online.de', 'claudia.schmidt@whisky-club.de', 'kontakt@scholz-friese-webdesign.de'],
         attachments: [{ filename: 'PURE_WHISKY_Manifest.pdf', size: '1.2 MB' }],
         status: 'Erfolgreich zugestellt'

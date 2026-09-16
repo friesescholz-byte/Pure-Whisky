@@ -32,14 +32,15 @@ export default function BlogView({ posts, onOpenPost, onNavigateShop, onNavigate
             return (
               <article
                 key={post.id}
-                className="bg-white border border-[#D4C8B8] rounded-3xl p-6 sm:p-7 flex flex-col justify-between text-left shadow-xs hover:shadow-md transition-all group"
+                onClick={() => onOpenPost(post)}
+                className="bg-white border border-[#D4C8B8] rounded-3xl p-6 sm:p-7 flex flex-col justify-between text-left shadow-xs hover:shadow-xl hover:border-[#B85D2C]/60 hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer"
               >
                 <div className="space-y-4">
                   <div className="h-56 rounded-2xl overflow-hidden border border-[#E2DDD5] relative shadow-sm bg-[#FAF8F5]">
                     <img
                       src={coverImg}
                       alt={post.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-700"
                       loading="lazy"
                     />
                     
@@ -55,7 +56,7 @@ export default function BlogView({ posts, onOpenPost, onNavigateShop, onNavigate
                     )}
 
                     {post.videoUrl && (
-                      <div className="absolute bottom-4 right-4 p-2 rounded-full bg-[#B85D2C] text-white shadow-md">
+                      <div className="absolute bottom-4 right-4 p-2.5 rounded-full bg-[#B85D2C] text-white shadow-md group-hover:scale-110 transition-transform">
                         <Play className="w-4 h-4 fill-white" />
                       </div>
                     )}
@@ -81,14 +82,14 @@ export default function BlogView({ posts, onOpenPost, onNavigateShop, onNavigate
                   </p>
                 </div>
 
-                <div className="pt-6 border-t border-[#E2DDD5] mt-6">
-                  <button
-                    onClick={() => onOpenPost(post)}
-                    className="inline-flex items-center space-x-2 text-sm font-woodblock uppercase tracking-wider text-[#B85D2C] group/btn"
-                  >
-                    <span>Vollständigen Beitrag & Galerie ansehen</span>
-                    <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                  </button>
+                <div className="pt-6 border-t border-[#E2DDD5] mt-6 flex items-center justify-between">
+                  <span className="inline-flex items-center space-x-2 text-sm font-woodblock uppercase tracking-wider text-[#B85D2C] group-hover:text-[#A04E24] transition-colors">
+                    <span>Beitrag lesen</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
+                  </span>
+                  <span className="text-xs font-craft-mono text-[#7A8C82] group-hover:text-[#181F1C] transition-colors">
+                    Öffnen →
+                  </span>
                 </div>
               </article>
             );
@@ -106,9 +107,9 @@ export default function BlogView({ posts, onOpenPost, onNavigateShop, onNavigate
           <div className="pt-4 flex justify-center">
             <button
               onClick={onNavigateShop}
-              className="inline-flex items-center space-x-3 px-10 py-4.5 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-xl tracking-wider uppercase transition-all shadow-md hover:shadow-lg"
+              className="inline-flex items-center space-x-3 px-10 py-4.5 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-xl tracking-wider uppercase transition-all shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
             >
-              <span>Zu den 4 Fässern im Shop</span>
+              <span>Zu den Fässern im Shop</span>
               <ArrowRight className="w-5 h-5" />
             </button>
           </div>

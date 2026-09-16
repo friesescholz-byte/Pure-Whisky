@@ -152,10 +152,10 @@ Stand dieser Erklärung: September 2026`
           </h3>
           <button 
             onClick={onClose} 
-            className="p-2 rounded-full bg-white border border-[#D4C8B8] text-[#55695E] hover:text-[#181F1C] hover:bg-[#FAF8F5] transition-colors"
+            className="group p-2.5 rounded-full bg-white border border-[#D4C8B8] text-[#55695E] hover:text-white hover:bg-[#181F1C] hover:border-[#181F1C] hover:rotate-90 hover:scale-105 active:scale-95 transition-all duration-300 shadow-xs cursor-pointer"
             aria-label="Schließen"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 transition-transform duration-300" />
           </button>
         </div>
 

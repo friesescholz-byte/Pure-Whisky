@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   Package, Tag, Check, Edit2, RotateCcw, Eye, 
   CheckCircle2, AlertCircle, Search, SlidersHorizontal, 
-  Code, Sparkles, ArrowUpRight, DollarSign, Archive, Clock, Calendar
+  Code, Sparkles, ArrowUpRight, DollarSign, Archive, Clock, Calendar, X
 } from 'lucide-react';
 
 export default function InventoryManager({ 
@@ -323,15 +323,15 @@ export default function InventoryManager({
       {/* Products List Table */}
       <div className="bg-white border border-[#D4C8B8] rounded-3xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-[#181F1C]">
+          <table className="w-full min-w-[1100px] text-left text-sm text-[#181F1C]">
             <thead className="bg-[#FAF8F5] border-b border-[#E2DDD5] text-xs font-craft-mono uppercase text-[#55695E] tracking-wider">
               <tr>
-                <th className="py-4 px-6">Fass / Produkt</th>
-                <th className="py-4 px-6">Region & Fass-Typ</th>
-                <th className="py-4 px-6">Verkaufspreis</th>
-                <th className="py-4 px-6">Status & Release-Datum</th>
-                <th className="py-4 px-6">Lager / Flaschen</th>
-                <th className="py-4 px-6 text-right">Aktionen</th>
+                <th className="py-4 px-6 min-w-[280px]">Fass / Produkt</th>
+                <th className="py-4 px-6 min-w-[200px]">Region & Fass-Typ</th>
+                <th className="py-4 px-6 min-w-[150px]">Verkaufspreis</th>
+                <th className="py-4 px-6 min-w-[230px]">Status & Release-Datum</th>
+                <th className="py-4 px-6 min-w-[150px]">Lager / Flaschen</th>
+                <th className="py-4 px-6 min-w-[160px] text-right whitespace-nowrap">Aktionen</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#E2DDD5]">
@@ -346,7 +346,7 @@ export default function InventoryManager({
                     {/* Bottle thumbnail & Name */}
                     <td className="py-4 px-6">
                       <div className="flex items-center space-x-3.5">
-                        <div className="w-12 h-14 rounded-xl bg-[#FAF8F5] border border-[#D4C8B8] p-1 flex items-center justify-center shrink-0 overflow-hidden">
+                        <div className="w-12 h-14 rounded-xl bg-[#FAF8F5] border border-[#D4C8B8] p-1 flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
                           <img 
                             src={p.image} 
                             alt={p.name} 
@@ -395,7 +395,7 @@ export default function InventoryManager({
                         <select
                           value={isUpcoming ? 'upcoming' : (isSoldOut ? 'soldout' : 'available')}
                           onChange={(e) => handleQuickStatusChange(p, e.target.value)}
-                          className={`px-2.5 py-1.5 rounded-lg text-xs font-craft-mono font-bold border focus:outline-none transition-colors cursor-pointer ${
+                          className={`px-2.5 py-1.5 rounded-lg text-xs font-craft-mono font-bold border focus:outline-none transition-all cursor-pointer hover:border-[#B85D2C] ${
                             isUpcoming
                               ? 'bg-amber-50 text-amber-900 border-amber-300'
                               : isSoldOut
@@ -431,11 +431,11 @@ export default function InventoryManager({
                     </td>
 
                     {/* Actions */}
-                    <td className="py-4 px-6 text-right">
+                    <td className="py-4 px-6 text-right whitespace-nowrap">
                       <div className="flex items-center justify-end space-x-2">
                         <button
                           onClick={() => handleOpenEdit(p)}
-                          className="px-3 py-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#E2DDD5] border border-[#D4C8B8] text-xs font-craft-mono font-bold text-[#181F1C] transition-colors flex items-center space-x-1.5"
+                          className="px-3.5 py-1.5 rounded-xl bg-[#FAF8F5] hover:bg-[#E2DDD5] border border-[#D4C8B8] text-xs font-craft-mono font-bold text-[#181F1C] hover:border-[#B85D2C] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center space-x-1.5 shadow-2xs"
                           title="Preis, Release-Datum und Details bearbeiten"
                         >
                           <Edit2 className="w-3.5 h-3.5 text-[#B85D2C]" />
@@ -445,7 +445,7 @@ export default function InventoryManager({
                         {onNavigateProduct && (
                           <button
                             onClick={() => onNavigateProduct(p)}
-                            className="p-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#E2DDD5] border border-[#D4C8B8] text-xs text-[#55695E] hover:text-[#181F1C] transition-colors"
+                            className="p-1.5 rounded-xl bg-[#FAF8F5] hover:bg-[#E2DDD5] border border-[#D4C8B8] text-xs text-[#55695E] hover:text-[#181F1C] hover:border-[#B85D2C] transition-all hover:scale-105 active:scale-95 shadow-2xs"
                             title="Im Shop ansehen"
                           >
                             <Eye className="w-3.5 h-3.5" />
@@ -482,9 +482,10 @@ export default function InventoryManager({
               </div>
               <button
                 onClick={() => setEditingProduct(null)}
-                className="p-2 rounded-xl text-stone-400 hover:text-[#181F1C] hover:bg-[#FAF8F5] transition-colors"
+                className="group p-2.5 rounded-full bg-[#FAF8F5] border border-[#D4C8B8] text-stone-500 hover:text-[#181F1C] hover:border-[#B85D2C] hover:bg-white transition-all duration-300 shadow-xs hover:scale-105 active:scale-95"
+                title="Schließen"
               >
-                ✕
+                <X className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" />
               </button>
             </div>
 
@@ -746,9 +747,10 @@ export default function InventoryManager({
               </div>
               <button
                 onClick={() => setShowMollieModal(false)}
-                className="p-2 rounded-xl text-stone-400 hover:text-[#181F1C] hover:bg-[#FAF8F5] transition-colors"
+                className="group p-2.5 rounded-full bg-[#FAF8F5] border border-[#D4C8B8] text-stone-500 hover:text-[#181F1C] hover:border-[#B85D2C] hover:bg-white transition-all duration-300 shadow-xs hover:scale-105 active:scale-95"
+                title="Schließen"
               >
-                ✕
+                <X className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" />
               </button>
             </div>
 

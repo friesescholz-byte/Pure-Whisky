@@ -19,9 +19,10 @@ export default function ProductDossierModal({ product, onClose, onAddToCart }) {
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-600 hover:text-neutral-900 transition-colors"
+            className="group p-2.5 rounded-full bg-white border border-[#D4C8B8] text-stone-500 hover:text-[#181F1C] hover:border-[#B85D2C] transition-all duration-300 shadow-xs hover:scale-105 active:scale-95"
+            title="Schließen"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" />
           </button>
         </div>
 

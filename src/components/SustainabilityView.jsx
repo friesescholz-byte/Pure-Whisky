@@ -257,9 +257,9 @@ export default function SustainabilityView({ onNavigateShop, onNavigateHome, onO
           <div className="pt-4 flex justify-center">
             <button
               onClick={onNavigateShop}
-              className="inline-flex items-center space-x-3 px-10 py-4.5 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-xl tracking-wider uppercase transition-all shadow-md hover:shadow-lg"
+              className="inline-flex items-center space-x-3 px-10 py-4.5 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-xl tracking-wider uppercase transition-all shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
             >
-              <span>Zu den 4 Fässern im Shop</span>
+              <span>Zu den Fässern im Shop</span>
               <ArrowRight className="w-5 h-5" />
             </button>
           </div>
