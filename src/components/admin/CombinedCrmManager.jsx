@@ -49,8 +49,8 @@ export default function CombinedCrmManager({
         fullName: c.fullName || `${c.firstName || ''} ${c.lastName || ''}`.trim() || email.split('@')[0],
         date: c.subscribedAt || c.date || '–',
         isShop: true,
-        isNewsletter: !!matchingSub,
-        newsletterStatus: matchingSub ? matchingSub.listStatus : null,
+        isNewsletter: !!matchingSub || c.listStatus === 'unsubscribed',
+        newsletterStatus: matchingSub ? matchingSub.listStatus : (c.listStatus === 'unsubscribed' || c.globalStatus === 'unsubscribed' ? 'unsubscribed' : null),
         source: 'shop'
       });
     });

@@ -9,28 +9,34 @@ export default function UnsubscribeView({ onUnsubscribe, onResubscribe, onNaviga
   const [isUnsubscribed, setIsUnsubscribed] = useState(false);
   const [isReSubscribed, setIsReSubscribed] = useState(false);
 
-  // Synchronize unsubscribe state with Cloudflare KV / Resend notification
+  // Synchronize unsubscribe state with Pure-Whisky Cloudflare KV
   const callUnsubscribeApi = async (email) => {
     try {
-      await fetch('https://resend-mailer.friese-scholz.workers.dev/api/unsubscribe', {
+      const endpoint = typeof window !== 'undefined' && window.location.origin.includes('workers.dev')
+        ? '/api/unsubscribe'
+        : 'https://pure-whisky.friese-scholz.workers.dev/api/unsubscribe';
+      await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
       });
     } catch (e) {
-      console.warn('Worker unsubscribe sync notice:', e);
+      console.warn('Pure-Whisky worker unsubscribe sync notice:', e);
     }
   };
 
   const callResubscribeApi = async (email) => {
     try {
-      await fetch('https://resend-mailer.friese-scholz.workers.dev/api/resubscribe', {
+      const endpoint = typeof window !== 'undefined' && window.location.origin.includes('workers.dev')
+        ? '/api/resubscribe'
+        : 'https://pure-whisky.friese-scholz.workers.dev/api/resubscribe';
+      await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
       });
     } catch (e) {
-      console.warn('Worker resubscribe sync notice:', e);
+      console.warn('Pure-Whisky worker resubscribe sync notice:', e);
     }
   };
 

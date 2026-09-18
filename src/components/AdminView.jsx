@@ -144,14 +144,23 @@ Ines Zager · PURE.WHISKY.`);
   const [kvUnsubscribers, setKvUnsubscribers] = useState(new Set());
 
   useEffect(() => {
-    fetch('https://resend-mailer.friese-scholz.workers.dev/api/unsubscribers')
-      .then(r => r.json())
-      .then(d => {
-        if (d && Array.isArray(d.unsubscribers)) {
-          setKvUnsubscribers(new Set(d.unsubscribers.map(e => e.toLowerCase().trim())));
-        }
-      })
-      .catch(err => console.warn('Could not load KV unsubscribers:', err));
+    const fetchUnsubs = () => {
+      const endpoint = typeof window !== 'undefined' && window.location.origin.includes('workers.dev')
+        ? '/api/unsubscribers'
+        : 'https://pure-whisky.friese-scholz.workers.dev/api/unsubscribers';
+      fetch(endpoint)
+        .then(r => r.json())
+        .then(d => {
+          if (d && Array.isArray(d.unsubscribers)) {
+            setKvUnsubscribers(new Set(d.unsubscribers.map(e => e.toLowerCase().trim())));
+          }
+        })
+        .catch(err => console.warn('Could not load KV unsubscribers:', err));
+    };
+
+    fetchUnsubs();
+    window.addEventListener('focus', fetchUnsubs);
+    return () => window.removeEventListener('focus', fetchUnsubs);
   }, []);
 
   // Unified Deduplicated Audience from all active sources:

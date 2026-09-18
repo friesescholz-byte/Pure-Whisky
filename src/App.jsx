@@ -314,39 +314,115 @@ export default function App() {
     }));
   };
 
-  // Synchronize unsubscribers globally from Cloudflare KV
+  // Synchronize unsubscribers globally from Cloudflare KV with real-time tab & focus sync
   useEffect(() => {
-    fetch('https://resend-mailer.friese-scholz.workers.dev/api/unsubscribers')
-      .then(res => res.json())
-      .then(data => {
-        if (data && Array.isArray(data.unsubscribers) && data.unsubscribers.length > 0) {
-          const unsubsSet = new Set(data.unsubscribers.map(e => e.toLowerCase().trim()));
-          setNewsletterSubs(prev => prev.map(s => {
-            if (unsubsSet.has((s.email || '').toLowerCase().trim())) {
-              return { ...s, listStatus: 'unsubscribed', globalStatus: 'unsubscribed' };
-            }
-            return s;
-          }));
-          setWooCustomers(prev => prev.map(c => {
-            if (unsubsSet.has((c.email || '').toLowerCase().trim())) {
-              return { ...c, listStatus: 'unsubscribed', globalStatus: 'unsubscribed' };
-            }
-            return c;
-          }));
-        }
-      })
-      .catch(err => console.warn('Could not sync unsubscribers from KV:', err));
+    const syncUnsubscribers = () => {
+      const endpoint = typeof window !== 'undefined' && window.location.origin.includes('workers.dev')
+        ? '/api/unsubscribers'
+        : 'https://pure-whisky.friese-scholz.workers.dev/api/unsubscribers';
+
+      fetch(endpoint)
+        .then(res => res.json())
+        .then(data => {
+          if (data && Array.isArray(data.unsubscribers) && data.unsubscribers.length > 0) {
+            const unsubsSet = new Set(data.unsubscribers.map(e => e.toLowerCase().trim()));
+            setNewsletterSubs(prev => {
+              const knownEmails = new Set(prev.map(s => (s.email || '').toLowerCase().trim()));
+              const updated = prev.map(s => {
+                if (unsubsSet.has((s.email || '').toLowerCase().trim())) {
+                  return { ...s, listStatus: 'unsubscribed', globalStatus: 'unsubscribed' };
+                }
+                return s;
+              });
+
+              // Add any unsubscribed email that wasn't in list yet
+              data.unsubscribers.forEach(unsubEmail => {
+                const clean = unsubEmail.toLowerCase().trim();
+                if (clean && !knownEmails.has(clean)) {
+                  updated.unshift({
+                    id: `crm_kv_${clean}`,
+                    email: clean,
+                    fullName: clean.split('@')[0],
+                    firstName: '',
+                    lastName: '',
+                    subscribedAt: '–',
+                    confirmedAt: '',
+                    listStatus: 'unsubscribed',
+                    globalStatus: 'unsubscribed',
+                    listName: 'Newsletter Mailing List'
+                  });
+                  knownEmails.add(clean);
+                }
+              });
+
+              return updated;
+            });
+
+            setWooCustomers(prev => prev.map(c => {
+              if (unsubsSet.has((c.email || '').toLowerCase().trim())) {
+                return { ...c, listStatus: 'unsubscribed', globalStatus: 'unsubscribed' };
+              }
+              return c;
+            }));
+          }
+        })
+        .catch(err => console.warn('Could not sync unsubscribers from KV:', err));
+    };
+
+    syncUnsubscribers();
+
+    // Re-sync automatically whenever user switches back to this browser tab
+    window.addEventListener('focus', syncUnsubscribers);
+
+    // Cross-tab real-time localStorage sync
+    const handleStorage = (e) => {
+      if (e.key === 'pure_whisky_newsletter_subs' && e.newValue) {
+        try { setNewsletterSubs(JSON.parse(e.newValue)); } catch {}
+      }
+      if (e.key === 'pure_whisky_woo_customers' && e.newValue) {
+        try { setWooCustomers(JSON.parse(e.newValue)); } catch {}
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+
+    return () => {
+      window.removeEventListener('focus', syncUnsubscribers);
+      window.removeEventListener('storage', handleStorage);
+    };
   }, []);
 
   const handleUnsubscribeEmail = (email) => {
     const clean = (email || '').toLowerCase().trim();
     if (!clean) return;
-    setNewsletterSubs(prev => prev.map(s => {
-      if ((s.email || '').toLowerCase().trim() === clean) {
-        return { ...s, listStatus: 'unsubscribed', globalStatus: 'unsubscribed' };
+
+    setNewsletterSubs(prev => {
+      const exists = prev.some(s => (s.email || '').toLowerCase().trim() === clean);
+      if (exists) {
+        return prev.map(s => {
+          if ((s.email || '').toLowerCase().trim() === clean) {
+            return { ...s, listStatus: 'unsubscribed', globalStatus: 'unsubscribed' };
+          }
+          return s;
+        });
+      } else {
+        return [
+          {
+            id: `crm_unsub_${Date.now()}`,
+            email: clean,
+            fullName: clean.split('@')[0],
+            firstName: '',
+            lastName: '',
+            subscribedAt: new Date().toLocaleDateString('de-DE'),
+            confirmedAt: '',
+            listStatus: 'unsubscribed',
+            globalStatus: 'unsubscribed',
+            listName: 'Newsletter Mailing List'
+          },
+          ...prev
+        ];
       }
-      return s;
-    }));
+    });
+
     setWooCustomers(prev => prev.map(c => {
       if ((c.email || '').toLowerCase().trim() === clean) {
         return { ...c, listStatus: 'unsubscribed', globalStatus: 'unsubscribed' };
