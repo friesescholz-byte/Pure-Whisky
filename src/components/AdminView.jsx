@@ -148,7 +148,7 @@ Ines Zager · PURE.WHISKY.`);
       const endpoint = typeof window !== 'undefined' && window.location.origin.includes('workers.dev')
         ? '/api/unsubscribers'
         : 'https://pure-whisky.friese-scholz.workers.dev/api/unsubscribers';
-      fetch(endpoint)
+      fetch(endpoint, { cache: 'no-store' })
         .then(r => r.json())
         .then(d => {
           if (d && Array.isArray(d.unsubscribers)) {
@@ -160,7 +160,16 @@ Ines Zager · PURE.WHISKY.`);
 
     fetchUnsubs();
     window.addEventListener('focus', fetchUnsubs);
-    return () => window.removeEventListener('focus', fetchUnsubs);
+    const handleStorage = (e) => {
+      if (e.key === 'pure_whisky_sync_trigger' || e.key === 'pure_whisky_newsletter_subs') {
+        fetchUnsubs();
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => {
+      window.removeEventListener('focus', fetchUnsubs);
+      window.removeEventListener('storage', handleStorage);
+    };
   }, []);
 
   // Unified Deduplicated Audience from all active sources:

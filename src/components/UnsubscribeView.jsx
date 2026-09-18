@@ -8,6 +8,7 @@ export default function UnsubscribeView({ onUnsubscribe, onResubscribe, onNaviga
   const [targetEmail, setTargetEmail] = useState('');
   const [isUnsubscribed, setIsUnsubscribed] = useState(false);
   const [isReSubscribed, setIsReSubscribed] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Synchronize unsubscribe state with Pure-Whisky Cloudflare KV
   const callUnsubscribeApi = async (email) => {
@@ -15,11 +16,13 @@ export default function UnsubscribeView({ onUnsubscribe, onResubscribe, onNaviga
       const endpoint = typeof window !== 'undefined' && window.location.origin.includes('workers.dev')
         ? '/api/unsubscribe'
         : 'https://pure-whisky.friese-scholz.workers.dev/api/unsubscribe';
-      await fetch(endpoint, {
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email: (email || '').toLowerCase().trim() }),
+        cache: 'no-store'
       });
+      return await res.json();
     } catch (e) {
       console.warn('Pure-Whisky worker unsubscribe sync notice:', e);
     }
@@ -30,11 +33,13 @@ export default function UnsubscribeView({ onUnsubscribe, onResubscribe, onNaviga
       const endpoint = typeof window !== 'undefined' && window.location.origin.includes('workers.dev')
         ? '/api/resubscribe'
         : 'https://pure-whisky.friese-scholz.workers.dev/api/resubscribe';
-      await fetch(endpoint, {
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email: (email || '').toLowerCase().trim() }),
+        cache: 'no-store'
       });
+      return await res.json();
     } catch (e) {
       console.warn('Pure-Whisky worker resubscribe sync notice:', e);
     }
@@ -58,26 +63,55 @@ export default function UnsubscribeView({ onUnsubscribe, onResubscribe, onNaviga
     }
   }, [onUnsubscribe]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const cleanEmail = emailInput.trim().toLowerCase();
     if (!cleanEmail) return;
+    setIsLoading(true);
     setTargetEmail(cleanEmail);
-    callUnsubscribeApi(cleanEmail);
+    await callUnsubscribeApi(cleanEmail);
     if (onUnsubscribe) {
       onUnsubscribe(cleanEmail);
     }
+    setIsLoading(false);
     setIsUnsubscribed(true);
     setIsReSubscribed(false);
   };
 
-  const handleUndo = () => {
-    if (targetEmail) {
-      callResubscribeApi(targetEmail);
+  const handleUndo = async () => {
+    if (!targetEmail) return;
+    setIsLoading(true);
+    try {
+      await callResubscribeApi(targetEmail);
       if (onResubscribe) {
         onResubscribe(targetEmail);
       }
+      // Clean query parameter from URL so a subsequent reload does not re-unsubscribe
+      if (typeof window !== 'undefined' && window.history && window.history.replaceState) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
       setIsReSubscribed(true);
+    } catch (err) {
+      console.error('Error during resubscribe:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleReUnsubscribe = async () => {
+    if (!targetEmail) return;
+    setIsLoading(true);
+    try {
+      await callUnsubscribeApi(targetEmail);
+      if (onUnsubscribe) {
+        onUnsubscribe(targetEmail);
+      }
+      setIsReSubscribed(false);
+      setIsUnsubscribed(true);
+    } catch (err) {
+      console.error('Error during re-unsubscribe:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -127,20 +161,32 @@ export default function UnsubscribeView({ onUnsubscribe, onResubscribe, onNaviga
               </p>
             </div>
 
-            {/* Accidental Unsubscribe Undo */}
-            <div className="pt-2 border-t border-[#E2DDD5]/60">
-              <button
-                type="button"
-                onClick={handleUndo}
-                className="text-xs text-[#55695E] hover:text-[#B85D2C] underline underline-offset-4 transition-colors font-craft-mono inline-flex items-center space-x-1"
-              >
-                <RefreshCw className="w-3 h-3" />
-                <span>{lang === 'de' ? 'Versehentlich abgemeldet? Hier wieder anmelden' : 'Unsubscribed by mistake? Re-subscribe here'}</span>
-              </button>
+            {/* Accidental Unsubscribe Undo Box - Prominent, clean and stylish */}
+            <div className="pt-2 pb-2">
+              <div className="bg-[#FAF8F5] border border-[#D4C8B8] rounded-2xl p-4 text-center space-y-3 shadow-xs">
+                <p className="text-xs text-[#55695E] font-medium">
+                  {lang === 'de' 
+                    ? 'War das ein Versehen oder möchten Sie weiterhin informiert bleiben?' 
+                    : 'Unsubscribed by mistake or want to stay in the loop?'}
+                </p>
+                <button
+                  type="button"
+                  onClick={handleUndo}
+                  disabled={isLoading}
+                  className="w-full py-3.5 px-4 rounded-xl bg-white hover:bg-[#181F1C] hover:text-white border border-[#B85D2C] text-[#B85D2C] text-xs font-woodblock uppercase tracking-wider transition-all duration-200 shadow-xs flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50 group"
+                >
+                  <RefreshCw className={`w-4 h-4 transition-transform group-hover:rotate-180 ${isLoading ? 'animate-spin' : ''}`} />
+                  <span className="font-bold">
+                    {isLoading 
+                      ? (lang === 'de' ? 'Wird wieder angemeldet...' : 'Re-subscribing...') 
+                      : (lang === 'de' ? 'Hier wieder anmelden' : 'Re-subscribe here')}
+                  </span>
+                </button>
+              </div>
             </div>
 
             {/* Navigation CTAs */}
-            <div className="pt-4 flex flex-col sm:flex-row gap-3">
+            <div className="pt-2 flex flex-col sm:flex-row gap-3">
               <button
                 onClick={onNavigateHome}
                 className="flex-1 py-3.5 rounded-xl bg-[#FAF8F5] hover:bg-[#E2DDD5] border border-[#D4C8B8] text-xs font-woodblock uppercase tracking-wider text-[#181F1C] transition-all text-center"
@@ -157,30 +203,54 @@ export default function UnsubscribeView({ onUnsubscribe, onResubscribe, onNaviga
           </div>
         )}
 
-        {/* State 2: Re-subscribed Undo */}
+        {/* State 2: Re-subscribed Undo Success */}
         {isReSubscribed && (
           <div className="space-y-6 text-center">
-            <div className="w-16 h-16 rounded-full bg-[#FAF8F5] border border-[#D4C8B8] text-[#B85D2C] flex items-center justify-center mx-auto shadow-xs">
+            <div className="w-16 h-16 rounded-full bg-[#E8EFEA] border border-[#C5D8CC] text-[#2D6A4F] flex items-center justify-center mx-auto shadow-xs">
               <ShieldCheck className="w-8 h-8" />
             </div>
 
             <div className="space-y-2">
               <h2 className="font-woodblock text-2xl text-[#181F1C] uppercase">
-                {lang === 'de' ? 'Wieder angemeldet' : 'Subscribed Again'}
+                {lang === 'de' ? 'Wieder angemeldet!' : 'Subscribed Again!'}
               </h2>
-              <p className="text-sm text-[#3A4A40]">
-                {lang === 'de' 
-                  ? `Willkommen zurück! ${targetEmail} erhält wieder die exklusiven Vorab-Mitteilungen.` 
-                  : `Welcome back! ${targetEmail} will receive our exclusive preview releases again.`}
+              <p className="text-sm text-[#3A4A40] leading-relaxed">
+                {lang === 'de' ? (
+                  <>
+                    Willkommen zurück! <strong className="font-mono text-[#181F1C]">{targetEmail}</strong> ist ab sofort wieder aktiv in unserem Verteiler für exklusive Fassabfüllungen registriert.
+                  </>
+                ) : (
+                  <>
+                    Welcome back! <strong className="font-mono text-[#181F1C]">{targetEmail}</strong> is now actively subscribed again for our cask drops.
+                  </>
+                )}
               </p>
             </div>
 
-            <div className="pt-4">
+            <div className="pt-3 flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={onNavigateHome}
+                className="flex-1 py-3.5 rounded-xl bg-[#FAF8F5] hover:bg-[#E2DDD5] border border-[#D4C8B8] text-xs font-woodblock uppercase tracking-wider text-[#181F1C] transition-all text-center"
+              >
+                {lang === 'de' ? 'Zur Startseite' : 'Back to Home'}
+              </button>
               <button
                 onClick={onNavigateShop}
-                className="w-full py-3.5 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white text-xs font-woodblock uppercase tracking-wider transition-all text-center shadow-xs"
+                className="flex-1 py-3.5 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white text-xs font-woodblock uppercase tracking-wider transition-all text-center shadow-xs"
               >
                 {lang === 'de' ? 'Zum Whisky-Shop' : 'Explore Casks'}
+              </button>
+            </div>
+
+            {/* Subtle Undo Re-Subscription if desired */}
+            <div className="pt-2 border-t border-[#E2DDD5]/60">
+              <button
+                type="button"
+                onClick={handleReUnsubscribe}
+                disabled={isLoading}
+                className="text-xs text-[#55695E] hover:text-[#B85D2C] underline underline-offset-4 transition-colors font-craft-mono inline-flex items-center space-x-1 cursor-pointer"
+              >
+                <span>{lang === 'de' ? 'Doch wieder abmelden?' : 'Unsubscribe again?'}</span>
               </button>
             </div>
           </div>
@@ -214,9 +284,14 @@ export default function UnsubscribeView({ onUnsubscribe, onResubscribe, onNaviga
 
             <button
               type="submit"
-              className="w-full py-4 rounded-xl bg-[#181F1C] hover:bg-black text-white font-woodblock text-sm tracking-wider uppercase transition-all shadow-md flex items-center justify-center space-x-2 cursor-pointer"
+              disabled={isLoading}
+              className="w-full py-4 rounded-xl bg-[#181F1C] hover:bg-black text-white font-woodblock text-sm tracking-wider uppercase transition-all shadow-md flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
             >
-              <span>{lang === 'de' ? 'Jetzt mit einem Klick abmelden' : 'Unsubscribe with one click'}</span>
+              <span>
+                {isLoading 
+                  ? (lang === 'de' ? 'Abmeldung läuft...' : 'Processing...') 
+                  : (lang === 'de' ? 'Jetzt mit einem Klick abmelden' : 'Unsubscribe with one click')}
+              </span>
               <ArrowRight className="w-4 h-4" />
             </button>
 

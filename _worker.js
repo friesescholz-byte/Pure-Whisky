@@ -6,6 +6,8 @@ export default {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+      'Pragma': 'no-cache',
     };
 
     if (request.method === 'OPTIONS') {
@@ -17,8 +19,16 @@ export default {
       try {
         let list = [];
         if (env.PURE_KV) {
-          const kvList = await env.PURE_KV.list({ prefix: 'unsub:' });
-          list = kvList.keys.map(k => k.name.replace('unsub:', ''));
+          const raw = await env.PURE_KV.get('unsub_list');
+          if (raw) {
+            try { list = JSON.parse(raw); } catch {}
+          }
+          if (!Array.isArray(list) || list.length === 0) {
+            const kvList = await env.PURE_KV.list({ prefix: 'unsub:' });
+            if (kvList && kvList.keys) {
+              list = kvList.keys.map(k => k.name.replace('unsub:', ''));
+            }
+          }
         }
         return new Response(JSON.stringify({ unsubscribers: list }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -34,12 +44,24 @@ export default {
     if (request.method === 'POST' && url.pathname === '/api/unsubscribe') {
       try {
         const body = await request.json();
-        const email = (body.email || '').toLowerCase().trim();
+        let rawEmail = body.email || '';
+        try { rawEmail = decodeURIComponent(rawEmail); } catch {}
+        const email = rawEmail.toLowerCase().trim();
         if (!email) {
           return new Response(JSON.stringify({ error: 'E-Mail fehlt' }), { status: 400, headers: corsHeaders });
         }
 
         if (env.PURE_KV) {
+          let list = [];
+          try {
+            const raw = await env.PURE_KV.get('unsub_list');
+            if (raw) list = JSON.parse(raw);
+          } catch {}
+          if (!Array.isArray(list)) list = [];
+          if (!list.includes(email)) {
+            list.push(email);
+            await env.PURE_KV.put('unsub_list', JSON.stringify(list));
+          }
           await env.PURE_KV.put('unsub:' + email, JSON.stringify({
             email,
             unsubscribedAt: new Date().toISOString()
@@ -58,8 +80,19 @@ export default {
     if (request.method === 'POST' && url.pathname === '/api/resubscribe') {
       try {
         const body = await request.json();
-        const email = (body.email || '').toLowerCase().trim();
+        let rawEmail = body.email || '';
+        try { rawEmail = decodeURIComponent(rawEmail); } catch {}
+        const email = rawEmail.toLowerCase().trim();
         if (email && env.PURE_KV) {
+          let list = [];
+          try {
+            const raw = await env.PURE_KV.get('unsub_list');
+            if (raw) list = JSON.parse(raw);
+          } catch {}
+          if (Array.isArray(list)) {
+            list = list.filter(e => e !== email);
+            await env.PURE_KV.put('unsub_list', JSON.stringify(list));
+          }
           await env.PURE_KV.delete('unsub:' + email);
         }
         return new Response(JSON.stringify({ success: true, email }), {
