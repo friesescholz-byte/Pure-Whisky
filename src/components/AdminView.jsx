@@ -140,16 +140,33 @@ Ines Zager · PURE.WHISKY.`);
     localStorage.removeItem('pure_admin_auth');
   };
 
+  // Global KV Unsubscribers from Cloudflare
+  const [kvUnsubscribers, setKvUnsubscribers] = useState(new Set());
+
+  useEffect(() => {
+    fetch('https://resend-mailer.friese-scholz.workers.dev/api/unsubscribers')
+      .then(r => r.json())
+      .then(d => {
+        if (d && Array.isArray(d.unsubscribers)) {
+          setKvUnsubscribers(new Set(d.unsubscribers.map(e => e.toLowerCase().trim())));
+        }
+      })
+      .catch(err => console.warn('Could not load KV unsubscribers:', err));
+  }, []);
+
   // Unified Deduplicated Audience from all active sources:
-  // 1. Shop-Kunden (wooCustomers)
+  // 1. Shop-Kunden (wooCustomers - strictly active only)
   // 2. Newsletter-Kunden (active newsletterSubs where listStatus === 'subscribed')
+  // Excludes any global unsubscribers from Cloudflare KV
   const allUnifiedContacts = useMemo(() => {
     const map = new Map();
 
-    // 1. Shop Customers
+    // 1. Shop Customers (only active, non-unsubscribed)
     wooCustomers.forEach(c => {
       if (!c.email) return;
       const key = c.email.toLowerCase().trim();
+      if (c.listStatus === 'unsubscribed' || c.globalStatus === 'unsubscribed' || kvUnsubscribers.has(key)) return;
+
       const name = c.fullName || `${c.firstName || ''} ${c.lastName || ''}`.trim() || c.name || '';
       map.set(key, {
         email: c.email.trim(),
@@ -166,7 +183,7 @@ Ines Zager · PURE.WHISKY.`);
       if (!s.email) return;
       const key = s.email.toLowerCase().trim();
       const isActive = s.listStatus === 'subscribed';
-      if (!isActive) return; // Only active per user instruction
+      if (!isActive || kvUnsubscribers.has(key)) return; // Only active per user instruction
 
       const name = s.fullName || `${s.firstName || ''} ${s.lastName || ''}`.trim() || '';
       if (map.has(key)) {
@@ -187,7 +204,7 @@ Ines Zager · PURE.WHISKY.`);
     });
 
     return Array.from(map.values());
-  }, [wooCustomers, newsletterSubs]);
+  }, [wooCustomers, newsletterSubs, kvUnsubscribers]);
 
   const totalUniqueCount = allUnifiedContacts.length;
   const shopCount = allUnifiedContacts.filter(c => c.categories.includes('shop')).length;
@@ -475,7 +492,7 @@ Ines Zager · PURE.WHISKY.`);
               <p style="margin: 0; font-weight: 600; color: #3A4A40;">PURE.WHISKY. · Ines Zager · Dürerring 1 · 31582 Nienburg</p>
               <p style="margin: 4px 0 0 0;"><a href="https://pure-whisky.com" style="color: #B85D2C; text-decoration: none; font-weight: 600;">pure-whisky.com</a> · Sie erhalten diese E-Mail, da Sie Kunde oder Abonnent des Fass-Depots sind.</p>
               <p style="margin: 12px 0 0 0; font-size: 11px;">
-                Kein Interesse mehr? <a href="https://pure-whisky.com/abmelden?email=${encodeURIComponent(email)}" style="color: #7A8C82; text-decoration: underline;">Hier mit einem Klick abmelden</a>
+                Kein Interesse mehr? <a href="https://pure-whisky.pages.dev/abmelden?email=${encodeURIComponent(email)}" style="color: #7A8C82; text-decoration: underline;">Hier mit einem Klick abmelden</a>
               </p>
             </td>
           </tr>

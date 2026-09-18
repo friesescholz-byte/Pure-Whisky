@@ -314,14 +314,44 @@ export default function App() {
     }));
   };
 
+  // Synchronize unsubscribers globally from Cloudflare KV
+  useEffect(() => {
+    fetch('https://resend-mailer.friese-scholz.workers.dev/api/unsubscribers')
+      .then(res => res.json())
+      .then(data => {
+        if (data && Array.isArray(data.unsubscribers) && data.unsubscribers.length > 0) {
+          const unsubsSet = new Set(data.unsubscribers.map(e => e.toLowerCase().trim()));
+          setNewsletterSubs(prev => prev.map(s => {
+            if (unsubsSet.has((s.email || '').toLowerCase().trim())) {
+              return { ...s, listStatus: 'unsubscribed', globalStatus: 'unsubscribed' };
+            }
+            return s;
+          }));
+          setWooCustomers(prev => prev.map(c => {
+            if (unsubsSet.has((c.email || '').toLowerCase().trim())) {
+              return { ...c, listStatus: 'unsubscribed', globalStatus: 'unsubscribed' };
+            }
+            return c;
+          }));
+        }
+      })
+      .catch(err => console.warn('Could not sync unsubscribers from KV:', err));
+  }, []);
+
   const handleUnsubscribeEmail = (email) => {
     const clean = (email || '').toLowerCase().trim();
     if (!clean) return;
     setNewsletterSubs(prev => prev.map(s => {
-      if (s.email.toLowerCase().trim() === clean) {
+      if ((s.email || '').toLowerCase().trim() === clean) {
         return { ...s, listStatus: 'unsubscribed', globalStatus: 'unsubscribed' };
       }
       return s;
+    }));
+    setWooCustomers(prev => prev.map(c => {
+      if ((c.email || '').toLowerCase().trim() === clean) {
+        return { ...c, listStatus: 'unsubscribed', globalStatus: 'unsubscribed' };
+      }
+      return c;
     }));
   };
 
@@ -329,10 +359,16 @@ export default function App() {
     const clean = (email || '').toLowerCase().trim();
     if (!clean) return;
     setNewsletterSubs(prev => prev.map(s => {
-      if (s.email.toLowerCase().trim() === clean) {
+      if ((s.email || '').toLowerCase().trim() === clean) {
         return { ...s, listStatus: 'subscribed', globalStatus: 'subscribed' };
       }
       return s;
+    }));
+    setWooCustomers(prev => prev.map(c => {
+      if ((c.email || '').toLowerCase().trim() === clean) {
+        return { ...c, listStatus: 'subscribed', globalStatus: 'subscribed' };
+      }
+      return c;
     }));
   };
 

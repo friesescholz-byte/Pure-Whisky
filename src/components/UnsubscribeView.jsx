@@ -9,15 +9,41 @@ export default function UnsubscribeView({ onUnsubscribe, onResubscribe, onNaviga
   const [isUnsubscribed, setIsUnsubscribed] = useState(false);
   const [isReSubscribed, setIsReSubscribed] = useState(false);
 
+  // Synchronize unsubscribe state with Cloudflare KV / Resend notification
+  const callUnsubscribeApi = async (email) => {
+    try {
+      await fetch('https://resend-mailer.friese-scholz.workers.dev/api/unsubscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+    } catch (e) {
+      console.warn('Worker unsubscribe sync notice:', e);
+    }
+  };
+
+  const callResubscribeApi = async (email) => {
+    try {
+      await fetch('https://resend-mailer.friese-scholz.workers.dev/api/resubscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+    } catch (e) {
+      console.warn('Worker resubscribe sync notice:', e);
+    }
+  };
+
   useEffect(() => {
     // Check URL query parameters for ?email=...
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const emailParam = params.get('email');
       if (emailParam) {
-        const decoded = decodeURIComponent(emailParam).trim();
+        const decoded = decodeURIComponent(emailParam).trim().toLowerCase();
         setTargetEmail(decoded);
         setEmailInput(decoded);
+        callUnsubscribeApi(decoded);
         if (onUnsubscribe) {
           onUnsubscribe(decoded);
         }
@@ -31,6 +57,7 @@ export default function UnsubscribeView({ onUnsubscribe, onResubscribe, onNaviga
     const cleanEmail = emailInput.trim().toLowerCase();
     if (!cleanEmail) return;
     setTargetEmail(cleanEmail);
+    callUnsubscribeApi(cleanEmail);
     if (onUnsubscribe) {
       onUnsubscribe(cleanEmail);
     }
@@ -39,8 +66,11 @@ export default function UnsubscribeView({ onUnsubscribe, onResubscribe, onNaviga
   };
 
   const handleUndo = () => {
-    if (targetEmail && onResubscribe) {
-      onResubscribe(targetEmail);
+    if (targetEmail) {
+      callResubscribeApi(targetEmail);
+      if (onResubscribe) {
+        onResubscribe(targetEmail);
+      }
       setIsReSubscribed(true);
     }
   };
