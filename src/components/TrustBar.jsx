@@ -15,8 +15,8 @@ export default function TrustBar() {
     },
     {
       icon: Scale,
-      title: 'Juristisches Umwelt-Audit',
-      desc: 'Vor-Ort-Prüfung der Brennereien nach Kriterien wie EMAS & ISO 14001.'
+      title: 'Kriterien nach EMAS & ISO 14001',
+      desc: 'Persönliche Auswahl der Brennereien nach handfesten Umweltkriterien.'
     },
     {
       icon: Truck,

@@ -32,7 +32,7 @@ export default function FounderTeaser({ onOpenAbout, onOpenShop }) {
                 „Ich glaube nicht an Dogmen wie ‚kein Eis im Whisky‘ oder Urteile nach dunkler Farbe. Gut ist, was gefällt.“
               </blockquote>
               <p className="text-[#3A4A40] text-base sm:text-lg font-normal leading-relaxed">
-                Als Umweltjuristin bei großen Energiekonzernen fuhr Ines Zager 2023 ihre Karriere auf Teilzeit zurück, um PURE.WHISKY. zu gründen: Reine Fassstärke, 100% Einzelfass und persönliche Vor-Ort-Audits der Brennereien.
+                Als Umweltjuristin fuhr Ines Zager 2023 ihre Karriere auf Teilzeit zurück, um PURE.WHISKY. zu gründen: Reine Fassstärke, 100% Einzelfass und persönliche Vor-Ort-Prüfungen der Brennereien nach Kriterien wie EMAS und ISO 14001.
               </p>
 
               <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">

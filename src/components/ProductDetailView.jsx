@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronRight, ShoppingBag, ShieldCheck, Droplets, Leaf, Check, Bell, CheckCircle2 } from 'lucide-react';
 import { PRODUCTS } from '../data/pureWhiskyFullData';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function ProductDetailView({ 
   product, 
@@ -11,6 +12,7 @@ export default function ProductDetailView({
   onSelectOtherProduct,
   products = PRODUCTS 
 }) {
+  const { lang, t } = useLanguage();
   const [selectedImageIdx, setSelectedImageIdx] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [addedNotice, setAddedNotice] = useState(false);
@@ -25,7 +27,6 @@ export default function ProductDetailView({
   const isSoldOut = product.soldOut === true || (product.isAvailable === false && !product.isUpcoming);
   const isUpcoming = product.isUpcoming === true;
   const isAvailable = !isSoldOut && !isUpcoming;
-  const remaining = product.stock !== undefined ? product.stock : (product.bottlesRemaining !== undefined ? product.bottlesRemaining : (isSoldOut ? 0 : 48));
   const total = product.bottlesTotal || (product.bottleCount ? parseInt(product.bottleCount) : 240);
   const releaseDateStr = product.releaseDate || '17. September 2026';
 
@@ -33,7 +34,6 @@ export default function ProductDetailView({
   const gallery = product.galleryImages || [product.image];
   const activeImage = gallery[selectedImageIdx] || product.image;
 
-  // Determine if active image is a cut-out bottle or a full photograph
   const isCutoutBottle = 
     activeImage === product.cutoutImage ||
     (typeof activeImage === 'string' && (
@@ -59,7 +59,7 @@ export default function ProductDetailView({
     if (onPreReserve) {
       onPreReserve({
         email: reserveEmail.trim(),
-        name: reserveName.trim() || 'Whisky-Liebhaber',
+        name: reserveName.trim() || (lang === 'de' ? 'Whisky-Liebhaber' : 'Whisky Enthusiast'),
         caskInterest: `${product.name} (Vorab-Zuteilung 17.09.)`,
         source: 'vorabzugriff-17september',
         date: new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })
@@ -75,68 +75,62 @@ export default function ProductDetailView({
         
         {/* Breadcrumb Navigation */}
         <div className="flex items-center space-x-2 text-xs font-craft-mono font-bold text-[#55695E] mb-8">
-          <button onClick={onNavigateHome} className="hover:text-[#181F1C]">Startseite</button>
+          <button onClick={onNavigateHome} className="hover:text-[#181F1C] cursor-pointer">
+            {lang === 'de' ? 'Startseite' : 'Home'}
+          </button>
           <ChevronRight className="w-3.5 h-3.5 text-[#D4C8B8]" />
-          <button onClick={onNavigateShop} className="hover:text-[#181F1C]">Shop</button>
+          <button onClick={onNavigateShop} className="hover:text-[#181F1C] cursor-pointer">
+            {lang === 'de' ? 'Shop' : 'Shop'}
+          </button>
           <ChevronRight className="w-3.5 h-3.5 text-[#D4C8B8]" />
           <span className="text-[#B85D2C] truncate">{product.name}</span>
         </div>
 
-        {/* Top Product Section: Gallery Left, Purchase Dossier Right */}
+        {/* Top Product Section */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start mb-24">
           
-          {/* Left Column: Interactive Bottle Stage & Thumbnails (6 cols) */}
+          {/* Left Column: Stage & Thumbnails (6 cols) */}
           <div className="lg:col-span-6 space-y-4">
             
-            {/* Main Stage Image */}
             <div className="border border-[#D4C8B8] rounded-3xl h-[500px] sm:h-[580px] flex items-center justify-center shadow-md relative overflow-hidden group bg-neutral-900">
-              
               {isFullPhotograph ? (
-                /* Full photograph mode */
                 <img
                   src={activeImage}
                   alt={product.fullName}
                   className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
                 />
               ) : (
-                /* Cut-out bottle stage with cinematic background */
                 <>
                   <img
                     src={product.cardBg}
-                    alt="Schottische Landschaft"
+                    alt="Schottische Natur"
                     className="absolute inset-0 w-full h-full object-cover filter brightness-[0.88] contrast-[1.05] blur-[1px] scale-105 opacity-90 group-hover:scale-110 group-hover:opacity-100 transition-all duration-700"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-black/30" />
-                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(212,139,56,0.20)_0%,_transparent_65%)]" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-black/35" />
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(212,139,56,0.22)_0%,_transparent_65%)]" />
 
-                  <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
+                  <div className="relative z-10 h-full flex flex-col items-center justify-center p-8">
                     <img
                       src={activeImage}
                       alt={product.fullName}
-                      className="max-h-[86%] w-auto object-contain drop-shadow-[0_25px_35px_rgba(0,0,0,0.75)] transition-all duration-500 group-hover:scale-105"
+                      className="max-h-[90%] w-auto object-contain drop-shadow-[0_25px_35px_rgba(0,0,0,0.8)] group-hover:scale-106 transition-transform duration-500"
+                      loading="eager"
                     />
-                    <div className="w-32 sm:w-36 h-4 bg-black/70 rounded-full blur-md -mt-2 opacity-85" />
+                    <div className="w-32 h-4 bg-black/75 rounded-full blur-md -mt-2 opacity-85" />
                   </div>
                 </>
               )}
-              
-              {/* Region Label Badge */}
-              <div className="absolute top-6 left-6 z-20 font-script text-3xl text-white drop-shadow-md">
-                {product.region} Single Cask
-              </div>
             </div>
 
-            {/* Gallery Thumbnail Strip */}
+            {/* Thumbnails */}
             {gallery.length > 1 && (
               <div className="flex items-center space-x-3 overflow-x-auto pb-2">
                 {gallery.map((imgUrl, idx) => (
                   <button
                     key={idx}
                     onClick={() => setSelectedImageIdx(idx)}
-                    className={`w-20 h-20 rounded-xl bg-white border p-1.5 transition-all overflow-hidden shrink-0 ${
-                      selectedImageIdx === idx 
-                        ? 'border-[#B85D2C] ring-2 ring-[#B85D2C]/30 shadow-xs' 
-                        : 'border-[#E2DDD5] opacity-70 hover:opacity-100 hover:border-[#D4C8B8]'
+                    className={`w-20 h-20 rounded-xl overflow-hidden border-2 transition-all p-1 shrink-0 ${
+                      selectedImageIdx === idx ? 'border-[#B85D2C] shadow-sm' : 'border-[#D4C8B8] opacity-70 hover:opacity-100'
                     }`}
                   >
                     <img src={imgUrl} alt="Thumbnail" className="w-full h-full object-cover rounded-lg" />
@@ -175,7 +169,7 @@ export default function ProductDetailView({
               <div className="flex items-baseline justify-between border-b border-[#E2DDD5] pb-4">
                 <div>
                   <span className="font-woodblock text-4xl text-[#181F1C] block">{product.price.toFixed(2)} €</span>
-                  <span className="font-craft-mono text-xs text-[#55695E] font-medium">{product.pricePerLiter} · inkl. MwSt.</span>
+                  <span className="font-craft-mono text-xs text-[#55695E] font-medium">{product.pricePerLiter} · {lang === 'de' ? 'inkl. MwSt.' : 'incl. VAT'}</span>
                 </div>
 
                 <div className="text-right font-craft-mono text-xs font-bold">
@@ -184,21 +178,27 @@ export default function ProductDetailView({
                       <span className="text-[#B85D2C] text-sm block font-woodblock uppercase">
                         Release am {releaseDateStr}
                       </span>
-                      <span className="text-[11px] text-[#55695E] mt-0.5 block">Vorab-Zuteilung: {total} Flaschen</span>
+                      <span className="text-[11px] text-[#55695E] mt-0.5 block">
+                        {lang === 'de' ? `Vorab-Zuteilung: ${total} Flaschen` : `Pre-Allocation: ${total} Bottles`}
+                      </span>
                     </div>
                   ) : isAvailable ? (
                     <div className="text-right">
                       <span className="text-[#2D6A4F] text-sm block font-woodblock uppercase">
-                        🟢 Noch {remaining} von {total} Flaschen
+                        🟢 {lang === 'de' ? 'Sofort lieferbar' : 'In Stock'}
                       </span>
-                      <span className="text-[11px] text-[#55695E] mt-0.5 block">Streng limitiertes Einzelfass</span>
+                      <span className="text-[11px] text-[#55695E] mt-0.5 block">
+                        {lang === 'de' ? `Limitierte Einzelfassabfüllung (${total} Flaschen)` : `Limited Single Cask (${total} Bottles)`}
+                      </span>
                     </div>
                   ) : (
                     <div className="text-right">
                       <span className="text-rose-600 text-sm block font-woodblock uppercase">
-                        🔴 Ausverkauft
+                        🔴 {lang === 'de' ? 'Ausverkauft' : 'Sold Out'}
                       </span>
-                      <span className="text-[11px] text-[#55695E] mt-0.5 block">Sammler-Archiv ({total} Flaschen)</span>
+                      <span className="text-[11px] text-[#55695E] mt-0.5 block">
+                        {lang === 'de' ? `Sammler-Archiv (${total} Flaschen)` : `Archive (${total} Bottles)`}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -209,10 +209,12 @@ export default function ProductDetailView({
                 <div className="space-y-4">
                   <div className="p-4 rounded-2xl bg-[#FAF0EB] border border-[#F2DDD2] space-y-2">
                     <span className="font-craft-mono text-xs uppercase tracking-wider text-[#B85D2C] font-bold">
-                      Exklusiver Vorab-Zugriff für Fass-Depot Abonnenten
+                      {lang === 'de' ? 'Exklusiver Vorab-Zugriff für Fass-Depot Abonnenten' : 'Exclusive Priority Access for Allocation Members'}
                     </span>
                     <p className="text-xs text-[#3A4A40] leading-relaxed">
-                      Dieses Einzelfass kommt am <strong>{releaseDateStr}</strong> in den Verkauf. Tragen Sie sich jetzt ein, um Ihren persönlichen Bestell-Link vor allen anderen zu erhalten.
+                      {lang === 'de'
+                        ? `Dieses Einzelfass kommt am ${releaseDateStr} in den Verkauf. Tragen Sie sich jetzt ein, um Ihren persönlichen Bestell-Link vor allen anderen zu erhalten.`
+                        : `This single cask will officially release on ${releaseDateStr}. Sign up now to receive your priority link prior to public availability.`}
                     </p>
                   </div>
 
@@ -220,10 +222,12 @@ export default function ProductDetailView({
                     <div className="p-6 rounded-2xl bg-[#E8EFEA] border border-[#C5D8CC] text-center space-y-2">
                       <CheckCircle2 className="w-8 h-8 text-[#2D6A4F] mx-auto" />
                       <h4 className="font-woodblock text-xl uppercase text-[#181F1C]">
-                        Erfolgreich vorgemerkt!
+                        {lang === 'de' ? 'Erfolgreich vorgemerkt!' : 'Successfully Registered!'}
                       </h4>
                       <p className="text-xs text-[#3A4A40]">
-                        Vielen Dank! Wir senden Ihnen am {releaseDateStr} pünktlich den exklusiven Zuteilungs-Link für <strong>{product.name}</strong> per E-Mail.
+                        {lang === 'de'
+                          ? `Vielen Dank! Wir senden Ihnen am ${releaseDateStr} pünktlich den exklusiven Zuteilungs-Link für ${product.name} per E-Mail.`
+                          : `Thank you! We will email you the priority allocation link for ${product.name} on ${releaseDateStr}.`}
                       </p>
                     </div>
                   ) : (
@@ -231,7 +235,7 @@ export default function ProductDetailView({
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <input
                           type="text"
-                          placeholder="Ihr Name (optional)"
+                          placeholder={lang === 'de' ? 'Ihr Name (optional)' : 'Your Name (optional)'}
                           value={reserveName}
                           onChange={(e) => setReserveName(e.target.value)}
                           className="px-4 py-3 rounded-xl border border-[#D4C8B8] bg-[#FAF8F5] text-xs text-[#181F1C] focus:bg-white focus:outline-none"
@@ -239,7 +243,7 @@ export default function ProductDetailView({
                         <input
                           type="email"
                           required
-                          placeholder="Ihre E-Mail-Adresse *"
+                          placeholder={lang === 'de' ? 'Ihre E-Mail-Adresse *' : 'Your Email Address *'}
                           value={reserveEmail}
                           onChange={(e) => setReserveEmail(e.target.value)}
                           className="px-4 py-3 rounded-xl border border-[#D4C8B8] bg-[#FAF8F5] text-xs text-[#181F1C] focus:bg-white focus:outline-none"
@@ -248,10 +252,10 @@ export default function ProductDetailView({
 
                       <button
                         type="submit"
-                        className="w-full py-4 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-md flex items-center justify-center space-x-2"
+                        className="w-full py-4 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-md flex items-center justify-center space-x-2 cursor-pointer"
                       >
                         <Bell className="w-4 h-4" />
-                        <span>Für Vorabzugriff ({releaseDateStr}) vormerken</span>
+                        <span>{lang === 'de' ? `Für Vorabzugriff (${releaseDateStr}) vormerken` : `Join Allocation List (${releaseDateStr})`}</span>
                       </button>
                     </form>
                   )}
@@ -259,43 +263,41 @@ export default function ProductDetailView({
               ) : isAvailable ? (
                 <div className="space-y-4">
                   <div className="flex items-center space-x-4">
-                    {/* Quantity Selector */}
                     <div className="flex items-center border border-[#D4C8B8] rounded-xl bg-[#FAF8F5] p-1 font-craft-mono">
                       <button
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="px-3 py-2 text-lg font-bold text-[#181F1C] hover:text-[#B85D2C]"
+                        className="px-3 py-2 text-lg font-bold text-[#181F1C] hover:text-[#B85D2C] cursor-pointer"
                       >
                         -
                       </button>
                       <span className="px-4 py-2 text-base font-bold text-[#181F1C]">{quantity}</span>
                       <button
-                        onClick={() => setQuantity(Math.min(product.bottlesRemaining, quantity + 1))}
-                        className="px-3 py-2 text-lg font-bold text-[#181F1C] hover:text-[#B85D2C]"
+                        onClick={() => setQuantity(Math.min(product.bottlesRemaining || 12, quantity + 1))}
+                        className="px-3 py-2 text-lg font-bold text-[#181F1C] hover:text-[#B85D2C] cursor-pointer"
                       >
                         +
                       </button>
                     </div>
 
-                    {/* Add to Cart Button */}
                     <button
                       onClick={handleBuy}
-                      className="flex-1 py-4.5 px-8 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-xl tracking-wider uppercase transition-all shadow-md hover:shadow-lg flex items-center justify-center space-x-3"
+                      className="flex-1 py-4.5 px-8 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-xl tracking-wider uppercase transition-all shadow-md hover:shadow-lg flex items-center justify-center space-x-3 cursor-pointer"
                     >
                       <ShoppingBag className="w-5 h-5" />
-                      <span>In den Warenkorb</span>
+                      <span>{lang === 'de' ? 'In den Warenkorb' : 'Add to Cart'}</span>
                     </button>
                   </div>
 
                   {addedNotice && (
                     <div className="p-3 rounded-xl bg-[#E8EFEA] border border-[#C5D8CC] text-xs font-craft-mono font-bold text-[#2D6A4F] flex items-center justify-center space-x-2">
                       <Check className="w-4 h-4" />
-                      <span>Flasche wurde zum Warenkorb hinzugefügt!</span>
+                      <span>{lang === 'de' ? 'Flasche wurde zum Warenkorb hinzugefügt!' : 'Bottle added to cart!'}</span>
                     </div>
                   )}
                 </div>
               ) : (
                 <div className="p-5 rounded-2xl bg-neutral-100 border border-neutral-200 text-neutral-500 font-woodblock text-xl uppercase text-center">
-                  Dieses Fass ist restlos ausverkauft (Sammler-Archiv)
+                  {lang === 'de' ? 'Dieses Fass ist restlos ausverkauft (Sammler-Archiv)' : 'This release is sold out (Collector Archive)'}
                 </div>
               )}
 
@@ -303,15 +305,15 @@ export default function ProductDetailView({
               <div className="pt-2 border-t border-[#E2DDD5] space-y-2 text-xs font-craft-mono text-[#55695E] font-bold">
                 <div className="flex items-center space-x-2">
                   <ShieldCheck className="w-4 h-4 text-[#2D6A4F]" />
-                  <span>Klimaneutraler DHL GoGreen Versand (Versand innerhalb von 2–4 Werktagen)</span>
+                  <span>{lang === 'de' ? 'Klimaneutraler DHL GoGreen Versand (2–4 Werktage)' : 'Climate-neutral DHL GoGreen shipping (2–4 days)'}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Droplets className="w-4 h-4 text-[#B85D2C]" />
-                  <span>100% Cask Strength · Unfiltriert · Ohne Zuckerkulör</span>
+                  <span>{lang === 'de' ? '100% Cask Strength · Unfiltriert · Ohne Zuckerkulör' : '100% Cask Strength · Unchillfiltered · Natural Colour'}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Leaf className="w-4 h-4 text-[#2D6A4F]" />
-                  <span>100% Estal Wild Glass aus Spanien & Naturkork</span>
+                  <span>{lang === 'de' ? '100% Estal Wild Glass aus Spanien & Naturkork' : '100% Estal Wild Glass from Spain & Natural Cork'}</span>
                 </div>
               </div>
 
@@ -321,26 +323,24 @@ export default function ProductDetailView({
 
         </div>
 
-        {/* ------------------------------------------------------------- */}
-        {/* SENSORISCHES PROFIL (TASTING NOTES)                            */}
-        {/* ------------------------------------------------------------- */}
+        {/* Sensory Notes */}
         <div className="mb-24 space-y-8">
           <div className="border-b border-[#E2DDD5] pb-4">
             <span className="font-script text-3xl text-[#2D6A4F] block">
-              Sensorische Verkostung
+              {lang === 'de' ? 'Sensorische Verkostung' : 'Sensory Evaluation'}
             </span>
             <h2 className="font-woodblock text-4xl sm:text-5xl text-[#181F1C] tracking-wide uppercase">
-              Tasting Notes von Ines Zager.
+              {lang === 'de' ? 'Tasting Notes von Ines Zager.' : 'Tasting Notes by Ines Zager.'}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-8 rounded-3xl border border-[#D4C8B8] shadow-xs space-y-3">
               <span className="font-craft-mono text-xs uppercase tracking-widest text-[#B85D2C] font-bold block">
-                01 · Nase
+                01 · {lang === 'de' ? 'Nase' : 'Nose'}
               </span>
               <h3 className="font-woodblock text-2xl text-[#181F1C] uppercase">
-                Aromatik & Bukett
+                {lang === 'de' ? 'Aromatik & Bukett' : 'Aroma & Bouquet'}
               </h3>
               <p className="text-[#3A4A40] text-sm sm:text-base font-normal leading-relaxed">
                 {product.tastingNotes.nose}
@@ -349,10 +349,10 @@ export default function ProductDetailView({
 
             <div className="bg-white p-8 rounded-3xl border border-[#D4C8B8] shadow-xs space-y-3">
               <span className="font-craft-mono text-xs uppercase tracking-widest text-[#B85D2C] font-bold block">
-                02 · Gaumen
+                02 · {lang === 'de' ? 'Gaumen' : 'Palate'}
               </span>
               <h3 className="font-woodblock text-2xl text-[#181F1C] uppercase">
-                Körper & Textur
+                {lang === 'de' ? 'Körper & Textur' : 'Body & Texture'}
               </h3>
               <p className="text-[#3A4A40] text-sm sm:text-base font-normal leading-relaxed">
                 {product.tastingNotes.palate}
@@ -361,10 +361,10 @@ export default function ProductDetailView({
 
             <div className="bg-white p-8 rounded-3xl border border-[#D4C8B8] shadow-xs space-y-3">
               <span className="font-craft-mono text-xs uppercase tracking-widest text-[#B85D2C] font-bold block">
-                03 · Nachklang
+                03 · {lang === 'de' ? 'Nachklang' : 'Finish'}
               </span>
               <h3 className="font-woodblock text-2xl text-[#181F1C] uppercase">
-                Finish & Tiefe
+                {lang === 'de' ? 'Finish & Tiefe' : 'Finish & Depth'}
               </h3>
               <p className="text-[#3A4A40] text-sm sm:text-base font-normal leading-relaxed">
                 {product.tastingNotes.finish}
@@ -373,86 +373,22 @@ export default function ProductDetailView({
           </div>
         </div>
 
-        {/* ------------------------------------------------------------- */}
-        {/* HERKUNFT & DESTILLERIE GESCHICHTE                              */}
-        {/* ------------------------------------------------------------- */}
-        <div className="mb-24 bg-white border border-[#D4C8B8] rounded-3xl p-8 sm:p-12 shadow-xs grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-          <div className="lg:col-span-7 space-y-4">
-            <span className="font-script text-3xl text-[#2D6A4F] block">
-              Brennerei & Terroir
-            </span>
-            <h2 className="font-woodblock text-4xl sm:text-5xl text-[#181F1C] uppercase tracking-wide leading-tight">
-              {product.history.headline}
-            </h2>
-            <p className="text-[#3A4A40] text-base sm:text-lg font-normal leading-relaxed">
-              {product.history.text}
-            </p>
-            <div className="pt-2 font-craft-mono text-xs text-[#55695E] space-y-1">
-              <p>📍 Standort: <strong>{product.distilleryLocation}</strong></p>
-              <p>🪵 Fasstyp: <strong>{product.caskType}</strong></p>
-              <p>⚖️ Limitierung: <strong>Streng limitiert auf {product.bottlesTotal} Flaschen</strong></p>
-            </div>
-          </div>
-
-          <div className="lg:col-span-5">
-            <div className="rounded-2xl overflow-hidden border border-[#D4C8B8] shadow-md h-72 sm:h-84">
-              <img
-                src={product.history.image}
-                alt={product.distillery}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* ------------------------------------------------------------- */}
-        {/* UMWELT-JURISTISCHES AUDIT                                     */}
-        {/* ------------------------------------------------------------- */}
-        <div className="mb-24 bg-[#FAF8F5] border border-[#D4C8B8] rounded-3xl p-8 sm:p-12 shadow-xs grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-          <div className="lg:col-span-5 order-2 lg:order-1">
-            <div className="rounded-2xl overflow-hidden border border-[#D4C8B8] shadow-md h-72 sm:h-84">
-              <img
-                src={product.sustainability.image || product.sustainability.story}
-                alt="Audit vor Ort"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-
-          <div className="lg:col-span-7 space-y-4 order-1 lg:order-2">
-            <span className="font-script text-3xl text-[#2D6A4F] block">
-              Juristisches Nachhaltigkeits-Audit
-            </span>
-            <h2 className="font-woodblock text-4xl sm:text-5xl text-[#181F1C] uppercase tracking-wide leading-tight">
-              {product.sustainability.headline}
-            </h2>
-            <p className="text-[#3A4A40] text-base sm:text-lg font-normal leading-relaxed">
-              {product.sustainability.story}
-            </p>
-            <p className="text-xs font-craft-mono text-[#55695E]">
-              Auditiert und persönlich geprüft von Juristin Ines Zager vor Ort in Schottland.
-            </p>
-          </div>
-        </div>
-
-        {/* ------------------------------------------------------------- */}
-        {/* WEITERE ABFÜLLUNGEN                                           */}
-        {/* ------------------------------------------------------------- */}
+        {/* Further Casks */}
         <div className="space-y-8">
           <div className="flex items-center justify-between border-b border-[#E2DDD5] pb-4">
             <div>
               <span className="font-script text-3xl text-[#2D6A4F] block">
-                Entdeckungen
+                {lang === 'de' ? 'Entdeckungen' : 'Discoveries'}
               </span>
               <h2 className="font-woodblock text-3xl sm:text-4xl text-[#181F1C] uppercase tracking-wide">
-                Weitere handverlesene Einzelfässer.
+                {lang === 'de' ? 'Weitere handverlesene Einzelfässer.' : 'Further Handpicked Single Casks.'}
               </h2>
             </div>
             <button
               onClick={onNavigateShop}
-              className="font-craft-mono text-xs font-bold text-[#B85D2C] hover:underline"
+              className="font-craft-mono text-xs font-bold text-[#B85D2C] hover:underline cursor-pointer"
             >
-              Alle im Shop ansehen →
+              {lang === 'de' ? 'Alle im Shop ansehen →' : 'View all in shop →'}
             </button>
           </div>
 
@@ -475,7 +411,7 @@ export default function ProductDetailView({
                     </span>
                   ) : !other.isAvailable ? (
                     <span className="absolute top-2 right-2 px-2 py-0.5 bg-rose-100 text-rose-700 text-[10px] font-craft-mono font-bold rounded">
-                      Ausverkauft
+                      {lang === 'de' ? 'Ausverkauft' : 'Sold Out'}
                     </span>
                   ) : null}
                 </div>
@@ -493,7 +429,7 @@ export default function ProductDetailView({
                 <div className="flex items-center justify-between pt-2 border-t border-[#E2DDD5]">
                   <span className="font-woodblock text-xl text-[#181F1C]">{other.price.toFixed(2)} €</span>
                   <span className="font-craft-mono text-xs text-[#B85D2C] font-bold group-hover:underline">
-                    Dossier öffnen →
+                    {lang === 'de' ? 'Dossier öffnen →' : 'Open dossier →'}
                   </span>
                 </div>
               </div>

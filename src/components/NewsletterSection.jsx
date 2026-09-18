@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Mail, ArrowRight, ShieldCheck, CheckCircle2, Sparkles } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function NewsletterSection({ onSubscribe }) {
+  const { lang, t } = useLanguage();
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [caskInterest, setCaskInterest] = useState('Alle Fässer (Highland & Island)');
@@ -13,7 +15,9 @@ export default function NewsletterSection({ onSubscribe }) {
       if (onSubscribe) {
         onSubscribe({
           email: email.trim(),
-          name: name.trim() || 'Whisky-Liebhaber',
+          name: name.trim() || (lang === 'de' ? 'Whisky-Liebhaber' : 'Whisky Enthusiast'),
+          firstName: name.trim().split(' ')[0] || '',
+          lastName: name.trim().split(' ').slice(1).join(' ') || '',
           caskInterest,
           source: 'newsletter',
           date: new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })
@@ -24,19 +28,18 @@ export default function NewsletterSection({ onSubscribe }) {
   };
 
   return (
-    <section id="newsletter-section" className="py-28 lg:py-36 bg-[#FAF8F5] border-b border-[#E2DDD5]">
+    <section id="newsletter-section" className="py-24 lg:py-32 bg-[#FAF8F5] border-b border-[#E2DDD5]">
       <div className="max-w-4xl mx-auto px-6 sm:px-8 text-center space-y-8">
         
-        <div className="space-y-4 max-w-2xl mx-auto">
-          <span className="font-script text-3xl sm:text-4xl text-[#2D6A4F] block">
-            Exklusive Fass-Zuteilung
+        <div className="space-y-3 max-w-2xl mx-auto">
+          <span className="font-script text-2xl sm:text-3xl text-[#2D6A4F] block font-bold">
+            {t.newsletter.badge}
           </span>
-          <h2 className="font-woodblock text-4xl sm:text-5xl lg:text-6xl text-[#181F1C] tracking-wide uppercase leading-tight">
-            Zugang zum Fass-Depot.
+          <h2 className="font-woodblock text-3xl sm:text-4xl lg:text-5xl text-[#181F1C] tracking-wide uppercase leading-tight">
+            {t.newsletter.title}
           </h2>
-          <p className="text-[#3A4A40] text-lg font-normal leading-relaxed">
-            Weil jedes Einzelfass auf maximal 100–240 Flaschen limitiert ist, 
-            werden neue Releases zuerst an eingetragene Liebhaber per E-Mail vergeben.
+          <p className="text-[#3A4A40] text-base sm:text-lg font-normal leading-relaxed">
+            {t.newsletter.subtitle}
           </p>
         </div>
 
@@ -45,12 +48,15 @@ export default function NewsletterSection({ onSubscribe }) {
             <div className="w-12 h-12 rounded-full bg-[#E8EFEA] text-[#2D6A4F] flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-6 h-6" />
             </div>
-            <h3 className="font-woodblock text-3xl text-[#181F1C] uppercase">
-              Erfolgreich vorgemerkt!
+            <h3 className="font-woodblock text-2xl text-[#181F1C] uppercase">
+              {lang === 'de' ? 'Erfolgreich vorgemerkt!' : 'Successfully Subscribed!'}
             </h3>
             <p className="text-sm text-[#3A4A40] leading-relaxed">
-              Vielen Dank, <strong>{name || email}</strong>. Sie erhalten ab sofort vor allen anderen 
-              persönliche Benachrichtigungen von Ines Zager, sobald ein neues Fass geöffnet wird.
+              {lang === 'de' ? (
+                <>Vielen Dank, <strong>{name || email}</strong>. Sie erhalten ab sofort vor allen anderen persönliche Benachrichtigungen von Ines Zager, sobald ein neues Fass geöffnet wird.</>
+              ) : (
+                <>Thank you, <strong>{name || email}</strong>. You will now receive priority notifications directly from Ines Zager whenever a new cask release becomes available.</>
+              )}
             </p>
           </div>
         ) : (
@@ -58,60 +64,60 @@ export default function NewsletterSection({ onSubscribe }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block font-craft-mono text-xs uppercase tracking-wider text-[#55695E] font-bold mb-1.5">
-                  Ihr Name
+                  {lang === 'de' ? 'Ihr Name' : 'Your Name'}
                 </label>
                 <input
                   type="text"
-                  placeholder="z.B. Martin Weber"
+                  placeholder={lang === 'de' ? 'z.B. Martin Weber' : 'e.g. Martin Weber'}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3.5 rounded-xl border border-[#D4C8B8] bg-white text-sm text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
+                  className="w-full px-4 py-3 rounded-xl border border-[#D4C8B8] bg-white text-sm text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
                 />
               </div>
 
               <div>
                 <label className="block font-craft-mono text-xs uppercase tracking-wider text-[#55695E] font-bold mb-1.5">
-                  Ihre E-Mail-Adresse *
+                  {lang === 'de' ? 'Ihre E-Mail-Adresse *' : 'Your Email *'}
                 </label>
                 <input
                   type="email"
                   required
-                  placeholder="ihre.mail@beispiel.de"
+                  placeholder={t.newsletter.placeholder}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3.5 rounded-xl border border-[#D4C8B8] bg-white text-sm text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
+                  className="w-full px-4 py-3 rounded-xl border border-[#D4C8B8] bg-white text-sm text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
                 />
               </div>
             </div>
 
             <div>
               <label className="block font-craft-mono text-xs uppercase tracking-wider text-[#55695E] font-bold mb-1.5">
-                Bevorzugte Fass-Kategorie
+                {lang === 'de' ? 'Bevorzugte Fass-Kategorie' : 'Preferred Cask Profile'}
               </label>
               <select
                 value={caskInterest}
                 onChange={(e) => setCaskInterest(e.target.value)}
-                className="w-full px-4 py-3.5 rounded-xl border border-[#D4C8B8] bg-white text-sm text-[#181F1C] focus:outline-none focus:border-[#B85D2C] font-craft-mono"
+                className="w-full px-4 py-3 rounded-xl border border-[#D4C8B8] bg-white text-sm text-[#181F1C] focus:outline-none focus:border-[#B85D2C] font-craft-mono"
               >
-                <option value="Alle Fässer (Highland & Island)">Alle Fässer (Highland & Island)</option>
-                <option value="Rauchige Islay & Peated Fässer">Rauchige Islay & Peated Fässer</option>
-                <option value="Fruchtige Bourbon & Refill Fässer">Fruchtige Bourbon & Refill Fässer</option>
-                <option value="Alte Jahrgänge (15+ Jahre)">Alte Jahrgänge (15+ Jahre)</option>
+                <option value="Alle Fässer (Highland & Island)">{lang === 'de' ? 'Alle Fässer (Highland & Island)' : 'All Casks (Highland & Island)'}</option>
+                <option value="Rauchige Islay & Peated Fässer">{lang === 'de' ? 'Rauchige Islay & Peated Fässer' : 'Peated & Smoky Casks'}</option>
+                <option value="Fruchtige Bourbon & Refill Fässer">{lang === 'de' ? 'Fruchtige Bourbon & Refill Fässer' : 'Fruity Bourbon & Refill Casks'}</option>
+                <option value="Alte Jahrgänge (15+ Jahre)">{lang === 'de' ? 'Alte Jahrgänge (15+ Jahre)' : 'Aged Expressions (15+ Years)'}</option>
               </select>
             </div>
 
             <div className="pt-2">
               <button
                 type="submit"
-                className="w-full py-4.5 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-xl tracking-wider uppercase transition-all shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
+                className="w-full py-4 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-md hover:shadow-lg flex items-center justify-center space-x-2 cursor-pointer"
               >
-                <span>Für exklusive Zuteilung vormerken</span>
+                <span>{t.newsletter.button}</span>
                 <ArrowRight className="w-5 h-5" />
               </button>
             </div>
 
             <p className="text-[11px] text-[#55695E] text-center pt-1 font-craft-mono">
-              🔒 Kein Spam. Abmeldung jederzeit mit 1 Klick möglich. Datenschutz gemäß DSGVO.
+              🔒 {t.newsletter.privacyNote}
             </p>
           </form>
         )}

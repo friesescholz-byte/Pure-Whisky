@@ -4,25 +4,41 @@ import {
   Square, Users, BookOpen, Smartphone, Monitor, 
   CheckCircle2, AlertCircle, RefreshCw, X,
   ChevronDown, ChevronUp, Search, Upload, Mail, Image as ImageIcon, Play,
-  History, Clock, Check, FileText, UserMinus, Package, Star, Link
+  History, Clock, Check, FileText, UserMinus, Package, Star, Link,
+  ShoppingBag, Receipt, Settings, ShieldCheck
 } from 'lucide-react';
 import { IMAGES } from '../data/pureWhiskyFullData';
 import InventoryManager from './InventoryManager';
+import OrdersManager from './admin/OrdersManager';
+import CombinedCrmManager from './admin/CombinedCrmManager';
 
 export default function AdminView({ 
   blogPosts, 
   onSaveBlogPost, 
   onDeleteBlogPost, 
-  contacts, 
-  onAddContact,
-  onDeleteContact,
-  onBulkDeleteContacts,
   onNavigateHome,
   onNavigateBlog,
   products = [],
   onUpdateProduct,
   onResetProducts,
-  onNavigateProduct
+  onNavigateProduct,
+  // Orders & Invoices Props
+  orders = [],
+  onSendInvoice,
+  onViewInvoice,
+  onAddTestOrder,
+  // WooCommerce Customers CRM Props
+  wooCustomers = [],
+  onAddWooCustomer,
+  onDeleteWooCustomer,
+  // Newsletter CRM Props
+  newsletterSubs = [],
+  onAddNewsletterSub,
+  onToggleNewsletterStatus,
+  onDeleteNewsletterSub,
+  // Settings Props
+  adminEmail = 'friese.scholz@gmail.com',
+  onSaveAdminEmail
 }) {
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -31,18 +47,12 @@ export default function AdminView({
   const [passwordInput, setPasswordInput] = useState('');
   const [authError, setAuthError] = useState(false);
 
-  // Active Admin Tab: 'inventory' | 'broadcast' | 'history' | 'crm' | 'journal'
-  const [adminTab, setAdminTab] = useState('inventory');
-
-  // CRM Search & Source Filter & Selected CRM contacts for bulk actions
-  const [crmSourceFilter, setCrmSourceFilter] = useState('all');
-  const [crmSearchTerm, setCrmSearchTerm] = useState('');
-  const [selectedCrmEmails, setSelectedCrmEmails] = useState([]);
+  // Active Admin Tab: 'orders' | 'inventory' | 'broadcast' | 'journal' | 'crm_all'
+  const [adminTab, setAdminTab] = useState('orders');
 
   // Audience Selection for Broadcaster
-  const [selectedEmails, setSelectedEmails] = useState(() => {
-    return Array.from(new Set(contacts.map(c => c.email.toLowerCase())));
-  });
+  const [selectedEmails, setSelectedEmails] = useState([]);
+  const hasInitializedEmails = useRef(false);
   const [isAudienceExpanded, setIsAudienceExpanded] = useState(false);
   const [audienceSearchTerm, setAudienceSearchTerm] = useState('');
 
@@ -129,47 +139,82 @@ Ines Zager · PURE.WHISKY.`);
     localStorage.removeItem('pure_admin_auth');
   };
 
-  // Deduplicated Contacts Map
-  const uniqueContactsMap = useMemo(() => {
+  // Unified Deduplicated Audience from all active sources:
+  // 1. Shop-Kunden (wooCustomers)
+  // 2. Newsletter-Kunden (active newsletterSubs where listStatus === 'subscribed')
+  const allUnifiedContacts = useMemo(() => {
     const map = new Map();
-    contacts.forEach(c => {
-      const emailKey = c.email.toLowerCase().trim();
-      if (!map.has(emailKey)) {
-        map.set(emailKey, {
-          email: c.email,
-          name: c.name || 'Kunde',
-          sources: [c.source],
-          date: c.date,
-          caskInterest: c.caskInterest
-        });
+
+    // 1. Shop Customers
+    wooCustomers.forEach(c => {
+      if (!c.email) return;
+      const key = c.email.toLowerCase().trim();
+      const name = c.fullName || `${c.firstName || ''} ${c.lastName || ''}`.trim() || c.name || '';
+      map.set(key, {
+        email: c.email.trim(),
+        name: name || key.split('@')[0],
+        categories: ['shop'],
+        date: c.subscribedAt || c.date || '–',
+        isShop: true,
+        isNewsletter: false
+      });
+    });
+
+    // 2. Newsletter Subscribers (Strictly active only!)
+    newsletterSubs.forEach(s => {
+      if (!s.email) return;
+      const key = s.email.toLowerCase().trim();
+      const isActive = s.listStatus === 'subscribed';
+      if (!isActive) return; // Only active per user instruction
+
+      const name = s.fullName || `${s.firstName || ''} ${s.lastName || ''}`.trim() || '';
+      if (map.has(key)) {
+        const existing = map.get(key);
+        if (!existing.categories.includes('newsletter')) existing.categories.push('newsletter');
+        existing.isNewsletter = true;
+        if (!existing.name && name) existing.name = name;
       } else {
-        const existing = map.get(emailKey);
-        if (!existing.sources.includes(c.source)) {
-          existing.sources.push(c.source);
-        }
+        map.set(key, {
+          email: s.email.trim(),
+          name: name || key.split('@')[0],
+          categories: ['newsletter'],
+          date: s.subscribedAt || '–',
+          isShop: false,
+          isNewsletter: true
+        });
       }
     });
+
     return Array.from(map.values());
-  }, [contacts]);
+  }, [wooCustomers, newsletterSubs]);
 
-  const totalUniqueCount = uniqueContactsMap.length;
-  const newsletterOnlyCount = uniqueContactsMap.filter(c => c.sources.includes('newsletter')).length;
-  const shopOnlyCount = uniqueContactsMap.filter(c => c.sources.includes('shop')).length;
+  const totalUniqueCount = allUnifiedContacts.length;
+  const shopCount = allUnifiedContacts.filter(c => c.categories.includes('shop')).length;
+  const activeNewsletterCount = allUnifiedContacts.filter(c => c.categories.includes('newsletter')).length;
 
-  const filteredCrmContacts = uniqueContactsMap.filter(c => {
-    const matchesSource = crmSourceFilter === 'all' || c.sources.includes(crmSourceFilter);
-    const matchesSearch = c.email.toLowerCase().includes(crmSearchTerm.toLowerCase()) || 
-                          c.name.toLowerCase().includes(crmSearchTerm.toLowerCase());
-    return matchesSource && matchesSearch;
-  });
+  // Sync selectedEmails on initial load once allUnifiedContacts is ready
+  useEffect(() => {
+    if (!hasInitializedEmails.current && allUnifiedContacts.length > 0) {
+      setSelectedEmails(allUnifiedContacts.map(c => c.email.toLowerCase()));
+      hasInitializedEmails.current = true;
+    }
+  }, [allUnifiedContacts]);
+
+  // Deep-link "Mail schreiben" to a specific individual customer
+  const handleComposeMailToContact = (contact) => {
+    const emailKey = contact.email.toLowerCase().trim();
+    setSelectedEmails([emailKey]);
+    setIsAudienceExpanded(false);
+    setAdminTab('broadcast');
+  };
 
   const handleSelectAudience = (type) => {
     if (type === 'all') {
-      setSelectedEmails(uniqueContactsMap.map(c => c.email.toLowerCase()));
-    } else if (type === 'newsletter') {
-      setSelectedEmails(uniqueContactsMap.filter(c => c.sources.includes('newsletter')).map(c => c.email.toLowerCase()));
+      setSelectedEmails(allUnifiedContacts.map(c => c.email.toLowerCase()));
     } else if (type === 'shop') {
-      setSelectedEmails(uniqueContactsMap.filter(c => c.sources.includes('shop')).map(c => c.email.toLowerCase()));
+      setSelectedEmails(allUnifiedContacts.filter(c => c.categories.includes('shop')).map(c => c.email.toLowerCase()));
+    } else if (type === 'newsletter') {
+      setSelectedEmails(allUnifiedContacts.filter(c => c.categories.includes('newsletter')).map(c => c.email.toLowerCase()));
     } else if (type === 'none') {
       setSelectedEmails([]);
     }
@@ -184,29 +229,12 @@ Ines Zager · PURE.WHISKY.`);
     }
   };
 
-  const filteredAudience = uniqueContactsMap.filter(c => {
+  const filteredAudience = allUnifiedContacts.filter(c => {
     return c.email.toLowerCase().includes(audienceSearchTerm.toLowerCase()) ||
            c.name.toLowerCase().includes(audienceSearchTerm.toLowerCase());
   });
 
-  // CRM Customer Delete Handlers
-  const handleDeleteSingleCustomer = (email, e) => {
-    if (e) e.stopPropagation();
-    if (confirm(`Möchten Sie den Kunden "${email}" wirklich dauerhaft aus dem System löschen?`)) {
-      onDeleteContact(email);
-      setSelectedEmails(prev => prev.filter(em => em.toLowerCase() !== email.toLowerCase()));
-      setSelectedCrmEmails(prev => prev.filter(em => em.toLowerCase() !== email.toLowerCase()));
-    }
-  };
 
-  const handleBulkDeleteSelectedCrm = () => {
-    if (selectedCrmEmails.length === 0) return;
-    if (confirm(`Möchten Sie wirklich alle ${selectedCrmEmails.length} ausgewählten Kunden dauerhaft löschen?`)) {
-      onBulkDeleteContacts(selectedCrmEmails);
-      setSelectedEmails(prev => prev.filter(em => !selectedCrmEmails.includes(em.toLowerCase())));
-      setSelectedCrmEmails([]);
-    }
-  };
 
   // Blog Image Compression to guarantee zero crash and fast saving
   const compressImageFile = (file) => {
@@ -358,7 +386,8 @@ Ines Zager · PURE.WHISKY.`);
   // REAL ROBUST EMAIL DISPATCH (USES LOCAL PROXY OR PROD SERVERLESS)
   // -------------------------------------------------------------
   const handleSendBroadcast = async () => {
-    const targetEmails = selectedEmails;
+    // 100% Guarantee of deduplication across all customer groups
+    const targetEmails = Array.from(new Set(selectedEmails.map(e => e.toLowerCase().trim()))).filter(Boolean);
     if (targetEmails.length === 0) {
       alert('Bitte wählen Sie mindestens einen Empfänger aus.');
       return;
@@ -380,7 +409,7 @@ Ines Zager · PURE.WHISKY.`);
               <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #D4C8B8; border-radius: 16px; overflow: hidden; padding: 36px;">
                 <div style="text-align: center; margin-bottom: 28px; border-bottom: 1px solid #E2DDD5; padding-bottom: 20px;">
                   <h1 style="font-size: 28px; margin: 0; color: #181F1C; letter-spacing: 2px; text-transform: uppercase;">PURE.WHISKY.</h1>
-                  <p style="margin: 4px 0 0 0; color: #2D6A4F; font-size: 14px; font-style: italic;">Single Cask Scotch Selection</p>
+                  <p style="margin: 4px 0 0 0; color: #2D6A4F; font-size: 14px; font-style: italic;">Single Cask Sustainable Whisky</p>
                 </div>
                 <div style="font-size: 16px; line-height: 1.6; color: #3A4A40; white-space: pre-line;">
                   ${emailBody}
@@ -395,9 +424,25 @@ Ines Zager · PURE.WHISKY.`);
           attachments: attachments.map(a => ({ filename: a.filename, content: a.content }))
         };
 
-        // Try Vite local proxy / production endpoint first, then direct
+        // 1. Primary: Official Scholz & Friese Shops Resend Worker
         let response = null;
         try {
+          response = await fetch('https://resend-mailer.friese-scholz.workers.dev', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              from: `${senderName} <${senderEmail}>`,
+              to: [email],
+              reply_to: 'info@pure-whisky.com',
+              subject: emailSubject,
+              text: emailBody,
+              html: payload.html
+            })
+          });
+        } catch (fetchErr) {
+          // Fallback to local proxy if offline
           response = await fetch('/api/resend/emails', {
             method: 'POST',
             headers: {
@@ -406,18 +451,12 @@ Ines Zager · PURE.WHISKY.`);
             },
             body: JSON.stringify(payload)
           });
-        } catch (fetchErr) {
-          // Fallback to central backend if proxy unavailable
-          response = await fetch('https://friesescholzwebdesign.pages.dev/api/send-email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
         }
 
         const resData = await response.json();
-        if (response.ok && resData.id) {
-          newLogs.push({ email, status: `✅ Erfolgreich gesendet (Resend ID: ${resData.id.slice(0, 8)}...)`, time: new Date().toLocaleTimeString() });
+        if (response.ok && (resData.id || resData.success)) {
+          const idStr = resData.id ? ` (Resend ID: ${resData.id.slice(0, 8)}...)` : '';
+          newLogs.push({ email, status: `✅ Erfolgreich gesendet${idStr}`, time: new Date().toLocaleTimeString() });
           successfulRecipients.push(email);
         } else {
           newLogs.push({ email, status: `⚠️ Gesendet (Status: ${response.status})`, time: new Date().toLocaleTimeString() });
@@ -550,9 +589,31 @@ Ines Zager · PURE.WHISKY.`);
           </div>
         </div>
 
-        {/* 5 Main Tabs (Responsive scrollable tab bar) */}
+        {/* Main Tabs (Responsive scrollable tab bar) */}
         <div className="flex items-center space-x-2 sm:space-x-3 border-b border-[#E2DDD5] pb-3 sm:pb-4 mb-6 sm:mb-8 overflow-x-auto select-none">
           
+          {/* Tab 1: Bestellungen & Rechnungen */}
+          <button
+            onClick={() => setAdminTab('orders')}
+            className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-woodblock text-sm sm:text-base md:text-lg tracking-wider uppercase transition-all flex items-center space-x-2 shrink-0 cursor-pointer ${
+              adminTab === 'orders' 
+                ? 'bg-[#B85D2C] text-white shadow-md' 
+                : 'bg-white border border-[#D4C8B8] text-[#181F1C] hover:bg-[#FAF8F5]'
+            }`}
+          >
+            <Receipt className="w-4 h-4" />
+            <span>Bestellungen & Rechnungen</span>
+            {orders.filter(o => o.status === 'neu_eingegangen').length > 0 && (
+              <span className="ml-1 px-2 py-0.5 bg-amber-500 text-white text-xs font-craft-mono font-bold rounded-full animate-pulse">
+                {orders.filter(o => o.status === 'neu_eingegangen').length} neu
+              </span>
+            )}
+            <span className="ml-1 px-2 py-0.5 bg-black/10 text-xs font-craft-mono font-bold rounded-full">
+              {orders.length}
+            </span>
+          </button>
+
+          {/* Tab 2: Fässer & Preise (Shop) */}
           <button
             onClick={() => setAdminTab('inventory')}
             className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-woodblock text-sm sm:text-base md:text-lg tracking-wider uppercase transition-all flex items-center space-x-2 shrink-0 cursor-pointer ${
@@ -568,6 +629,7 @@ Ines Zager · PURE.WHISKY.`);
             </span>
           </button>
 
+          {/* Tab 3: Mitteilung senden */}
           <button
             onClick={() => setAdminTab('broadcast')}
             className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-woodblock text-sm sm:text-base md:text-lg tracking-wider uppercase transition-all flex items-center space-x-2 shrink-0 cursor-pointer ${
@@ -577,36 +639,10 @@ Ines Zager · PURE.WHISKY.`);
             }`}
           >
             <Send className="w-4 h-4" />
-            <span>Newsletter & E-Mails</span>
-            <span className="ml-1 px-2 py-0.5 bg-black/10 text-xs font-craft-mono font-bold rounded-full">
-              {selectedEmails.length}
-            </span>
+            <span>Mitteilung senden</span>
           </button>
 
-          <button
-            onClick={() => setAdminTab('history')}
-            className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-woodblock text-sm sm:text-base md:text-lg tracking-wider uppercase transition-all flex items-center space-x-2 shrink-0 cursor-pointer ${
-              adminTab === 'history' 
-                ? 'bg-[#B85D2C] text-white shadow-md' 
-                : 'bg-white border border-[#D4C8B8] text-[#181F1C] hover:bg-[#FAF8F5]'
-            }`}
-          >
-            <History className="w-4 h-4" />
-            <span>Versendet ({sentCampaigns.length})</span>
-          </button>
-
-          <button
-            onClick={() => setAdminTab('crm')}
-            className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-woodblock text-sm sm:text-base md:text-lg tracking-wider uppercase transition-all flex items-center space-x-2 shrink-0 cursor-pointer ${
-              adminTab === 'crm' 
-                ? 'bg-[#B85D2C] text-white shadow-md' 
-                : 'bg-white border border-[#D4C8B8] text-[#181F1C] hover:bg-[#FAF8F5]'
-            }`}
-          >
-            <Users className="w-4 h-4" />
-            <span>Kunden ({totalUniqueCount})</span>
-          </button>
-
+          {/* Tab 4: Journal */}
           <button
             onClick={() => setAdminTab('journal')}
             className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-woodblock text-sm sm:text-base md:text-lg tracking-wider uppercase transition-all flex items-center space-x-2 shrink-0 cursor-pointer ${
@@ -619,10 +655,39 @@ Ines Zager · PURE.WHISKY.`);
             <span>Journal ({blogPosts.length})</span>
           </button>
 
+          {/* Tab 5: Kunden- & Newsletter-Verteiler (Ganz hinten) */}
+          <button
+            onClick={() => setAdminTab('crm_all')}
+            className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-woodblock text-sm sm:text-base md:text-lg tracking-wider uppercase transition-all flex items-center space-x-2 shrink-0 cursor-pointer ${
+              adminTab === 'crm_all' 
+                ? 'bg-[#B85D2C] text-white shadow-md' 
+                : 'bg-white border border-[#D4C8B8] text-[#181F1C] hover:bg-[#FAF8F5]'
+            }`}
+          >
+            <Mail className="w-4 h-4" />
+            <span>Kunden- & Newsletter-Verteiler</span>
+            <span className="ml-1 px-2 py-0.5 bg-black/10 text-xs font-craft-mono font-bold rounded-full">
+              {wooCustomers.length + newsletterSubs.length}
+            </span>
+          </button>
+
         </div>
 
         {/* ------------------------------------------------------------- */}
-        {/* TAB 0: FÄSSER & PREISE (SHOP / MOLLIE)                         */}
+        {/* TAB 1: BESTELLUNGEN & RECHNUNGEN (KAUFVERTRAGS-MANAGEMENT)   */}
+        {/* ------------------------------------------------------------- */}
+        {adminTab === 'orders' && (
+          <OrdersManager
+            orders={orders}
+            onSendInvoice={onSendInvoice}
+            onViewInvoice={onViewInvoice}
+            onAddTestOrder={onAddTestOrder}
+            adminEmail={adminEmail}
+          />
+        )}
+
+        {/* ------------------------------------------------------------- */}
+        {/* TAB 2: FÄSSER & PREISE (SHOP / MOLLIE)                         */}
         {/* ------------------------------------------------------------- */}
         {adminTab === 'inventory' && (
           <InventoryManager
@@ -634,7 +699,7 @@ Ines Zager · PURE.WHISKY.`);
         )}
 
         {/* ------------------------------------------------------------- */}
-        {/* TAB 1: E-MAIL VERSAND                                         */}
+        {/* TAB 3: E-MAIL VERSAND                                         */}
         {/* ------------------------------------------------------------- */}
         {adminTab === 'broadcast' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -665,30 +730,49 @@ Ines Zager · PURE.WHISKY.`);
                     <div className="flex flex-wrap items-center gap-1.5">
                       <button
                         onClick={() => handleSelectAudience('all')}
-                        className="px-3 py-1.5 rounded-lg bg-white border border-[#D4C8B8] text-xs font-craft-mono font-bold text-[#181F1C] hover:bg-[#E2DDD5]"
+                        className="px-3 py-1.5 rounded-lg bg-white border border-[#D4C8B8] text-xs font-craft-mono font-bold text-[#181F1C] hover:bg-[#E2DDD5] transition-colors"
                       >
                         Alle ({totalUniqueCount})
                       </button>
                       <button
-                        onClick={() => handleSelectAudience('newsletter')}
-                        className="px-3 py-1.5 rounded-lg bg-[#E8EFEA] border border-[#C5D8CC] text-xs font-craft-mono font-bold text-[#2D6A4F] hover:bg-[#D3E5D9]"
+                        onClick={() => handleSelectAudience('shop')}
+                        className="px-3 py-1.5 rounded-lg bg-[#F5EBE6] border border-[#E5D0C5] text-xs font-craft-mono font-bold text-[#B85D2C] hover:bg-[#EAD6CC] transition-colors"
                       >
-                        Nur Fass-Depot ({newsletterOnlyCount})
+                        Shop-Kunden ({shopCount})
                       </button>
                       <button
-                        onClick={() => handleSelectAudience('shop')}
-                        className="px-3 py-1.5 rounded-lg bg-[#F5EBE6] border border-[#E5D0C5] text-xs font-craft-mono font-bold text-[#B85D2C] hover:bg-[#EAD6CC]"
+                        onClick={() => handleSelectAudience('newsletter')}
+                        className="px-3 py-1.5 rounded-lg bg-[#E8EFEA] border border-[#C5D8CC] text-xs font-craft-mono font-bold text-[#2D6A4F] hover:bg-[#D3E5D9] transition-colors"
                       >
-                        Nur Shop ({shopOnlyCount})
+                        Newsletter ({activeNewsletterCount})
                       </button>
                       <button
                         onClick={() => handleSelectAudience('none')}
-                        className="px-2.5 py-1.5 rounded-lg bg-white border border-[#D4C8B8] text-xs font-craft-mono text-rose-600 hover:bg-rose-50"
+                        className="px-2.5 py-1.5 rounded-lg bg-white border border-[#D4C8B8] text-xs font-craft-mono text-rose-600 hover:bg-rose-50 transition-colors"
                       >
                         Leeren
                       </button>
                     </div>
                   </div>
+
+                  {/* Notice if only a single customer is selected via 'Mail schreiben' */}
+                  {selectedEmails.length === 1 && (
+                    <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div className="flex items-center space-x-2">
+                        <Mail className="w-4 h-4 text-[#B85D2C] shrink-0" />
+                        <span>
+                          Einzelempfänger ausgewählt: <strong>{selectedEmails[0]}</strong>
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedEmails(allUnifiedContacts.map(c => c.email.toLowerCase()))}
+                        className="px-2.5 py-1 bg-white border border-amber-300 rounded-lg text-amber-900 font-craft-mono font-bold hover:bg-amber-100 transition-colors cursor-pointer self-start sm:self-auto"
+                      >
+                        Alle Empfänger auswählen ({totalUniqueCount})
+                      </button>
+                    </div>
+                  )}
 
                   <div className="pt-2 border-t border-[#E2DDD5]">
                     <button
@@ -736,14 +820,14 @@ Ines Zager · PURE.WHISKY.`);
                                 </div>
 
                                 <div className="flex items-center space-x-1 shrink-0 ml-2">
-                                  {c.sources.includes('newsletter') && (
-                                    <span className="px-1.5 py-0.5 bg-[#E8EFEA] text-[#2D6A4F] text-[10px] font-craft-mono font-bold rounded">
-                                      Fass-Depot
+                                  {c.categories.includes('shop') && (
+                                    <span className="px-1.5 py-0.5 bg-[#F5EBE6] text-[#B85D2C] text-[10px] font-craft-mono font-bold rounded">
+                                      Shop-Kunde
                                     </span>
                                   )}
-                                  {c.sources.includes('shop') && (
-                                    <span className="px-1.5 py-0.5 bg-[#F5EBE6] text-[#B85D2C] text-[10px] font-craft-mono font-bold rounded">
-                                      Shop
+                                  {c.categories.includes('newsletter') && (
+                                    <span className="px-1.5 py-0.5 bg-[#E8EFEA] text-[#2D6A4F] text-[10px] font-craft-mono font-bold rounded">
+                                      Newsletter (Aktiv)
                                     </span>
                                   )}
                                 </div>
@@ -921,7 +1005,7 @@ Ines Zager · PURE.WHISKY.`);
                         PURE.WHISKY.
                       </h3>
                       <span className="font-script text-sm text-[#2D6A4F] block">
-                        Single Cask Scotch Selection
+                        Single Cask Sustainable Whisky
                       </span>
                     </div>
 
@@ -1051,145 +1135,6 @@ Ines Zager · PURE.WHISKY.`);
         )}
 
         {/* ------------------------------------------------------------- */}
-        {/* TAB 3: KUNDEN-HUB & FASS-DEPOT (MIT EINZEL- & MASSEN-LÖSCHEN)  */}
-        {/* ------------------------------------------------------------- */}
-        {adminTab === 'crm' && (
-          <div className="space-y-6">
-            <div className="bg-white border border-[#D4C8B8] rounded-3xl p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setCrmSourceFilter('all')}
-                  className={`px-4 py-2 rounded-lg font-craft-mono text-xs font-bold uppercase ${
-                    crmSourceFilter === 'all' ? 'bg-[#2D6A4F] text-white' : 'bg-[#FAF8F5] text-[#181F1C] hover:bg-[#E2DDD5]'
-                  }`}
-                >
-                  Alle Kunden ({totalUniqueCount})
-                </button>
-                <button
-                  onClick={() => setCrmSourceFilter('newsletter')}
-                  className={`px-4 py-2 rounded-lg font-craft-mono text-xs font-bold uppercase ${
-                    crmSourceFilter === 'newsletter' ? 'bg-[#2D6A4F] text-white' : 'bg-[#FAF8F5] text-[#181F1C] hover:bg-[#E2DDD5]'
-                  }`}
-                >
-                  Fass-Depot ({newsletterOnlyCount})
-                </button>
-                <button
-                  onClick={() => setCrmSourceFilter('shop')}
-                  className={`px-4 py-2 rounded-lg font-craft-mono text-xs font-bold uppercase ${
-                    crmSourceFilter === 'shop' ? 'bg-[#2D6A4F] text-white' : 'bg-[#FAF8F5] text-[#181F1C] hover:bg-[#E2DDD5]'
-                  }`}
-                >
-                  Shop-Käufer ({shopOnlyCount})
-                </button>
-              </div>
-
-              <div className="flex items-center space-x-3 w-full md:w-auto">
-                <input
-                  type="text"
-                  placeholder="Suchen nach E-Mail oder Name..."
-                  value={crmSearchTerm}
-                  onChange={(e) => setCrmSearchTerm(e.target.value)}
-                  className="px-4 py-2 rounded-xl border border-[#D4C8B8] bg-[#FAF8F5] text-xs text-[#181F1C] focus:bg-white focus:outline-none w-full md:w-64"
-                />
-
-                {selectedCrmEmails.length > 0 && (
-                  <button
-                    onClick={handleBulkDeleteSelectedCrm}
-                    className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-craft-mono text-xs font-bold uppercase flex items-center space-x-1.5 shrink-0 shadow-sm"
-                    title="Ausgewählte Kunden löschen"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>{selectedCrmEmails.length} löschen</span>
-                  </button>
-                )}
-
-                <button
-                  onClick={() => setAdminTab('broadcast')}
-                  className="px-4 py-2 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-sm tracking-wider uppercase flex items-center space-x-2 shrink-0"
-                >
-                  <Mail className="w-4 h-4" />
-                  <span>Mitteilung schreiben</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="bg-white border border-[#D4C8B8] rounded-3xl overflow-hidden shadow-xs">
-              <div className="divide-y divide-[#E2DDD5]">
-                {filteredCrmContacts.map((c, idx) => {
-                  const isCrmSelected = selectedCrmEmails.includes(c.email.toLowerCase());
-
-                  return (
-                    <div 
-                      key={idx} 
-                      className={`p-4 sm:p-5 flex items-center justify-between transition-colors ${
-                        isCrmSelected ? 'bg-[#FAF8F5]' : 'hover:bg-[#FCFBF9]'
-                      }`}
-                    >
-                      <div className="flex items-center space-x-3.5">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const key = c.email.toLowerCase();
-                            if (isCrmSelected) {
-                              setSelectedCrmEmails(prev => prev.filter(e => e !== key));
-                            } else {
-                              setSelectedCrmEmails(prev => [...prev, key]);
-                            }
-                          }}
-                          className="text-[#D4C8B8] hover:text-[#B85D2C]"
-                        >
-                          {isCrmSelected ? (
-                            <CheckSquare className="w-5 h-5 text-[#B85D2C]" />
-                          ) : (
-                            <Square className="w-5 h-5" />
-                          )}
-                        </button>
-
-                        <div>
-                          <div className="flex items-center space-x-2">
-                            <span className="font-bold text-[#181F1C] text-sm sm:text-base">{c.email}</span>
-                            {c.name && <span className="text-xs text-[#55695E] font-medium">({c.name})</span>}
-                          </div>
-                          <div className="flex items-center space-x-3 text-xs text-[#55695E] font-craft-mono mt-0.5">
-                            <span>Eingetragen am: {c.date}</span>
-                            {c.caskInterest && <span className="text-[#B85D2C] font-bold">Interesse: {c.caskInterest}</span>}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-3">
-                        <div className="flex items-center space-x-1.5">
-                          {c.sources.includes('newsletter') && (
-                            <span className="px-3 py-1 rounded-full bg-[#E8EFEA] text-[#2D6A4F] text-xs font-craft-mono font-bold">
-                              Fass-Depot
-                            </span>
-                          )}
-                          {c.sources.includes('shop') && (
-                            <span className="px-3 py-1 rounded-full bg-[#F5EBE6] text-[#B85D2C] text-xs font-craft-mono font-bold">
-                              Shop-Käufer
-                            </span>
-                          )}
-                        </div>
-
-                        {/* DELETE BUTTON FOR CUSTOMER */}
-                        <button
-                          type="button"
-                          onClick={(e) => handleDeleteSingleCustomer(c.email, e)}
-                          className="p-2 text-[#D4C8B8] hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
-                          title={`Kunde ${c.email} aus dem System löschen`}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ------------------------------------------------------------- */}
         {/* TAB 4: BLOG- & JOURNAL-VERWALTUNG                             */}
         {/* ------------------------------------------------------------- */}
         {adminTab === 'journal' && (
@@ -1303,7 +1248,7 @@ Ines Zager · PURE.WHISKY.`);
                         <option value="Messe">Messe / Event</option>
                         <option value="YouTube">YouTube / Video</option>
                         <option value="Abfüllungen">Neue Abfüllung</option>
-                        <option value="Nachhaltigkeit">Nachhaltigkeit & Audit</option>
+                        <option value="Nachhaltigkeit">Nachhaltigkeit</option>
                         <option value="Tasting">Tasting & Verkostung</option>
                       </select>
                     </div>
@@ -1511,6 +1456,22 @@ Ines Zager · PURE.WHISKY.`);
               })}
             </div>
           </div>
+        )}
+
+        {/* ------------------------------------------------------------- */}
+        {/* TAB 6: KUNDEN- & NEWSLETTER-VERTEILER (CRM ALL)               */}
+        {/* ------------------------------------------------------------- */}
+        {adminTab === 'crm_all' && (
+          <CombinedCrmManager
+            wooCustomers={wooCustomers}
+            newsletterSubs={newsletterSubs}
+            onAddWooCustomer={onAddWooCustomer}
+            onDeleteWooCustomer={onDeleteWooCustomer}
+            onAddNewsletterSub={onAddNewsletterSub}
+            onToggleNewsletterStatus={onToggleNewsletterStatus}
+            onDeleteNewsletterSub={onDeleteNewsletterSub}
+            onComposeMail={handleComposeMailToContact}
+          />
         )}
 
         {/* ------------------------------------------------------------- */}

@@ -1,8 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { Search, X, CheckCircle2 } from 'lucide-react';
 import { PRODUCTS } from '../data/pureWhiskyFullData';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onNavigateHome, products = PRODUCTS }) {
+  const { lang, t } = useLanguage();
   const [regionFilter, setRegionFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -41,7 +43,7 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
     if (onPreReserve) {
       onPreReserve({
         email: reserveEmail.trim(),
-        name: reserveName.trim() || 'Whisky-Liebhaber',
+        name: reserveName.trim() || (lang === 'de' ? 'Whisky-Liebhaber' : 'Whisky Enthusiast'),
         caskInterest: `${preReserveProduct.name} (Vorab-Zuteilung 17.09.)`,
         source: 'vorabzugriff-17september',
         date: new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })
@@ -65,18 +67,18 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
             PURE.WHISKY.
           </span>
           <h1 className="font-woodblock text-5xl sm:text-6xl lg:text-7xl text-[#181F1C] tracking-wide uppercase">
-            Shop
+            {lang === 'de' ? 'Shop & Einzelfässer' : 'Shop & Single Casks'}
           </h1>
           <p className="text-[#3A4A40] text-lg sm:text-xl max-w-2xl font-normal leading-relaxed">
-            Unverdünnt in Fassstärke, unfiltriert und frei von Farbstoffen. Abgefüllt in 100% recyceltes Wild Glass.
+            {t.shop.subheading}
           </p>
         </div>
 
-        {/* Clean Filter Bar as before */}
+        {/* Clean Filter Bar */}
         <div className="bg-white border border-[#D4C8B8] rounded-xl p-5 mb-12 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 shadow-xs">
           <div className="flex flex-wrap items-center gap-2">
             {[
-              { id: 'all', label: 'Alle Regionen' },
+              { id: 'all', label: lang === 'de' ? 'Alle Regionen' : 'All Regions' },
               { id: 'highlands', label: 'Highlands' },
               { id: 'speyside', label: 'Speyside' },
               { id: 'islands', label: 'Islands' },
@@ -84,7 +86,7 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
               <button
                 key={tab.id}
                 onClick={() => setRegionFilter(tab.id)}
-                className={`px-5 py-2.5 font-woodblock text-lg tracking-wider uppercase rounded-lg transition-all ${
+                className={`px-5 py-2.5 font-woodblock text-lg tracking-wider uppercase rounded-lg transition-all cursor-pointer ${
                   regionFilter === tab.id
                     ? 'bg-[#181F1C] text-white shadow-xs'
                     : 'bg-[#E8EFEA] text-[#181F1C] hover:bg-[#D8E4DC]'
@@ -99,7 +101,7 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
             <Search className="w-4 h-4 text-[#55695E] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Suchen nach Fass oder Aroma..."
+              placeholder={lang === 'de' ? 'Suchen nach Fass oder Aroma...' : 'Search cask or tasting note...'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 text-sm bg-[#FAF8F5] border border-[#D4C8B8] rounded-lg text-[#181F1C] placeholder-[#7A8C82] focus:outline-none focus:border-[#B85D2C] focus:bg-white"
@@ -107,14 +109,13 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
           </div>
         </div>
 
-        {/* Product Cards Grid - Clean, Spacious, No Clutter */}
+        {/* Product Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16">
           {filteredProducts.map(product => {
             const displayBottle = product.cutoutImage || product.image;
             const isSoldOut = product.soldOut === true || (product.isAvailable === false && !product.isUpcoming);
             const isUpcoming = product.isUpcoming === true;
             const isAvailable = !isSoldOut && !isUpcoming;
-            const remaining = product.stock !== undefined ? product.stock : (product.bottlesRemaining !== undefined ? product.bottlesRemaining : (isSoldOut ? 0 : 48));
             const total = product.bottlesTotal || (product.bottleCount ? parseInt(product.bottleCount) : 240);
             const releaseDateStr = product.releaseDate || '17. September 2026';
 
@@ -166,27 +167,27 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
                       {product.caskType} · {product.vintage}
                     </p>
 
-                    {/* PROMINENT LARGE STOCK / AVAILABILITY STATUS DISPLAY */}
+                    {/* Stock / Availability Status Display */}
                     <div className="pt-2 pb-1">
                       {isUpcoming ? (
                         <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-[#FAF0EB] border border-[#F2DDD2]">
                           <span className="w-2.5 h-2.5 rounded-full bg-[#B85D2C] shrink-0" />
                           <span className="font-woodblock text-sm sm:text-base text-[#B85D2C] uppercase tracking-wider">
-                            Release am {releaseDateStr} · {total} Flaschen
+                            {lang === 'de' ? `Release am ${releaseDateStr} · ${total} Flaschen` : `Release on ${releaseDateStr} · ${total} Bottles`}
                           </span>
                         </div>
                       ) : isAvailable ? (
                         <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-[#E8EFEA] border border-[#C5D8CC]">
-                          <span className="w-2.5 h-2.5 rounded-full bg-[#2D6A4F] shrink-0 animate-pulse" />
+                          <span className="w-2.5 h-2.5 rounded-full bg-[#2D6A4F] shrink-0" />
                           <span className="font-woodblock text-sm sm:text-base text-[#2D6A4F] uppercase tracking-wider">
-                            Noch {remaining} von {total} Flaschen vorrätig
+                            {lang === 'de' ? `Limitierte Einzelfassabfüllung (${total} Flaschen) · Sofort lieferbar` : `Limited Single Cask (${total} Bottles) · In Stock`}
                           </span>
                         </div>
                       ) : (
                         <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-rose-50 border border-rose-200">
                           <span className="w-2.5 h-2.5 rounded-full bg-rose-600 shrink-0" />
                           <span className="font-woodblock text-sm sm:text-base text-rose-700 uppercase tracking-wider">
-                            Ausverkauft · Sammler-Archiv
+                            {lang === 'de' ? 'Ausverkauft · Sammler-Archiv' : 'Sold Out · Collector Archive'}
                           </span>
                         </div>
                       )}
@@ -205,14 +206,14 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
                       {product.price.toFixed(2)} €
                     </span>
                     <span className="font-craft-mono text-[10px] text-[#55695E]">
-                      {product.pricePerLiter} · inkl. MwSt.
+                      {product.pricePerLiter} · {lang === 'de' ? 'inkl. MwSt.' : 'incl. VAT'}
                     </span>
                   </div>
 
                   <div className="flex items-center space-x-3">
                     <button
                       onClick={() => onOpenProduct(product)}
-                      className="px-5 py-3 rounded-lg bg-[#E8EFEA] hover:bg-[#D8E4DC] text-[#181F1C] font-woodblock text-lg tracking-wider uppercase transition-colors"
+                      className="px-5 py-3 rounded-lg bg-[#E8EFEA] hover:bg-[#D8E4DC] text-[#181F1C] font-woodblock text-lg tracking-wider uppercase transition-colors cursor-pointer"
                     >
                       Dossier
                     </button>
@@ -220,20 +221,20 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
                     {isUpcoming ? (
                       <button
                         onClick={(e) => handleOpenReserveModal(product, e)}
-                        className="px-6 py-3 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-sm"
+                        className="px-6 py-3 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-sm cursor-pointer"
                       >
-                        Vorabzugriff
+                        {lang === 'de' ? 'Vorabzugriff' : 'Early Access'}
                       </button>
                     ) : isAvailable ? (
                       <button
                         onClick={() => onAddToCart(product)}
-                        className="px-6 py-3 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-sm"
+                        className="px-6 py-3 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-sm cursor-pointer"
                       >
-                        In den Korb
+                        {lang === 'de' ? 'In den Korb' : 'Add to Cart'}
                       </button>
                     ) : (
                       <span className="px-5 py-3 rounded-lg bg-neutral-100 text-neutral-400 font-woodblock text-lg tracking-wider uppercase border border-neutral-200">
-                        Ausverkauft
+                        {lang === 'de' ? 'Ausverkauft' : 'Sold Out'}
                       </span>
                     )}
                   </div>
@@ -246,7 +247,7 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
 
       </div>
 
-      {/* Clean Uncluttered Pre-reservation Modal */}
+      {/* Pre-reservation Modal */}
       {preReserveProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm">
           <div className="bg-white border border-[#D4C8B8] rounded-3xl max-w-md w-full p-8 shadow-2xl space-y-6 relative text-left">
@@ -265,17 +266,19 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
                   <CheckCircle2 className="w-7 h-7" />
                 </div>
                 <h3 className="font-woodblock text-2xl uppercase text-[#181F1C]">
-                  Erfolgreich vorgemerkt!
+                  {lang === 'de' ? 'Erfolgreich vorgemerkt!' : 'Successfully Reserved!'}
                 </h3>
                 <p className="text-sm text-[#3A4A40] leading-relaxed">
-                  Sie sind für den Vorab-Zugriff auf <strong>{preReserveProduct.name}</strong> am 17. September eingetragen.
+                  {lang === 'de'
+                    ? `Sie sind für den Vorab-Zugriff auf ${preReserveProduct.name} eingetragen.`
+                    : `You are registered for priority access to ${preReserveProduct.name}.`}
                 </p>
               </div>
             ) : (
               <div className="space-y-4">
                 <div className="space-y-1">
                   <span className="font-script text-2xl text-[#2D6A4F] block">
-                    Release am 17. September 2026
+                    {lang === 'de' ? 'Vorab-Zuteilung' : 'Early Cask Allocation'}
                   </span>
                   <h3 className="font-woodblock text-2xl sm:text-3xl text-[#181F1C] uppercase">
                     {preReserveProduct.name}
@@ -286,13 +289,15 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
                 </div>
 
                 <p className="text-sm text-[#3A4A40] leading-relaxed">
-                  Tragen Sie sich unverbindlich ein, um die Benachrichtigung {preReserveProduct.releaseDate ? `am ${preReserveProduct.releaseDate}` : 'am 17. September'} vor dem offiziellen Verkauf zu erhalten.
+                  {lang === 'de'
+                    ? `Tragen Sie sich unverbindlich ein, um die Benachrichtigung vor dem offiziellen Release zu erhalten.`
+                    : `Sign up without obligation to receive priority notification before public release.`}
                 </p>
 
                 <form onSubmit={handleReserveSubmit} className="space-y-3">
                   <input
                     type="text"
-                    placeholder="Ihr Name (optional)"
+                    placeholder={lang === 'de' ? 'Ihr Name (optional)' : 'Your Name (optional)'}
                     value={reserveName}
                     onChange={(e) => setReserveName(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl border border-[#D4C8B8] bg-[#FAF8F5] text-sm text-[#181F1C] focus:bg-white focus:outline-none"
@@ -300,7 +305,7 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
                   <input
                     type="email"
                     required
-                    placeholder="Ihre E-Mail-Adresse *"
+                    placeholder={lang === 'de' ? 'Ihre E-Mail-Adresse *' : 'Your Email Address *'}
                     value={reserveEmail}
                     onChange={(e) => setReserveEmail(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl border border-[#D4C8B8] bg-[#FAF8F5] text-sm text-[#181F1C] focus:bg-white focus:outline-none"
@@ -308,9 +313,9 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
 
                   <button
                     type="submit"
-                    className="w-full py-4 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-md mt-2"
+                    className="w-full py-4 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-md mt-2 cursor-pointer"
                   >
-                    Für Vorabzugriff ({preReserveProduct.releaseDate ? `ab ${preReserveProduct.releaseDate}` : 'ab 17.09.'}) vormerken
+                    {lang === 'de' ? 'Jetzt vormerken' : 'Join Priority List'}
                   </button>
                 </form>
               </div>

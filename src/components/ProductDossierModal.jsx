@@ -96,7 +96,7 @@ export default function ProductDossierModal({ product, onClose, onAddToCart }) {
           <div className="p-6 rounded-xl bg-[#E8EFEA] border border-[#C5D8CC] space-y-2 text-left">
             <div className="flex items-center space-x-2 text-[#2D6A4F] text-xs font-bold uppercase tracking-wider">
               <Leaf className="w-4 h-4" />
-              <span>Vor-Ort Umwelt-Audit (Ines Zager)</span>
+              <span>Vor-Ort Prüfung nach EMAS & ISO 14001 (Ines Zager)</span>
             </div>
             <h4 className="font-serif text-lg text-[#1B2B23] font-bold">{product.sustainability.headline}</h4>
             <p className="text-sm text-[#3A4A40] font-normal leading-relaxed">

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
-import PillarsStrip from './components/PillarsStrip';
 import CaskSelectionTrust from './components/CaskSelectionTrust';
 import BlogTeaser from './components/BlogTeaser';
 import FAQSection from './components/FAQSection';
@@ -19,8 +18,11 @@ import PhilosophyModal from './components/PhilosophyModal';
 import BlogPostModal from './components/BlogPostModal';
 import CartDrawer from './components/CartDrawer';
 import LegalModal from './components/LegalModal';
+import InvoiceModal from './components/InvoiceModal';
 
 import { PRODUCTS, BLOG_POSTS } from './data/pureWhiskyFullData';
+import initialCrmData from './data/initialCrmData.json';
+import { sendOrderConfirmationEmail, sendInvoiceEmail } from './services/orderService';
 
 function getTabFromUrl() {
   if (typeof window === 'undefined') return 'home';
@@ -34,6 +36,40 @@ function getTabFromUrl() {
   return 'home';
 }
 
+const INITIAL_ORDERS = [
+  {
+    orderId: '1268',
+    invoiceNumber: 'A094010926',
+    date: '01/09/2026',
+    createdAt: '2026-09-01T19:32:59Z',
+    customer: {
+      firstName: 'Jürgen',
+      lastName: 'Eisner',
+      street: 'Stiegltzstr 6',
+      zip: '83101',
+      city: 'Rohrdorf',
+      email: 'juergen_eisner@hotmail.com'
+    },
+    paymentMethod: 'PayPal – juergen_eisner@hotmail.com',
+    items: [
+      {
+        id: 'tomatin-16',
+        name: 'Tomatin 16 Jahre 53,2% Peated Expression',
+        caskInfo: 'matured in an Bourbon Barrel 08/25',
+        quantity: 1,
+        price: 129.90
+      }
+    ],
+    shipping: 6.90,
+    total: 136.80,
+    netTotal: 114.96,
+    vatTotal: 21.84,
+    status: 'rechnung_versendet',
+    invoiceSentAt: '01.09.2026, 19:45 Uhr',
+    contractConcluded: true
+  }
+];
+
 export default function App() {
   const [activeTab, setActiveTab] = useState(getTabFromUrl);
   const [selectedProduct, setSelectedProduct] = useState(PRODUCTS[0]);
@@ -45,7 +81,12 @@ export default function App() {
   const [selectedPost, setSelectedPost] = useState(null);
   const [legalType, setLegalType] = useState(null);
 
-  // Sync state on component mount & on browser back/forward navigation
+  // Invoice Modal State
+  const [invoiceModalOrder, setInvoiceModalOrder] = useState(null);
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+
+
+  // Sync state on browser URL navigation
   useEffect(() => {
     const handleUrlSync = () => {
       const detected = getTabFromUrl();
@@ -57,7 +98,7 @@ export default function App() {
     return () => window.removeEventListener('popstate', handleUrlSync);
   }, []);
 
-  // Persistent Products & Pricing (Mollie-ready & Admin editable)
+  // Persistent Products & Pricing
   const [products, setProducts] = useState(() => {
     const saved = localStorage.getItem('pure_whisky_products_v2');
     if (saved) {
@@ -90,14 +131,13 @@ export default function App() {
       setProducts(PRODUCTS);
       try {
         localStorage.removeItem('pure_whisky_products_v2');
-        localStorage.removeItem('pure_whisky_products_v1');
       } catch (e) {
         console.error(e);
       }
     }
   };
 
-  // Persistent Blog Posts (v3 uses authentic articles with clean single primary images)
+  // Persistent Blog Posts
   const [blogPosts, setBlogPosts] = useState(() => {
     try {
       const saved = localStorage.getItem('pure_whisky_posts_v3');
@@ -116,42 +156,249 @@ export default function App() {
     }
   }, [blogPosts]);
 
-  // Persistent Contacts CRM
-  const [contacts, setContacts] = useState(() => {
-    const saved = localStorage.getItem('pure_whisky_contacts');
-    if (saved) return JSON.parse(saved);
-    return [
-      { email: 'm.weber@t-online.de', name: 'Martin Weber', caskInterest: 'Glenburgie 11Y (Vorab-Zuteilung 17.09.)', source: 'vorabzugriff-17september', date: '05.09.2026' },
-      { email: 'claudia.schmidt@whisky-club.de', name: 'Claudia Schmidt', caskInterest: 'Highland Park 18Y (Vorab-Zuteilung 17.09.)', source: 'vorabzugriff-17september', date: '04.09.2026' },
-      { email: 'dr.hoffmann@kanzlei-nord.de', name: 'Dr. Michael Hoffmann', caskInterest: 'Alle Fässer (Highland & Island)', source: 'shop', date: '30.08.2026' },
-      { email: 'j.vogel@whisky-passion.com', name: 'Julia Vogel', caskInterest: 'Aultmore 17Y (Vorab-Zuteilung 17.09.)', source: 'newsletter', date: '02.09.2026' },
-      { email: 'kontakt@scholz-friese-webdesign.de', name: 'Scholz & Friese', caskInterest: 'Fettercairn 15Y (Vorab-Zuteilung 17.09.)', source: 'shop', date: '01.09.2026' }
-    ];
+
+
+  // Persistent Orders (with Jürgen Eisner real order as seed)
+  const [orders, setOrders] = useState(() => {
+    const saved = localStorage.getItem('pure_whisky_orders');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse orders:', e);
+      }
+    }
+    return INITIAL_ORDERS;
   });
 
   useEffect(() => {
-    localStorage.setItem('pure_whisky_contacts', JSON.stringify(contacts));
-  }, [contacts]);
+    try {
+      localStorage.setItem('pure_whisky_orders', JSON.stringify(orders));
+    } catch (e) {
+      console.warn('Could not save orders to localStorage:', e);
+    }
+  }, [orders]);
 
-  const handleAddContact = (newContact) => {
-    setContacts(prev => {
-      const emailLower = newContact.email.toLowerCase().trim();
-      if (prev.some(c => c.email.toLowerCase().trim() === emailLower)) {
+  // Persistent WooCommerce Customers CRM (48 real records)
+  const [wooCustomers, setWooCustomers] = useState(() => {
+    const saved = localStorage.getItem('pure_whisky_woo_customers');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse woo customers:', e);
+      }
+    }
+    return initialCrmData.wooCommerceCustomers || [];
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('pure_whisky_woo_customers', JSON.stringify(wooCustomers));
+    } catch (e) {
+      console.warn('Could not save wooCustomers:', e);
+    }
+  }, [wooCustomers]);
+
+  // Persistent Newsletter Subscribers CRM (233 real records)
+  const [newsletterSubs, setNewsletterSubs] = useState(() => {
+    const saved = localStorage.getItem('pure_whisky_newsletter_subs');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse newsletter subs:', e);
+      }
+    }
+    return initialCrmData.newsletterSubscribers || [];
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('pure_whisky_newsletter_subs', JSON.stringify(newsletterSubs));
+    } catch (e) {
+      console.warn('Could not save newsletterSubs:', e);
+    }
+  }, [newsletterSubs]);
+
+  // Admin Notification Email Setting (default: friese.scholz@gmail.com)
+  const [adminEmail, setAdminEmail] = useState(() => {
+    return localStorage.getItem('pure_whisky_admin_email') || 'friese.scholz@gmail.com';
+  });
+
+  const handleSaveAdminEmail = (newEmail) => {
+    setAdminEmail(newEmail);
+    try {
+      localStorage.setItem('pure_whisky_admin_email', newEmail);
+    } catch (e) {
+      console.warn(e);
+    }
+  };
+
+  // Newsletter Handlers
+  const handleAddNewsletterSubscriber = (sub) => {
+    const emailLower = sub.email.toLowerCase().trim();
+    setNewsletterSubs(prev => {
+      if (prev.some(s => s.email.toLowerCase().trim() === emailLower)) {
         return prev;
       }
-      return [newContact, ...prev];
+      const newEntry = {
+        id: `crm_sub_${Date.now()}`,
+        firstName: sub.firstName || '',
+        lastName: sub.lastName || '',
+        fullName: sub.name || `${sub.firstName || ''} ${sub.lastName || ''}`.trim() || sub.email.split('@')[0],
+        email: sub.email,
+        subscribedAt: new Date().toISOString().replace('T', ' ').slice(0, 19),
+        confirmedAt: new Date().toISOString().replace('T', ' ').slice(0, 19),
+        listStatus: 'subscribed',
+        globalStatus: 'subscribed',
+        listName: 'Newsletter Mailing List'
+      };
+      return [newEntry, ...prev];
     });
   };
 
-  const handleDeleteContact = (emailToDelete) => {
-    setContacts(prev => prev.filter(c => c.email.toLowerCase().trim() !== emailToDelete.toLowerCase().trim()));
+  const handleToggleNewsletterStatus = (emailToToggle) => {
+    setNewsletterSubs(prev => prev.map(s => {
+      if (s.email.toLowerCase().trim() === emailToToggle.toLowerCase().trim()) {
+        const nextStatus = s.listStatus === 'subscribed' ? 'unsubscribed' : 'subscribed';
+        return { ...s, listStatus: nextStatus, globalStatus: nextStatus };
+      }
+      return s;
+    }));
   };
 
-  const handleBulkDeleteContacts = (emailsToDelete) => {
-    const set = new Set(emailsToDelete.map(e => e.toLowerCase().trim()));
-    setContacts(prev => prev.filter(c => !set.has(c.email.toLowerCase().trim())));
+  const handleDeleteNewsletterSubscriber = (emailToDelete) => {
+    setNewsletterSubs(prev => prev.filter(s => s.email.toLowerCase().trim() !== emailToDelete.toLowerCase().trim()));
   };
 
+  // WooCommerce Customers Handlers
+  const handleAddWooCustomer = (cust) => {
+    const emailLower = cust.email.toLowerCase().trim();
+    setWooCustomers(prev => {
+      if (prev.some(c => c.email.toLowerCase().trim() === emailLower)) {
+        return prev;
+      }
+      return [cust, ...prev];
+    });
+  };
+
+  const handleDeleteWooCustomer = (emailToDelete) => {
+    setWooCustomers(prev => prev.filter(c => c.email.toLowerCase().trim() !== emailToDelete.toLowerCase().trim()));
+  };
+
+  // Orders & Invoice Handlers
+  const handleSendInvoice = async (orderId) => {
+    const targetOrder = orders.find(o => o.orderId === orderId);
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const timeStr = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+
+    setOrders(prev => prev.map(o => {
+      if (o.orderId === orderId) {
+        return {
+          ...o,
+          status: 'rechnung_versendet',
+          contractConcluded: true,
+          invoiceSentAt: `${dateStr}, ${timeStr} Uhr`
+        };
+      }
+      return o;
+    }));
+
+    if (targetOrder) {
+      try {
+        await sendInvoiceEmail({ order: { ...targetOrder, date: dateStr }, adminEmail });
+      } catch (mailErr) {
+        console.warn('Resend invoice dispatch notice:', mailErr);
+      }
+    }
+
+    alert(`Rechnung zu Bestellung #${orderId} wurde erfolgreich per Resend übermittelt!\n\n• Absender: noreply@scholz-friese-webdesign.de\n• Antwort-Adresse: info@pure-whisky.com\n• Empfänger: ${targetOrder?.customer?.email}\n• Bcc an Admin: ${adminEmail}\n\nDer Kaufvertrag ist damit rechtswirksam geschlossen.`);
+  };
+
+  const handleOpenInvoice = (order) => {
+    setInvoiceModalOrder(order);
+    setIsInvoiceModalOpen(true);
+  };
+
+  const handleCloseInvoice = () => {
+    setIsInvoiceModalOpen(false);
+    setInvoiceModalOrder(null);
+  };
+
+  const handleCompleteOrder = async (newOrder) => {
+    setOrders(prev => [newOrder, ...prev]);
+
+    // Send order confirmation via Resend API
+    try {
+      await sendOrderConfirmationEmail({ order: newOrder, adminEmail });
+    } catch (confErr) {
+      console.warn('Resend order confirmation notice:', confErr);
+    }
+
+    // Automatically add customer to WooCommerce customers CRM
+    setWooCustomers(prev => {
+      const emailLower = newOrder.customer.email.toLowerCase().trim();
+      if (prev.some(c => c.email.toLowerCase().trim() === emailLower)) {
+        return prev;
+      }
+      const newCust = {
+        id: `crm_woo_${Date.now()}`,
+        firstName: newOrder.customer.firstName,
+        lastName: newOrder.customer.lastName,
+        fullName: `${newOrder.customer.firstName} ${newOrder.customer.lastName}`.trim(),
+        email: newOrder.customer.email,
+        subscribedAt: new Date().toISOString().replace('T', ' ').slice(0, 19),
+        confirmedAt: new Date().toISOString().replace('T', ' ').slice(0, 19),
+        listStatus: 'subscribed',
+        globalStatus: 'subscribed',
+        listName: 'WooCommerce Customers'
+      };
+      return [newCust, ...prev];
+    });
+
+    // Clear cart
+    setCartItems([]);
+  };
+
+  const handleAddTestOrder = () => {
+    const testId = (Math.floor(1300 + Math.random() * 700)).toString();
+    const testOrder = {
+      orderId: testId,
+      invoiceNumber: `A09401${testId}`,
+      date: new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+      createdAt: new Date().toISOString(),
+      customer: {
+        firstName: 'Wasja',
+        lastName: 'Brunotte',
+        street: 'Hauptstraße 42',
+        zip: '30159',
+        city: 'Hannover',
+        email: 'wasja.brunotte@gmx.de'
+      },
+      paymentMethod: 'PayPal – wasja.brunotte@gmx.de',
+      items: [
+        {
+          id: 'glenburgie-11',
+          name: 'Glenburgie 11 Jahre 59,2% vol.',
+          caskInfo: '1st Fill Oloroso Sherry Butt',
+          quantity: 1,
+          price: 109.00
+        }
+      ],
+      shipping: 6.90,
+      total: 115.90,
+      netTotal: 97.39,
+      vatTotal: 18.51,
+      status: 'neu_eingegangen',
+      invoiceSentAt: null,
+      contractConcluded: false
+    };
+    setOrders(prev => [testOrder, ...prev]);
+  };
+
+  // Blog Handlers
   const handleSaveBlogPost = (post) => {
     if (post.id) {
       setBlogPosts(prev => prev.map(p => p.id === post.id ? post : p));
@@ -165,6 +412,7 @@ export default function App() {
     setBlogPosts(prev => prev.filter(p => p.id !== postId));
   };
 
+  // Cart Handlers
   const handleAddToCart = (product) => {
     if (product.isUpcoming) return;
     setCartItems((prev) => {
@@ -175,13 +423,6 @@ export default function App() {
         );
       }
       return [...prev, { product, quantity: 1 }];
-    });
-    handleAddContact({
-      email: `kunde-${Date.now().toString().slice(-4)}@whisky-shop.de`,
-      name: `Käufer (${product.name})`,
-      caskInterest: product.name,
-      source: 'shop',
-      date: new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })
     });
     setIsCartOpen(true);
   };
@@ -287,16 +528,29 @@ export default function App() {
             blogPosts={blogPosts}
             onSaveBlogPost={handleSaveBlogPost}
             onDeleteBlogPost={handleDeleteBlogPost}
-            contacts={contacts}
-            onAddContact={handleAddContact}
-            onDeleteContact={handleDeleteContact}
-            onBulkDeleteContacts={handleBulkDeleteContacts}
             onNavigateHome={() => handleNavClick('home')}
             onNavigateBlog={() => handleNavClick('blog')}
             products={products}
             onUpdateProduct={handleUpdateProduct}
             onResetProducts={handleResetProducts}
             onNavigateProduct={handleOpenProductDetail}
+            // Orders & Invoices Props
+            orders={orders}
+            onSendInvoice={handleSendInvoice}
+            onViewInvoice={handleOpenInvoice}
+            onAddTestOrder={handleAddTestOrder}
+            // WooCommerce Customers CRM Props
+            wooCustomers={wooCustomers}
+            onAddWooCustomer={handleAddWooCustomer}
+            onDeleteWooCustomer={handleDeleteWooCustomer}
+            // Newsletter CRM Props
+            newsletterSubs={newsletterSubs}
+            onAddNewsletterSub={handleAddNewsletterSubscriber}
+            onToggleNewsletterStatus={handleToggleNewsletterStatus}
+            onDeleteNewsletterSub={handleDeleteNewsletterSubscriber}
+            // Admin Settings Props
+            adminEmail={adminEmail}
+            onSaveAdminEmail={handleSaveAdminEmail}
           />
         )}
 
@@ -308,7 +562,6 @@ export default function App() {
               onOpenProduct={handleOpenProductDetail}
               products={products}
             />
-            <PillarsStrip />
             <CaskSelectionTrust
               onOpenShop={() => handleNavClick('shop')}
               onOpenAbout={() => handleNavClick('about')}
@@ -321,7 +574,7 @@ export default function App() {
               onOpenShop={() => handleNavClick('shop')}
             />
             <FAQSection />
-            <NewsletterSection onSubscribe={handleAddContact} />
+            <NewsletterSection onSubscribe={handleAddNewsletterSubscriber} />
           </>
         )}
       </main>
@@ -347,6 +600,13 @@ export default function App() {
         cartItems={cartItems}
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
+        onCompleteOrder={handleCompleteOrder}
+      />
+
+      <InvoiceModal
+        isOpen={isInvoiceModalOpen}
+        onClose={handleCloseInvoice}
+        order={invoiceModalOrder}
       />
 
       <LegalModal

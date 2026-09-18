@@ -58,3 +58,19 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #B85D2C;
 }
+
+/* Print Rules: Isolate Invoice Document */
+@media print {
+  body.invoice-modal-open {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  body.invoice-modal-open > #root > *:not([data-invoice-modal-root="true"]) {
+    display: none !important;
+  }
+  body.invoice-modal-open header,
+  body.invoice-modal-open nav,
+  body.invoice-modal-open footer {
+    display: none !important;
+  }
+}

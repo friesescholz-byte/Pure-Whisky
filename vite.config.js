@@ -17,7 +17,16 @@ export default defineConfig({
         headers: {
           'User-Agent': 'Mozilla/5.0'
         }
+      },
+      '/api/mollie': {
+        target: 'https://api.mollie.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/mollie/, ''),
+        headers: {
+          'User-Agent': 'Mozilla/5.0'
+        }
       }
     }
   }
 })
+

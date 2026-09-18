@@ -1,8 +1,11 @@
 import React from 'react';
-import { ShieldCheck, Mail, Lock } from 'lucide-react';
+import { ShieldCheck, Mail } from 'lucide-react';
 import { IMAGES } from '../data/pureWhiskyFullData';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Footer({ onOpenLegal, setActiveTab }) {
+  const { lang, t } = useLanguage();
+
   const scrollToNewsletter = () => {
     setActiveTab('home');
     setTimeout(() => {
@@ -27,33 +30,32 @@ export default function Footer({ onOpenLegal, setActiveTab }) {
               </span>
             </div>
             <p className="text-base text-[#55695E] leading-relaxed font-normal">
-              Unabhängiger Abfüller für unberührten schottischen Single Cask Whisky in nativer Fassstärke. 
-              Handverlesen und auditiert nach strengen Nachhaltigkeitskriterien von Juristin Ines Zager.
+              {t.footer.tagline}
             </p>
             <div className="flex items-center space-x-2 text-xs font-craft-mono font-bold text-[#2D6A4F] pt-1">
               <ShieldCheck className="w-4 h-4 text-[#2D6A4F] shrink-0" />
-              <span>Verkauf & Zustellung nur an Personen ab 18 Jahren</span>
+              <span>{t.footer.disclaimer}</span>
             </div>
           </div>
 
           {/* Col 2: Navigation (3 cols) */}
           <div className="lg:col-span-3 space-y-4">
             <h4 className="font-woodblock text-2xl text-[#181F1C] uppercase tracking-wide">
-              Navigation
+              {t.footer.quickLinks}
             </h4>
             <ul className="space-y-2 text-base font-normal">
-              <li><button onClick={() => { setActiveTab('home'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="hover:text-[#B85D2C] transition-colors">Startseite</button></li>
-              <li><button onClick={() => { setActiveTab('shop'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="hover:text-[#B85D2C] transition-colors">Shop</button></li>
-              <li><button onClick={() => { setActiveTab('about'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="hover:text-[#B85D2C] transition-colors">Über Ines Zager</button></li>
-              <li><button onClick={() => { setActiveTab('sustainability'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="hover:text-[#B85D2C] transition-colors">Nachhaltigkeit & Audit</button></li>
-              <li><button onClick={() => { setActiveTab('blog'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="hover:text-[#B85D2C] transition-colors">Journal & Messen</button></li>
+              <li><button onClick={() => { setActiveTab('home'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="hover:text-[#B85D2C] transition-colors">{lang === 'de' ? 'Startseite' : 'Home'}</button></li>
+              <li><button onClick={() => { setActiveTab('shop'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="hover:text-[#B85D2C] transition-colors">{t.nav.shop}</button></li>
+              <li><button onClick={() => { setActiveTab('about'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="hover:text-[#B85D2C] transition-colors">{t.nav.about}</button></li>
+              <li><button onClick={() => { setActiveTab('sustainability'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="hover:text-[#B85D2C] transition-colors">{t.nav.sustainability}</button></li>
+              <li><button onClick={() => { setActiveTab('blog'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="hover:text-[#B85D2C] transition-colors">{t.nav.journal}</button></li>
               <li className="pt-1">
                 <button 
                   onClick={scrollToNewsletter} 
                   className="font-craft-mono text-xs font-bold text-[#B85D2C] hover:underline flex items-center space-x-1.5"
                 >
                   <Mail className="w-3.5 h-3.5" />
-                  <span>Fass-Depot / Newsletter →</span>
+                  <span>{lang === 'de' ? 'Fass-Depot / Newsletter →' : 'Cask Depot / Newsletter →'}</span>
                 </button>
               </li>
             </ul>
@@ -62,27 +64,28 @@ export default function Footer({ onOpenLegal, setActiveTab }) {
           {/* Col 3: Rechtliches (2 cols) */}
           <div className="lg:col-span-2 space-y-4">
             <h4 className="font-woodblock text-2xl text-[#181F1C] uppercase tracking-wide">
-              Rechtliches
+              {t.footer.legal}
             </h4>
             <ul className="space-y-2 text-base font-normal">
-              <li><button onClick={() => onOpenLegal('impressum')} className="hover:text-[#B85D2C] transition-colors">Impressum</button></li>
-              <li><button onClick={() => onOpenLegal('datenschutz')} className="hover:text-[#B85D2C] transition-colors">Datenschutz</button></li>
-              <li><button onClick={() => onOpenLegal('agb')} className="hover:text-[#B85D2C] transition-colors">AGB</button></li>
-              <li><button onClick={() => onOpenLegal('widerruf')} className="hover:text-[#B85D2C] transition-colors">Widerrufsrecht</button></li>
-              <li><button onClick={() => onOpenLegal('versand')} className="hover:text-[#B85D2C] transition-colors whitespace-nowrap">Versand & Zahlung</button></li>
-              <li><button onClick={() => onOpenLegal('barrierefreiheit')} className="hover:text-[#B85D2C] transition-colors">Barrierefreiheit</button></li>
+              <li><button onClick={() => onOpenLegal('impressum')} className="hover:text-[#B85D2C] transition-colors">{t.footer.imprint}</button></li>
+              <li><button onClick={() => onOpenLegal('datenschutz')} className="hover:text-[#B85D2C] transition-colors">{t.footer.privacy}</button></li>
+              <li><button onClick={() => onOpenLegal('agb')} className="hover:text-[#B85D2C] transition-colors">{t.footer.terms}</button></li>
+              <li><button onClick={() => onOpenLegal('widerruf')} className="hover:text-[#B85D2C] transition-colors">{t.footer.cancellation}</button></li>
+              <li><button onClick={() => onOpenLegal('versand')} className="hover:text-[#B85D2C] transition-colors whitespace-nowrap">{lang === 'de' ? 'Versand & Zahlung' : 'Shipping & Payment'}</button></li>
+              <li><button onClick={() => onOpenLegal('barrierefreiheit')} className="hover:text-[#B85D2C] transition-colors">{lang === 'de' ? 'Barrierefreiheit' : 'Accessibility'}</button></li>
             </ul>
           </div>
 
           {/* Col 4: Kontakt (3 cols) */}
           <div className="lg:col-span-3 space-y-4">
             <h4 className="font-woodblock text-2xl text-[#181F1C] uppercase tracking-wide">
-              Kontakt
+              {t.footer.contact}
             </h4>
             <div className="space-y-2 text-base font-normal text-[#3A4A40]">
               <p className="font-bold text-[#181F1C]">Ines Zager</p>
               <p className="text-[#55695E]">Dürerring 1</p>
               <p className="text-[#55695E]">31582 Nienburg</p>
+              <p className="text-[#55695E] text-xs">Deutschland</p>
               
               <div className="pt-2 space-y-1.5">
                 <a 
@@ -105,19 +108,12 @@ export default function Footer({ onOpenLegal, setActiveTab }) {
 
         {/* Bottom Bar with Scholz & Friese Link & Discreet Admin Trigger */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-sm text-[#55695E] gap-4">
-          <div className="flex items-center space-x-3">
-            <p>© {new Date().getFullYear()} PURE.WHISKY. · Ines Zager. Alle Rechte vorbehalten.</p>
-            <button
-              onClick={() => { setActiveTab('admin'); window.scrollTo({top: 0, behavior: 'smooth'}); }}
-              className="text-[#D4C8B8] hover:text-[#B85D2C] transition-colors p-1"
-              title="Admin Command Hub öffnen"
-            >
-              <Lock className="w-3.5 h-3.5" />
-            </button>
+          <div>
+            <p>© {new Date().getFullYear()} PURE.WHISKY. · Ines Zager. {t.footer.rights}</p>
           </div>
 
           <p className="flex items-center space-x-1.5">
-            <span>Gestaltet & Entwickelt von</span>
+            <span>{lang === 'de' ? 'Gestaltet & Entwickelt von' : 'Designed & Developed by'}</span>
             <a 
               href="https://scholz-friese-webdesign.de/" 
               target="_blank" 

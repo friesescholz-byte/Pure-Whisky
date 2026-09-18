@@ -4,6 +4,7 @@ export const R2_BASE = 'https://pub-b33108412309406a9a941ddc51e9a5b9.r2.dev/Pure
 export const IMAGES = {
   logo: `${R2_BASE}logo-pure-whisky.png`,
   hero_back: `${R2_BASE}Hero%20Back%20Pure%20Whisky_ergebnis.webp`,
+  hero_artwork: `${R2_BASE}Pure-Whisky-Hero_01.webp`,
   
   // Specific Regional Backgrounds requested by user:
   card_bg_speyside: `${R2_BASE}Pure-Whisky-Hintergrund_01.webp`,
@@ -133,7 +134,7 @@ export const PRODUCTS = [
     isAvailable: true,
     isUpcoming: false,
     isFeatured: true,
-    badge: 'Bestseller · Nur noch 18 Flaschen',
+    badge: 'Bestseller · Sofort lieferbar',
     bottlesTotal: 237,
     bottlesRemaining: 18,
     image: IMAGES.glengarioch,
@@ -177,12 +178,12 @@ export const PRODUCTS = [
     price: 129.90,
     originalPrice: null,
     pricePerLiter: '185,57 € / l',
-    isAvailable: false,
+    isAvailable: true,
     isUpcoming: false,
-    isFeatured: false,
-    badge: 'Ausverkauft · Sammler-Archiv',
+    isFeatured: true,
+    badge: 'Sofort lieferbar',
     bottlesTotal: 214,
-    bottlesRemaining: 0,
+    bottlesRemaining: 48,
     image: IMAGES.tomatin,
     cutoutImage: IMAGES.tomatin,
     cardBg: IMAGES.card_bg_highlands,
@@ -200,8 +201,8 @@ export const PRODUCTS = [
       finish: 'Langanhaltend, cremig-rauchig und wunderbar balanciert mit edler Eichenholznote.'
     },
     sustainability: {
-      headline: 'Pionier der Energiewende & Umweltjuristisches Audit',
-      story: 'Bereits 2013 installierte Tomatin als Pionier einen Holzpellet-Biomasse-Kessel, der rund 80% der gesamten Energie liefert und CO₂-Emissionen um über 80% senkt. Durch innovative Wehranlagen wurde der Wasserverbrauch halbiert, während Produktionsabwässer durch ein natürliches Schilf-Rieselfeld gereinigt werden. Juristin Ines Zager prüfte diese Anlagen persönlich vor Ort.',
+      headline: 'Pionier der Energiewende & Umweltmanagement',
+      story: 'Bereits 2013 installierte Tomatin als Pionier einen Holzpellet-Biomasse-Kessel, der rund 80% der gesamten Energie liefert und CO₂-Emissionen um über 80% senkt. Durch innovative Wehranlagen wurde der Wasserverbrauch halbiert, während Produktionsabwässer durch ein natürliches Schilf-Rieselfeld gereinigt werden. Ines Zager bewertet diese Maßnahmen als vorbildlich im Sinne moderner Umweltmanagementsysteme.',
       image: IMAGES.ines_barrel
     }
   },
@@ -292,7 +293,7 @@ export const PRODUCTS = [
     },
     sustainability: {
       headline: 'Wasserkreislauf am Burgie Hill & Regionale Gerste',
-      story: 'Glenburgie bezieht sein reines Brauwasser aus den geschützten Quellen der nahen Burgie Hills. Die Abwärme der Brennblasen wird über moderne Wärmetauscher rückgeführt, um den Primärenergiebedarf signifikant zu senken. Das Audit vor Ort bestätigte 100% sortenreine schottische Gerste.',
+      story: 'Glenburgie bezieht sein reines Brauwasser aus den geschützten Quellen der nahen Burgie Hills. Die Abwärme der Brennblasen wird über moderne Wärmetauscher rückgeführt, um den Primärenergiebedarf signifikant zu senken. Die Prüfung vor Ort bestätigte 100% sortenreine schottische Gerste.',
       image: IMAGES.ines_testing
     }
   },
@@ -458,7 +459,7 @@ export const PHILOSOPHY_PILLARS = [
     id: 'mission',
     title: 'Unsere Mission',
     tag: 'Das Versprechen',
-    subtitle: '100% Circular Craft & Umwelt-Juristisches Gewissen',
+    subtitle: 'Ganzheitliche Nachhaltigkeit nach EMAS & ISO 14001',
     image: IMAGES.mission,
     quote: '„Als Umweltjuristin kann ich nicht anders: Jedes Fass, jedes Glas und jedes Etikett muss strengsten ökologischen Standards standhalten.“',
     paragraphs: [
@@ -710,11 +711,11 @@ export const FAQ_DATA = [
   },
   {
     q: 'Was macht die PURE.WHISKY. Flaschen so besonders nachhaltig?',
-    a: 'Wir nutzen zu 100% recyceltes Wild Glass von Estal aus Spanien (PCR-Glas), bei dem kleine Unregelmäßigkeiten den handwerklichen Charakter unterstreichen. Unser Korken stammt aus nachhaltigen spanischen Eichenforsten in 5. Familiengeneration. Die Kapsel ist zu 100% aus biologisch abbaubarem Biopolymer (kein Erdölplastik), und das Etikett wird von Hand mit kompostierbarer Tinte auf Saatenpapier gestempelt.'
+    a: 'PURE.WHISKY. setzt zu 100% auf recyceltes Wild Glass von Estal aus Spanien (PCR-Altglas), bei dem kleine Unregelmäßigkeiten den handwerklichen Charakter unterstreichen. Die Naturkorken stammen aus nachhaltigen spanischen Eichenforsten in 5. Familiengeneration bzw. bestehen aus einem Korkgranulat-Aktivkohlegemisch. Die Kapsel ist zu 100% aus biologisch abbaubarem Biopolymer (kein Erdölplastik), und das Etikett wird von Hand mit kompostierbarer Tinte auf PFAS-freiem Bütten- und Saatenpapier gestempelt.'
   },
   {
-    q: 'Wie läuft die Prüfung der Brennereien auf Nachhaltigkeit ab?',
-    a: 'Als langjährige Umweltjuristin für Energiekonzerne auditiere ich Brennereien vor Fasseinkauf persönlich vor Ort. Ich bewerte Wassermanagement, Quellenschutz, CO2-Reduktionsmaßnahmen (z.B. Biomasse bei Tomatin) und soziale Faktoren angelehnt an EMAS- und ISO 14001 Standards.'
+    q: 'Wie läuft die Auswahl der Brennereien nach Nachhaltigkeitskriterien ab?',
+    a: 'Ines Zager beschäftigt sich seit rund 20 Jahren beruflich mit Nachhaltigkeits- und Umweltthemen und untersucht deshalb auch die Hintergründe der Brennereien, bevor sie ein Fass erwirbt. Dabei orientiert sie sich unter anderem an Kriterien etablierter Umweltmanagementsysteme wie EMAS und ISO 14001.'
   },
   {
     q: 'Wie funktioniert die Altersprüfung (18+) bei der Bestellung?',
@@ -722,7 +723,7 @@ export const FAQ_DATA = [
   },
   {
     q: 'Wie hoch sind die Versandkosten und wie läuft der Versand ab?',
-    a: 'Wir versenden versichert und klimaneutral mit DHL GoGreen inklusive 18+ Alterssichtprüfung. Der Versand erfolgt innerhalb von 2–4 Werktagen nach Bestellung bzw. Zahlungseingang. Die Versandkosten betragen pauschal 6,90 € innerhalb Deutschlands.'
+    a: 'Der Versand erfolgt versichert und klimaneutral mit DHL GoGreen inklusive 18+ Alterssichtprüfung innerhalb von 2–4 Werktagen nach Bestellung bzw. Zahlungseingang. Die Versandkosten betragen pauschal 6,90 € innerhalb Deutschlands.'
   },
   {
     q: 'Welche Zahlungsmethoden stehen im Shop zur Verfügung?',

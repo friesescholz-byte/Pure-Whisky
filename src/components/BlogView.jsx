@@ -18,7 +18,7 @@ export default function BlogView({ posts, onOpenPost, onNavigateShop, onNavigate
             Schottland, Messen & Tastings.
           </h1>
           <p className="text-[#3A4A40] text-lg sm:text-xl font-normal leading-relaxed pt-2">
-            Begleiten Sie Ines Zager auf ihren Reisen durch Schottland, zu Brennerei-Audits, 
+            Begleiten Sie Ines Zager auf ihren Reisen durch Schottland, zu Destilleriebesuchen, 
             Messeauftritten und exklusiven Verkostungen.
           </p>
         </div>

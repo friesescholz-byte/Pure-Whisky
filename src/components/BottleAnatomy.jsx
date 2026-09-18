@@ -23,7 +23,7 @@ export default function BottleAnatomy() {
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#121722] border border-[#3E5C46]/50 text-xs font-semibold tracking-wider text-[#5A7F63] uppercase mb-4">
             <Leaf className="w-3.5 h-3.5" />
-            <span>100% Circular Crafting</span>
+            <span>Nachhaltige Handwerkskunst</span>
           </div>
           <h2 className="font-serif text-3xl sm:text-5xl font-bold text-[#F6F4EE] mb-4">
             Die Anatomie einer nachhaltigen Flasche

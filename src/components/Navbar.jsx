@@ -1,14 +1,48 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Menu, X, ArrowRight, ChevronDown } from 'lucide-react';
+import { ShoppingBag, Menu, X, ArrowRight, ChevronDown, Globe, Shield } from 'lucide-react';
 import { IMAGES, PRODUCTS } from '../data/pureWhiskyFullData';
+import { useLanguage } from '../context/LanguageContext';
+
+function FlagDE({ className = "w-5 h-5" }) {
+  return (
+    <svg viewBox="0 0 512 512" className={`${className} rounded-full shrink-0 overflow-hidden shadow-2xs`} aria-hidden="true">
+      <clipPath id="navbar-flag-de">
+        <circle cx="256" cy="256" r="256" />
+      </clipPath>
+      <g clipPath="url(#navbar-flag-de)">
+        <path fill="#212529" d="M0 0h512v170.7H0z" />
+        <path fill="#D32F2F" d="M0 170.7h512v170.6H0z" />
+        <path fill="#FFC107" d="M0 341.3h512V512H0z" />
+      </g>
+    </svg>
+  );
+}
+
+function FlagEN({ className = "w-5 h-5" }) {
+  return (
+    <svg viewBox="0 0 60 60" className={`${className} rounded-full shrink-0 overflow-hidden shadow-2xs`} aria-hidden="true">
+      <clipPath id="navbar-flag-en">
+        <circle cx="30" cy="30" r="30" />
+      </clipPath>
+      <g clipPath="url(#navbar-flag-en)">
+        <path fill="#012169" d="M0 0h60v60H0z" />
+        <path fill="#FFFFFF" d="m0 0 60 60m0-60L0 60" stroke="#FFFFFF" strokeWidth="8" />
+        <path fill="#C8102E" d="m0 0 60 60m0-60L0 60" stroke="#C8102E" strokeWidth="4" />
+        <path fill="#FFFFFF" d="M30 0v60M0 30h60" stroke="#FFFFFF" strokeWidth="12" />
+        <path fill="#C8102E" d="M30 0v60M0 30h60" stroke="#C8102E" strokeWidth="7" />
+      </g>
+    </svg>
+  );
+}
 
 export default function Navbar({ activeTab, setActiveTab, onSelectProduct, cartItemsCount, setIsCartOpen, products = PRODUCTS }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
+  const { lang, setLang, t } = useLanguage();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-[#FAF8F5]/92 backdrop-blur-md border-b border-[#E2DDD5] transition-all">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 h-20 sm:h-24 flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-[#FAF8F5]/94 backdrop-blur-md border-b border-[#E2DDD5] transition-all">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 h-20 sm:h-24 flex items-center justify-between">
         
         {/* Brand Logo */}
         <button
@@ -25,13 +59,13 @@ export default function Navbar({ activeTab, setActiveTab, onSelectProduct, cartI
               PURE.WHISKY.
             </span>
             <span className="font-script text-base text-[#2D6A4F] leading-none mt-1">
-              Single Cask Scotch Selection
+              Single Cask Sustainable Whisky
             </span>
           </div>
         </button>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center space-x-8">
+        <nav className="hidden xl:flex items-center space-x-6 2xl:space-x-8">
           
           {/* Startseite */}
           <button
@@ -40,13 +74,13 @@ export default function Navbar({ activeTab, setActiveTab, onSelectProduct, cartI
               activeTab === 'home' ? 'text-[#B85D2C]' : 'text-[#181F1C] hover:text-[#B85D2C]'
             }`}
           >
-            Startseite
+            {lang === 'de' ? 'Startseite' : 'Home'}
             {activeTab === 'home' && (
               <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#B85D2C] rounded-full" />
             )}
           </button>
 
-          {/* Die Fässer (Clean, Spacious Dropdown) */}
+          {/* Shop / Die Fässer Dropdown */}
           <div 
             className="relative group py-6"
             onMouseEnter={() => setShopDropdownOpen(true)}
@@ -58,25 +92,25 @@ export default function Navbar({ activeTab, setActiveTab, onSelectProduct, cartI
                 activeTab === 'shop' || activeTab === 'product' ? 'text-[#B85D2C]' : 'text-[#181F1C] hover:text-[#B85D2C]'
               }`}
             >
-              <span>Shop</span>
+              <span>{t.nav.shop}</span>
               <ChevronDown className="w-4 h-4 text-[#55695E] group-hover:text-[#B85D2C] group-hover:rotate-180 transition-transform duration-200" />
               {(activeTab === 'shop' || activeTab === 'product') && (
                 <span className="absolute bottom-6 left-0 right-0 h-0.5 bg-[#B85D2C] rounded-full" />
               )}
             </button>
 
-            {/* Dropdown Menu - Clean, Legible, All Casks Readable */}
+            {/* Dropdown Menu */}
             <div className="absolute top-full left-1/2 -translate-x-1/2 w-[420px] bg-white border border-[#D4C8B8] rounded-2xl shadow-xl p-4 space-y-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 text-left max-h-[80vh] overflow-y-auto">
               
               <div className="pb-3 border-b border-[#E2DDD5] flex items-center justify-between">
                 <span className="font-woodblock text-sm uppercase tracking-wider text-[#181F1C]">
-                  Alle Abfüllungen ({products.length})
+                  {t.nav.allProducts} ({products.length})
                 </span>
                 <button
                   onClick={() => { setActiveTab('shop'); setShopDropdownOpen(false); }}
                   className="font-craft-mono text-xs text-[#B85D2C] font-bold hover:underline"
                 >
-                  Gesamten Shop öffnen →
+                  {lang === 'de' ? 'Gesamten Shop öffnen →' : 'Open full shop →'}
                 </button>
               </div>
 
@@ -122,7 +156,7 @@ export default function Navbar({ activeTab, setActiveTab, onSelectProduct, cartI
                   onClick={() => { setActiveTab('shop'); setShopDropdownOpen(false); }}
                   className="w-full py-3 rounded-xl bg-[#181F1C] hover:bg-[#2C3831] text-white font-woodblock text-base tracking-wider uppercase text-center flex items-center justify-center space-x-2"
                 >
-                  <span>Alle Abfüllungen im Shop ansehen</span>
+                  <span>{lang === 'de' ? 'Alle Abfüllungen im Shop ansehen' : 'View all releases in shop'}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -137,20 +171,20 @@ export default function Navbar({ activeTab, setActiveTab, onSelectProduct, cartI
               activeTab === 'about' ? 'text-[#B85D2C]' : 'text-[#181F1C] hover:text-[#B85D2C]'
             }`}
           >
-            Über Ines Zager
+            {t.nav.about}
             {activeTab === 'about' && (
               <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#B85D2C] rounded-full" />
             )}
           </button>
 
-          {/* Nachhaltigkeit & Audit */}
+          {/* Nachhaltigkeit */}
           <button
             onClick={() => setActiveTab('sustainability')}
             className={`font-woodblock text-lg tracking-wider uppercase transition-colors relative py-1 ${
               activeTab === 'sustainability' ? 'text-[#B85D2C]' : 'text-[#181F1C] hover:text-[#B85D2C]'
             }`}
           >
-            Nachhaltigkeit & Audit
+            {t.nav.sustainability}
             {activeTab === 'sustainability' && (
               <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#B85D2C] rounded-full" />
             )}
@@ -163,21 +197,51 @@ export default function Navbar({ activeTab, setActiveTab, onSelectProduct, cartI
               activeTab === 'blog' ? 'text-[#B85D2C]' : 'text-[#181F1C] hover:text-[#B85D2C]'
             }`}
           >
-            Journal & Messen
+            {t.nav.journal}
             {activeTab === 'blog' && (
               <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#B85D2C] rounded-full" />
             )}
           </button>
         </nav>
 
-        {/* Right Action Icons: Cart & Mobile Hamburger */}
-        <div className="flex items-center space-x-4">
+        {/* Right Action Bar: Language Toggle with Flags, Cart, Mobile Menu */}
+        <div className="flex items-center space-x-2.5 sm:space-x-3">
           
+          {/* Pure Round SVG Flag Icons Switcher (No redundant DE/GB text) */}
+          <div className="flex items-center bg-white border border-[#D4C8B8] rounded-full p-1 shadow-2xs gap-1">
+            <button
+              type="button"
+              onClick={() => setLang('de')}
+              className={`p-1 rounded-full transition-all duration-200 cursor-pointer flex items-center justify-center ${
+                lang === 'de'
+                  ? 'bg-[#FAF8F5] shadow-xs ring-2 ring-[#B85D2C] scale-105'
+                  : 'opacity-40 hover:opacity-80 hover:scale-105'
+              }`}
+              title="Auf Deutsch wechseln"
+              aria-label="Auf Deutsch wechseln"
+            >
+              <FlagDE className="w-5 h-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setLang('en')}
+              className={`p-1 rounded-full transition-all duration-200 cursor-pointer flex items-center justify-center ${
+                lang === 'en'
+                  ? 'bg-[#FAF8F5] shadow-xs ring-2 ring-[#B85D2C] scale-105'
+                  : 'opacity-40 hover:opacity-80 hover:scale-105'
+              }`}
+              title="Switch to English"
+              aria-label="Switch to English"
+            >
+              <FlagEN className="w-5 h-5" />
+            </button>
+          </div>
+
           {/* Cart Icon */}
           <button
             onClick={() => setIsCartOpen(true)}
             className="p-3 rounded-full bg-white border border-[#D4C8B8] hover:bg-[#FAF8F5] text-[#181F1C] relative transition-colors shadow-xs"
-            aria-label="Warenkorb öffnen"
+            aria-label={t.nav.cart}
           >
             <ShoppingBag className="w-5 h-5 text-[#181F1C]" />
             {cartItemsCount > 0 && (
@@ -187,10 +251,10 @@ export default function Navbar({ activeTab, setActiveTab, onSelectProduct, cartI
             )}
           </button>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Button (Switch to mobile burger earlier at < xl) */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-3 rounded-full bg-white border border-[#D4C8B8] text-[#181F1C] lg:hidden"
+            className="p-3 rounded-full bg-white border border-[#D4C8B8] text-[#181F1C] xl:hidden transition-colors hover:bg-[#FAF8F5]"
             aria-label="Menü umschalten"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -199,15 +263,15 @@ export default function Navbar({ activeTab, setActiveTab, onSelectProduct, cartI
 
       </div>
 
-      {/* Mobile Navigation Drawer */}
+      {/* Mobile Navigation Drawer (Active on < xl) */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white border-b border-[#D4C8B8] px-6 py-8 space-y-4 text-left shadow-lg">
+        <div className="xl:hidden bg-white border-b border-[#D4C8B8] px-6 py-8 space-y-4 text-left shadow-lg">
           {[
-            { id: 'home', label: 'Startseite' },
-            { id: 'shop', label: 'Shop' },
-            { id: 'about', label: 'Über Ines Zager' },
-            { id: 'sustainability', label: 'Nachhaltigkeit & Audit' },
-            { id: 'blog', label: 'Journal & Messen' },
+            { id: 'home', label: lang === 'de' ? 'Startseite' : 'Home' },
+            { id: 'shop', label: t.nav.shop },
+            { id: 'about', label: t.nav.about },
+            { id: 'sustainability', label: t.nav.sustainability },
+            { id: 'blog', label: t.nav.journal }
           ].map(link => (
             <button
               key={link.id}

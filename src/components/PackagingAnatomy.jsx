@@ -8,7 +8,7 @@ export default function PackagingAnatomy() {
         
         <div className="max-w-3xl mb-20 space-y-2">
           <span className="font-script text-3xl text-[#2D6A4F] block">
-            100% Circular Craft
+            Nachhaltige Handwerkskunst
           </span>
           <h2 className="font-woodblock text-4xl sm:text-5xl lg:text-6xl text-[#181F1C] tracking-wide uppercase leading-tight">
             Die Anatomie nachhaltiger Handwerkskunst.

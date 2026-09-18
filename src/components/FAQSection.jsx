@@ -1,9 +1,36 @@
 import React, { useState } from 'react';
 import { FAQ_DATA } from '../data/pureWhiskyFullData';
 import { ChevronDown } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+
+const FAQ_DATA_EN = [
+  {
+    q: 'What does "Natural Cask Strength" mean?',
+    a: 'Our single casks are bottled straight from the barrel without dilution. The natural alcohol volume (often between 53% and 60% vol.) reflects the undiluted aroma and character shaped over years of oak maturation.'
+  },
+  {
+    q: 'Why are the bottles not chill-filtered or artificially colored?',
+    a: 'Chill-filtration strips away essential fatty acids and natural oils that carry rich mouthfeel and flavor. Artificial caramel coloring (E150a) merely simulates age. PURE.WHISKY. stands for 100% natural, authentic Scotch whisky.'
+  },
+  {
+    q: 'What makes Estal Wild Glass and the closure sustainable?',
+    a: 'Every bottle is manufactured in Spain from 100% post-consumer recycled glass (PCR), saving melting energy and virgin raw materials. The seal is made from 100% biodegradable plant polymer, sealed with untreated natural Spanish cork.'
+  },
+  {
+    q: 'How does PURE.WHISKY. audit partner distilleries in Scotland?',
+    a: 'As an environmental jurist, founder Ines Zager inspects partner distilleries on-site. Key benchmarks adhere to recognized environmental management systems (EMAS and ISO 14001): river watershed protection, closed cooling loops, renewable biomass energy, and complete upcycling of spent grain.'
+  },
+  {
+    q: 'How are orders shipped and insured?',
+    a: 'All orders are dispatched via climate-neutral DHL GoGreen within 2–4 business days, securely packaged in plastic-free packaging. Delivery includes statutory age verification (18+).'
+  }
+];
 
 export default function FAQSection() {
+  const { lang, t } = useLanguage();
   const [openIdx, setOpenIdx] = useState(0);
+
+  const items = lang === 'de' ? FAQ_DATA : FAQ_DATA_EN;
 
   return (
     <section id="faq-section" className="py-24 lg:py-32 bg-[#FAF8F5] border-b border-neutral-200">
@@ -11,18 +38,18 @@ export default function FAQSection() {
         
         <div className="text-center mb-16 space-y-3">
           <span className="text-[11px] uppercase tracking-[0.25em] text-amber-800 font-semibold">
-            Transparenz & Antworten
+            {t.faq.badge}
           </span>
           <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-neutral-900 font-normal">
-            Häufig gestellte Fragen.
+            {t.faq.heading}
           </h2>
           <p className="text-neutral-600 text-sm font-light">
-            Alles über Fassstärke, 100% Wild Glass, Umwelt-Audits und Versand.
+            {t.faq.subheading}
           </p>
         </div>
 
         <div className="space-y-3 text-left">
-          {FAQ_DATA.map((faq, idx) => {
+          {items.map((faq, idx) => {
             const isOpen = openIdx === idx;
             return (
               <div
@@ -31,7 +58,7 @@ export default function FAQSection() {
               >
                 <button
                   onClick={() => setOpenIdx(isOpen ? null : idx)}
-                  className="w-full p-5 sm:p-6 text-left flex items-center justify-between text-neutral-900 hover:text-amber-800 transition-colors"
+                  className="w-full p-5 sm:p-6 text-left flex items-center justify-between text-neutral-900 hover:text-amber-800 transition-colors cursor-pointer"
                 >
                   <span className="font-serif text-base sm:text-lg font-medium pr-4">{faq.q}</span>
                   <ChevronDown className={`w-5 h-5 text-amber-800 shrink-0 transition-transform duration-300 ${

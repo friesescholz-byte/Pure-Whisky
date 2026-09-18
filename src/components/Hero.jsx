@@ -39,7 +39,7 @@ export default function Hero({ onOpenVIP, onSelectFeatured }) {
 
             {/* Subline */}
             <p className="text-base sm:text-lg text-[#D8D2C2] max-w-2xl font-normal leading-relaxed mb-8">
-              Handverlesene Einzelfässer bekannter Brennereien in unverdünnter Fassstärke. Radikal nachhaltig abgefüllt in 100% Wild Glass – persönlich kuratiert und auditiert von Umweltjuristin Ines Zager.
+              Handverlesene Einzelfässer bekannter Brennereien in unverdünnter Fassstärke. Radikal nachhaltig abgefüllt in 100% Wild Glass – persönlich ausgewählt nach Kriterien, die sich an EMAS und ISO 14001 orientieren, von Umweltjuristin Ines Zager.
             </p>
 
             {/* CTA Group */}
@@ -115,7 +115,7 @@ export default function Hero({ onOpenVIP, onSelectFeatured }) {
                 <div className="mt-4 px-4 py-2 rounded-full bg-[#0B0E14]/90 border border-[#D4A359]/40 backdrop-blur-md flex items-center gap-2.5 shadow-lg">
                   <span className="w-2 h-2 rounded-full bg-emerald-500" />
                   <span className="text-xs font-semibold text-[#F6F4EE]">
-                    Glen Garioch · Nur noch 18 Flaschen
+                    Glen Garioch · Sofort lieferbar
                   </span>
                 </div>
               </div>
