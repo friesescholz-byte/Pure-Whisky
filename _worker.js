@@ -71,6 +71,22 @@ export default {
     }
 
     // 4. Default: Serve static assets
-    return env.ASSETS.fetch(request);
+    if (env.ASSETS) {
+      try {
+        const assetResponse = await env.ASSETS.fetch(request);
+        if (assetResponse.status === 404 && !url.pathname.startsWith('/assets/')) {
+          return await env.ASSETS.fetch(new URL('/', request.url));
+        }
+        return assetResponse;
+      } catch (err) {
+        try {
+          return await env.ASSETS.fetch(new URL('/', request.url));
+        } catch {
+          return new Response('Asset fetch failed: ' + err.message, { status: 500 });
+        }
+      }
+    }
+
+    return new Response('Pure Whisky worker running, but ASSETS binding is missing.', { status: 500 });
   }
 };
