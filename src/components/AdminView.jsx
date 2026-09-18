@@ -492,7 +492,7 @@ Ines Zager · PURE.WHISKY.`);
               <p style="margin: 0; font-weight: 600; color: #3A4A40;">PURE.WHISKY. · Ines Zager · Dürerring 1 · 31582 Nienburg</p>
               <p style="margin: 4px 0 0 0;"><a href="https://pure-whisky.com" style="color: #B85D2C; text-decoration: none; font-weight: 600;">pure-whisky.com</a> · Sie erhalten diese E-Mail, da Sie Kunde oder Abonnent des Fass-Depots sind.</p>
               <p style="margin: 12px 0 0 0; font-size: 11px;">
-                Kein Interesse mehr? <a href="https://pure-whisky.pages.dev/abmelden?email=${encodeURIComponent(email)}" style="color: #7A8C82; text-decoration: underline;">Hier mit einem Klick abmelden</a>
+                Kein Interesse mehr? <a href="https://pure-whisky.friese-scholz.workers.dev/abmelden?email=${encodeURIComponent(email)}" style="color: #7A8C82; text-decoration: underline;">Hier mit einem Klick abmelden</a>
               </p>
             </td>
           </tr>
