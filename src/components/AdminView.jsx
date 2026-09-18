@@ -355,14 +355,18 @@ Ines Zager · PURE.WHISKY.`);
   };
 
   const handleFileUploadAttachment = (e) => {
-    const files = Array.from(e.target.files);
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
     files.forEach(file => {
       if (file.size > 5 * 1024 * 1024) {
         alert(`Hinweis: Die Datei "${file.name}" ist ${(file.size / 1024 / 1024).toFixed(1)} MB groß. E-Mail-Anhänge sollten maximal 5 MB groß sein, um zuverlässig zuzustellen.`);
       }
       const reader = new FileReader();
       reader.onload = () => {
-        const base64Content = reader.result.split(',')[1];
+        const rawResult = reader.result || '';
+        const commaIdx = rawResult.indexOf(',');
+        const base64Content = commaIdx !== -1 ? rawResult.substring(commaIdx + 1) : rawResult;
         setAttachments(prev => [
           ...prev, 
           { filename: file.name, content: base64Content, size: (file.size / 1024).toFixed(1) + ' KB' }
@@ -370,6 +374,9 @@ Ines Zager · PURE.WHISKY.`);
       };
       reader.readAsDataURL(file);
     });
+
+    // Reset input so selecting the same file again triggers onChange
+    e.target.value = '';
   };
 
   // -------------------------------------------------------------
@@ -389,9 +396,95 @@ Ines Zager · PURE.WHISKY.`);
 
     for (const email of targetEmails) {
       try {
-        const validAttachments = attachments && attachments.length > 0 
-          ? attachments.map(a => ({ filename: a.filename, content: a.content }))
-          : [];
+        const validAttachments = (attachments || []).map(a => ({
+          filename: a.filename,
+          content: a.content
+        })).filter(a => a.filename && a.content);
+
+        const uniqueToken = `PW-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+
+        const emailHtml = `<!DOCTYPE html>
+<html lang="de" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
+  <title>${emailSubject}</title>
+  <style>
+    /* Global Resets */
+    body, table, td, p, a, li, blockquote { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; margin: 0; padding: 0; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: collapse; }
+    img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+    body { width: 100% !important; min-width: 100%; background-color: #FAF8F5; margin: 0 auto !important; }
+    
+    /* Responsive Mobile Overrides */
+    @media only screen and (max-width: 600px) {
+      .outer-container { padding: 0 !important; width: 100% !important; }
+      .content-table { width: 100% !important; max-width: 100% !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; border-top: none !important; box-shadow: none !important; }
+      .header-cell { padding: 28px 20px 20px 20px !important; }
+      .body-cell { padding: 24px 20px !important; font-size: 15px !important; line-height: 1.65 !important; }
+      .footer-cell { padding: 24px 20px !important; }
+      .brand-title { font-size: 24px !important; letter-spacing: 2px !important; }
+    }
+  </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #FAF8F5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; color: #181F1C;">
+  <!-- Gmail Thread & Quoted Fold Anti-Collision Token -->
+  <div style="display:none;font-size:1px;color:#FAF8F5;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;mso-hide:all;">
+    ${emailSubject} &zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;[#${uniqueToken}]
+  </div>
+
+  <!-- Outer wrapper table -->
+  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" class="outer-container" style="background-color: #FAF8F5; width: 100%; padding: 32px 16px;">
+    <tr>
+      <td align="center" valign="top">
+        <!-- Inner content card -->
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" class="content-table" style="max-width: 600px; background-color: #ffffff; border: 1px solid #E2DDD5; border-radius: 12px; overflow: hidden; margin: 0 auto; text-align: left;">
+          <!-- Header -->
+          <tr>
+            <td class="header-cell" align="center" style="padding: 36px 32px 22px 32px; border-bottom: 1px solid #EAE5DE; background-color: #ffffff;">
+              <h1 class="brand-title" style="margin: 0; font-size: 28px; font-weight: 800; color: #181F1C; letter-spacing: 3px; text-transform: uppercase; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">PURE.WHISKY.</h1>
+              <p style="margin: 6px 0 0 0; color: #2D6A4F; font-size: 14px; font-style: italic; font-family: Georgia, serif;">Single Cask Sustainable Whisky</p>
+            </td>
+          </tr>
+
+          <!-- Message Body -->
+          <tr>
+            <td class="body-cell" style="padding: 32px 36px; font-size: 15px; line-height: 1.7; color: #2A3630; background-color: #ffffff;">
+              <div style="white-space: pre-line; word-break: break-word;">${emailBody}</div>
+
+              ${validAttachments.length > 0 ? `
+              <div style="margin-top: 28px; padding: 14px 18px; background-color: #FAF8F5; border-radius: 8px; border: 1px solid #E2DDD5;">
+                <p style="margin: 0; font-size: 12px; font-weight: bold; color: #181F1C;">
+                  📎 Angehängte Dokumente (${validAttachments.length}):
+                </p>
+                <div style="margin-top: 6px; font-size: 12px; color: #55695E;">
+                  ${validAttachments.map(a => `<span style="display: inline-block; margin-right: 14px; margin-top: 4px;">• ${a.filename}</span>`).join('')}
+                </div>
+              </div>` : ''}
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td class="footer-cell" align="center" style="padding: 24px 32px 32px 32px; border-top: 1px solid #EAE5DE; text-align: center; font-size: 12px; line-height: 1.6; color: #6F7F77; background-color: #FAF8F5;">
+              <p style="margin: 0; font-weight: 600; color: #3A4A40;">PURE.WHISKY. · Ines Zager · Dürerring 1 · 31582 Nienburg</p>
+              <p style="margin: 4px 0 0 0;"><a href="https://pure-whisky.com" style="color: #B85D2C; text-decoration: none; font-weight: 600;">pure-whisky.com</a> · Sie erhalten diese E-Mail, da Sie Kunde oder Abonnent des Fass-Depots sind.</p>
+              <p style="margin: 12px 0 0 0; font-size: 11px;">
+                Kein Interesse mehr? <a href="https://pure-whisky.com/abmelden?email=${encodeURIComponent(email)}" style="color: #7A8C82; text-decoration: underline;">Hier mit einem Klick abmelden</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
 
         const payload = {
           from: `${senderName} <${senderEmail}>`,
@@ -399,26 +492,7 @@ Ines Zager · PURE.WHISKY.`);
           reply_to: 'info@pure-whisky.com',
           subject: emailSubject,
           text: emailBody,
-          html: `
-            <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #FAF8F5; padding: 40px 20px; color: #181F1C;">
-              <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #D4C8B8; border-radius: 16px; overflow: hidden; padding: 36px;">
-                <div style="text-align: center; margin-bottom: 28px; border-bottom: 1px solid #E2DDD5; padding-bottom: 20px;">
-                  <h1 style="font-size: 28px; margin: 0; color: #181F1C; letter-spacing: 2px; text-transform: uppercase;">PURE.WHISKY.</h1>
-                  <p style="margin: 4px 0 0 0; color: #2D6A4F; font-size: 14px; font-style: italic;">Single Cask Sustainable Whisky</p>
-                </div>
-                <div style="font-size: 16px; line-height: 1.6; color: #3A4A40; white-space: pre-line;">
-                  ${emailBody}
-                </div>
-                <div style="margin-top: 36px; padding-top: 20px; border-top: 1px solid #E2DDD5; text-align: center; font-size: 12px; color: #55695E;">
-                  <p style="margin: 0;">PURE.WHISKY. · Ines Zager · Dürerring 1 · 31582 Nienburg</p>
-                  <p style="margin: 4px 0 0 0;"><a href="https://pure-whisky.com" style="color: #B85D2C; text-decoration: none;">pure-whisky.com</a> · Sie erhalten diese Nachricht, weil Sie sich für das Fass-Depot eingetragen haben.</p>
-                  <p style="margin: 10px 0 0 0; font-size: 11px;">
-                    Kein Interesse mehr? <a href="https://pure-whisky.com/abmelden?email=${encodeURIComponent(email)}" style="color: #7A8C82; text-decoration: underline;">Hier mit einem Klick abmelden</a>
-                  </p>
-                </div>
-              </div>
-            </div>
-          `,
+          html: emailHtml,
           attachments: validAttachments
         };
 
@@ -431,7 +505,7 @@ Ines Zager · PURE.WHISKY.`);
             reply_to: 'info@pure-whisky.com',
             subject: emailSubject,
             text: emailBody,
-            html: payload.html
+            html: emailHtml
           };
           if (validAttachments.length > 0) {
             reqBody.attachments = validAttachments;
@@ -1056,8 +1130,10 @@ Ines Zager · PURE.WHISKY.`);
                 <div className={`mx-auto transition-all ${
                   previewDevice === 'mobile' ? 'max-w-[320px]' : 'w-full'
                 }`}>
-                  <div className="bg-[#FAF8F5] border border-[#D4C8B8] rounded-2xl p-4 sm:p-6 text-left shadow-sm space-y-4">
-                    <div className="text-center pb-3 border-b border-[#E2DDD5]">
+                  <div className={`bg-white border border-[#E2DDD5] ${
+                    previewDevice === 'mobile' ? 'rounded-xl p-4 shadow-sm' : 'rounded-2xl p-6 sm:p-8 shadow-sm'
+                  } text-left space-y-6`}>
+                    <div className="text-center pb-4 border-b border-[#EAE5DE]">
                       <h3 className="font-woodblock text-2xl text-[#181F1C] uppercase tracking-wider">
                         PURE.WHISKY.
                       </h3>
@@ -1066,29 +1142,29 @@ Ines Zager · PURE.WHISKY.`);
                       </span>
                     </div>
 
-                    <div className="bg-white p-3 rounded-xl border border-[#E2DDD5]">
-                      <span className="text-[10px] uppercase font-craft-mono text-[#55695E] block font-bold">Betreff:</span>
-                      <p className="font-bold text-sm text-[#181F1C]">{emailSubject}</p>
-                    </div>
-
-                    <div className="bg-white p-4 rounded-xl border border-[#E2DDD5] text-xs leading-relaxed text-[#3A4A40] whitespace-pre-line">
+                    <div className="text-xs leading-relaxed text-[#2A3630] whitespace-pre-line">
                       {emailBody}
                     </div>
 
                     {attachments.length > 0 && (
-                      <div className="p-3 bg-white rounded-xl border border-[#E2DDD5] space-y-1">
-                        <span className="text-[10px] uppercase font-craft-mono text-[#55695E] block font-bold">Anhänge ({attachments.length}):</span>
-                        {attachments.map((a, i) => (
-                          <span key={i} className="inline-block px-2 py-0.5 bg-[#FAF8F5] rounded text-[10px] font-craft-mono mr-1">
-                            📎 {a.filename}
-                          </span>
-                        ))}
+                      <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#E2DDD5] space-y-1.5">
+                        <span className="text-[10px] uppercase font-craft-mono text-[#181F1C] block font-bold">
+                          📎 Angehängte Dokumente ({attachments.length}):
+                        </span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {attachments.map((a, i) => (
+                            <span key={i} className="inline-flex items-center px-2 py-0.5 bg-white border border-[#D4C8B8] rounded text-[10px] font-craft-mono text-[#55695E]">
+                              • {a.filename} <span className="opacity-60 ml-1">({a.size})</span>
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     )}
 
-                    <div className="pt-2 text-center text-[10px] text-[#55695E] leading-tight space-y-1">
-                      <p>PURE.WHISKY. · Ines Zager · Dürerring 1 · 31582 Nienburg</p>
-                      <p className="text-[#7A8C82] underline">Hier mit einem Klick abmelden</p>
+                    <div className="pt-4 border-t border-[#EAE5DE] text-center text-[10px] text-[#6F7F77] leading-relaxed space-y-1">
+                      <p className="font-medium text-[#3A4A40]">PURE.WHISKY. · Ines Zager · Dürerring 1 · 31582 Nienburg</p>
+                      <p><span className="text-[#B85D2C] font-semibold">pure-whisky.com</span> · Sie erhalten diese E-Mail, da Sie Kunde oder Abonnent des Fass-Depots sind.</p>
+                      <p className="pt-1 text-[#7A8C82] underline cursor-pointer">Hier mit einem Klick abmelden</p>
                     </div>
                   </div>
                 </div>
