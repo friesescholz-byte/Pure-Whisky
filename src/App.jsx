@@ -13,6 +13,7 @@ import AboutView from './components/AboutView';
 import SustainabilityView from './components/SustainabilityView';
 import BlogView from './components/BlogView';
 import AdminView from './components/AdminView';
+import UnsubscribeView from './components/UnsubscribeView';
 
 import PhilosophyModal from './components/PhilosophyModal';
 import BlogPostModal from './components/BlogPostModal';
@@ -28,6 +29,7 @@ function getTabFromUrl() {
   if (typeof window === 'undefined') return 'home';
   const path = window.location.pathname.toLowerCase().trim();
   if (path === '/admin' || path.startsWith('/admin')) return 'admin';
+  if (path === '/abmelden' || path.startsWith('/abmelden') || path === '/unsubscribe' || path.startsWith('/unsubscribe')) return 'unsubscribe';
   if (path === '/shop' || path.startsWith('/shop') || path.startsWith('/faesser')) return 'shop';
   if (path === '/about' || path.startsWith('/about') || path.startsWith('/ueber-uns') || path.startsWith('/ines-zager')) return 'about';
   if (path === '/sustainability' || path.startsWith('/sustainability') || path.startsWith('/nachhaltigkeit')) return 'sustainability';
@@ -156,6 +158,35 @@ export default function App() {
     }
   }, [blogPosts]);
 
+  // Cross-tab synchronization for blog posts & CRM
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'pure_whisky_posts_v3' && e.newValue) {
+        try {
+          setBlogPosts(JSON.parse(e.newValue));
+        } catch (err) {
+          console.error('Failed to sync blog posts from storage event:', err);
+        }
+      }
+      if (e.key === 'pure_whisky_woo_customers' && e.newValue) {
+        try {
+          setWooCustomers(JSON.parse(e.newValue));
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      if (e.key === 'pure_whisky_newsletter_subs' && e.newValue) {
+        try {
+          setNewsletterSubs(JSON.parse(e.newValue));
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
 
 
   // Persistent Orders (with Jürgen Eisner real order as seed)
@@ -258,9 +289,12 @@ export default function App() {
     });
   };
 
-  const handleToggleNewsletterStatus = (emailToToggle) => {
+  const handleToggleNewsletterStatus = (identifier) => {
+    const term = (identifier || '').toLowerCase().trim();
     setNewsletterSubs(prev => prev.map(s => {
-      if (s.email.toLowerCase().trim() === emailToToggle.toLowerCase().trim()) {
+      const sEmail = (s.email || '').toLowerCase().trim();
+      const sId = (s.id || '').toLowerCase().trim();
+      if (sEmail === term || sId === term) {
         const nextStatus = s.listStatus === 'subscribed' ? 'unsubscribed' : 'subscribed';
         return { ...s, listStatus: nextStatus, globalStatus: nextStatus };
       }
@@ -268,8 +302,38 @@ export default function App() {
     }));
   };
 
-  const handleDeleteNewsletterSubscriber = (emailToDelete) => {
-    setNewsletterSubs(prev => prev.filter(s => s.email.toLowerCase().trim() !== emailToDelete.toLowerCase().trim()));
+  const handleDeleteNewsletterSubscriber = (identifier, secondaryId) => {
+    const term = (identifier || '').toLowerCase().trim();
+    const sec = (secondaryId || '').toLowerCase().trim();
+    setNewsletterSubs(prev => prev.filter(s => {
+      const sEmail = (s.email || '').toLowerCase().trim();
+      const sId = (s.id || '').toLowerCase().trim();
+      if (term && (sEmail === term || sId === term)) return false;
+      if (sec && (sEmail === sec || sId === sec)) return false;
+      return true;
+    }));
+  };
+
+  const handleUnsubscribeEmail = (email) => {
+    const clean = (email || '').toLowerCase().trim();
+    if (!clean) return;
+    setNewsletterSubs(prev => prev.map(s => {
+      if (s.email.toLowerCase().trim() === clean) {
+        return { ...s, listStatus: 'unsubscribed', globalStatus: 'unsubscribed' };
+      }
+      return s;
+    }));
+  };
+
+  const handleReSubscribeEmail = (email) => {
+    const clean = (email || '').toLowerCase().trim();
+    if (!clean) return;
+    setNewsletterSubs(prev => prev.map(s => {
+      if (s.email.toLowerCase().trim() === clean) {
+        return { ...s, listStatus: 'subscribed', globalStatus: 'subscribed' };
+      }
+      return s;
+    }));
   };
 
   // WooCommerce Customers Handlers
@@ -283,8 +347,16 @@ export default function App() {
     });
   };
 
-  const handleDeleteWooCustomer = (emailToDelete) => {
-    setWooCustomers(prev => prev.filter(c => c.email.toLowerCase().trim() !== emailToDelete.toLowerCase().trim()));
+  const handleDeleteWooCustomer = (identifier, secondaryId) => {
+    const term = (identifier || '').toLowerCase().trim();
+    const sec = (secondaryId || '').toLowerCase().trim();
+    setWooCustomers(prev => prev.filter(c => {
+      const cEmail = (c.email || '').toLowerCase().trim();
+      const cId = (c.id || '').toLowerCase().trim();
+      if (term && (cEmail === term || cId === term)) return false;
+      if (sec && (cEmail === sec || cId === sec)) return false;
+      return true;
+    }));
   };
 
   // Orders & Invoice Handlers
@@ -400,16 +472,29 @@ export default function App() {
 
   // Blog Handlers
   const handleSaveBlogPost = (post) => {
+    let updated;
     if (post.id) {
-      setBlogPosts(prev => prev.map(p => p.id === post.id ? post : p));
+      updated = blogPosts.map(p => p.id === post.id ? post : p);
     } else {
-      const newPost = { ...post, id: Date.now() };
-      setBlogPosts(prev => [newPost, ...prev]);
+      const newPost = { ...post, id: `post_${Date.now()}` };
+      updated = [newPost, ...blogPosts];
+    }
+    setBlogPosts(updated);
+    try {
+      localStorage.setItem('pure_whisky_posts_v3', JSON.stringify(updated));
+    } catch (e) {
+      console.warn('LocalStorage limit exceeded when saving blog posts:', e);
     }
   };
 
   const handleDeleteBlogPost = (postId) => {
-    setBlogPosts(prev => prev.filter(p => p.id !== postId));
+    const updated = blogPosts.filter(p => p.id !== postId);
+    setBlogPosts(updated);
+    try {
+      localStorage.setItem('pure_whisky_posts_v3', JSON.stringify(updated));
+    } catch (e) {
+      console.warn('LocalStorage error deleting post:', e);
+    }
   };
 
   // Cart Handlers
@@ -551,6 +636,15 @@ export default function App() {
             // Admin Settings Props
             adminEmail={adminEmail}
             onSaveAdminEmail={handleSaveAdminEmail}
+          />
+        )}
+
+        {activeTab === 'unsubscribe' && (
+          <UnsubscribeView
+            onUnsubscribe={handleUnsubscribeEmail}
+            onResubscribe={handleReSubscribeEmail}
+            onNavigateHome={() => handleNavClick('home')}
+            onNavigateShop={() => handleNavClick('shop')}
           />
         )}
 

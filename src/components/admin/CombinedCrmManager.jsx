@@ -187,11 +187,17 @@ export default function CombinedCrmManager({
   // Delete Handler
   const handleDeleteItem = (item) => {
     if (confirm(`Möchten Sie "${item.email}" wirklich aus dem CRM & Verteiler entfernen?`)) {
+      const email = (item.email || '').trim();
+      const id = item.originalId || item.id;
       if (item.isShop && onDeleteWooCustomer) {
-        onDeleteWooCustomer(item.email);
+        onDeleteWooCustomer(email, id);
       }
       if (item.isNewsletter && onDeleteNewsletterSub) {
-        onDeleteNewsletterSub(item.originalId || item.id);
+        onDeleteNewsletterSub(email, id);
+      }
+      if (!item.isShop && !item.isNewsletter) {
+        if (onDeleteWooCustomer) onDeleteWooCustomer(email, id);
+        if (onDeleteNewsletterSub) onDeleteNewsletterSub(email, id);
       }
     }
   };
@@ -362,7 +368,7 @@ export default function CombinedCrmManager({
                       {item.isNewsletter ? (
                         item.newsletterStatus === 'subscribed' ? (
                           <button
-                            onClick={() => onToggleNewsletterStatus && onToggleNewsletterStatus(item.originalId || item.id)}
+                            onClick={() => onToggleNewsletterStatus && onToggleNewsletterStatus(item.email)}
                             className="inline-flex items-center space-x-1 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-full text-[10px] font-bold transition-colors cursor-pointer"
                             title="Klicken, um Abzumelden"
                           >
@@ -371,7 +377,7 @@ export default function CombinedCrmManager({
                           </button>
                         ) : (
                           <button
-                            onClick={() => onToggleNewsletterStatus && onToggleNewsletterStatus(item.originalId || item.id)}
+                            onClick={() => onToggleNewsletterStatus && onToggleNewsletterStatus(item.email)}
                             className="inline-flex items-center space-x-1 text-stone-600 bg-stone-100 hover:bg-stone-200 border border-stone-200 px-2 py-0.5 rounded-full text-[10px] font-bold transition-colors cursor-pointer"
                             title="Klicken, um wieder zu Aktivieren"
                           >

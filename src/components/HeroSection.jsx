@@ -150,7 +150,6 @@ export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct, pr
                       }
                     }}
                     className={`relative ${b.zIndex} ${b.baseOffset} group cursor-pointer transition-transform duration-300 ease-out hover:-translate-y-2 focus:outline-none`}
-                    title={`${b.name} (${b.caskInfo})`}
                   >
                     {/* Sanfte, dezente Farb-Atmosphäre in der speziellen Farbe der Flasche */}
                     <div
@@ -173,11 +172,6 @@ export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct, pr
                     <div
                       className={`${b.shadowWidth} h-3 bg-black/45 blur-xs rounded-full mx-auto -mt-2 group-hover:opacity-40 transition-opacity duration-300`}
                     />
-
-                    {/* Feiner Namens-Chip bei Hover */}
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap px-2.5 py-0.5 rounded-full bg-[#181F1C]/90 backdrop-blur-xs text-white text-[11px] font-craft-mono tracking-wider shadow-md z-50">
-                      {b.name}
-                    </div>
                   </div>
                 ))}
               </div>

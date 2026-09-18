@@ -79,11 +79,12 @@ export default function AdminView({
   }, [sentCampaigns]);
 
   const [selectedHistoryCampaign, setSelectedHistoryCampaign] = useState(null);
+  const [logPage, setLogPage] = useState(1);
+  const [historyPage, setHistoryPage] = useState(1);
 
   // Blog Post Form State & Auto-scroll Ref
   const blogEditorRef = useRef(null);
   const [isEditingPost, setIsEditingPost] = useState(false);
-  const [imageUrlInput, setImageUrlInput] = useState('');
   const [blogSaveSuccess, setBlogSaveSuccess] = useState('');
   const [isCompressingImages, setIsCompressingImages] = useState(false);
   const [currentPostForm, setCurrentPostForm] = useState({
@@ -195,8 +196,11 @@ Ines Zager · PURE.WHISKY.`);
   // Sync selectedEmails on initial load once allUnifiedContacts is ready
   useEffect(() => {
     if (!hasInitializedEmails.current && allUnifiedContacts.length > 0) {
-      setSelectedEmails(allUnifiedContacts.map(c => c.email.toLowerCase()));
+      setSelectedEmails(allUnifiedContacts.map(c => c.email.toLowerCase().trim()));
       hasInitializedEmails.current = true;
+    } else if (hasInitializedEmails.current) {
+      const validEmails = new Set(allUnifiedContacts.map(c => c.email.toLowerCase().trim()));
+      setSelectedEmails(prev => prev.filter(email => validEmails.has(email)));
     }
   }, [allUnifiedContacts]);
 
@@ -240,7 +244,7 @@ Ines Zager · PURE.WHISKY.`);
   const compressImageFile = (file) => {
     return new Promise((resolve) => {
       // If SVG or tiny, read directly
-      if (file.type === 'image/svg+xml' || file.size < 120 * 1024) {
+      if (file.type === 'image/svg+xml') {
         const r = new FileReader();
         r.onload = () => resolve(r.result);
         r.onerror = () => resolve('');
@@ -252,7 +256,7 @@ Ines Zager · PURE.WHISKY.`);
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
-          const maxDim = 1600;
+          const maxDim = 1200;
           let w = img.width;
           let h = img.height;
           if (w > maxDim || h > maxDim) {
@@ -269,8 +273,8 @@ Ines Zager · PURE.WHISKY.`);
           canvas.height = h;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, w, h);
-          // Export as clean JPEG 82% quality (shrinks 10MB phone photo to ~150KB)
-          const compressed = canvas.toDataURL('image/jpeg', 0.82);
+          // Export as clean JPEG 75% quality (~50-80KB per photo)
+          const compressed = canvas.toDataURL('image/jpeg', 0.75);
           resolve(compressed);
         };
         img.onerror = () => resolve(e.target.result);
@@ -280,7 +284,7 @@ Ines Zager · PURE.WHISKY.`);
     });
   };
 
-  // Blog Multiple Images Upload (with auto-compression)
+  // Blog Multiple Images Upload from PC (with auto-compression)
   const handleMultipleBlogImagesUpload = async (e) => {
     const files = Array.from(e.target.files);
     if (files.length > 0) {
@@ -299,20 +303,6 @@ Ines Zager · PURE.WHISKY.`);
         setIsCompressingImages(false);
       }
     }
-  };
-
-  // Add Image via direct URL (e.g. Cloudflare R2 link)
-  const handleAddImageUrl = () => {
-    const trimmed = imageUrlInput.trim();
-    if (!trimmed) return;
-    setCurrentPostForm((prev) => {
-      const currentImages = prev.images || (prev.image ? [prev.image] : []);
-      return {
-        ...prev,
-        images: [...currentImages, trimmed]
-      };
-    });
-    setImageUrlInput('');
   };
 
   // Promote an image to position 0 (Hauptbild)
@@ -399,9 +389,14 @@ Ines Zager · PURE.WHISKY.`);
 
     for (const email of targetEmails) {
       try {
+        const validAttachments = attachments && attachments.length > 0 
+          ? attachments.map(a => ({ filename: a.filename, content: a.content }))
+          : [];
+
         const payload = {
           from: `${senderName} <${senderEmail}>`,
           to: [email],
+          reply_to: 'info@pure-whisky.com',
           subject: emailSubject,
           text: emailBody,
           html: `
@@ -417,53 +412,69 @@ Ines Zager · PURE.WHISKY.`);
                 <div style="margin-top: 36px; padding-top: 20px; border-top: 1px solid #E2DDD5; text-align: center; font-size: 12px; color: #55695E;">
                   <p style="margin: 0;">PURE.WHISKY. · Ines Zager · Dürerring 1 · 31582 Nienburg</p>
                   <p style="margin: 4px 0 0 0;"><a href="https://pure-whisky.com" style="color: #B85D2C; text-decoration: none;">pure-whisky.com</a> · Sie erhalten diese Nachricht, weil Sie sich für das Fass-Depot eingetragen haben.</p>
+                  <p style="margin: 10px 0 0 0; font-size: 11px;">
+                    Kein Interesse mehr? <a href="https://pure-whisky.com/abmelden?email=${encodeURIComponent(email)}" style="color: #7A8C82; text-decoration: underline;">Hier mit einem Klick abmelden</a>
+                  </p>
                 </div>
               </div>
             </div>
           `,
-          attachments: attachments.map(a => ({ filename: a.filename, content: a.content }))
+          attachments: validAttachments
         };
 
         // 1. Primary: Official Scholz & Friese Shops Resend Worker
         let response = null;
         try {
+          const reqBody = {
+            from: `${senderName} <${senderEmail}>`,
+            to: [email],
+            reply_to: 'info@pure-whisky.com',
+            subject: emailSubject,
+            text: emailBody,
+            html: payload.html
+          };
+          if (validAttachments.length > 0) {
+            reqBody.attachments = validAttachments;
+          }
+
           response = await fetch('https://resend-mailer.friese-scholz.workers.dev', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-              from: `${senderName} <${senderEmail}>`,
-              to: [email],
-              reply_to: 'info@pure-whisky.com',
-              subject: emailSubject,
-              text: emailBody,
-              html: payload.html
-            })
+            body: JSON.stringify(reqBody)
           });
         } catch (fetchErr) {
           // Fallback to local proxy if offline
+          const apiKey = localStorage.getItem('pure_resend_key') || (import.meta.env?.VITE_RESEND_API_KEY || '');
           response = await fetch('/api/resend/emails', {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${RESEND_API_KEY}`,
+              'Authorization': `Bearer ${apiKey}`,
               'Content-Type': 'application/json'
             },
             body: JSON.stringify(payload)
           });
         }
 
-        const resData = await response.json();
-        if (response.ok && (resData.id || resData.success)) {
-          const idStr = resData.id ? ` (Resend ID: ${resData.id.slice(0, 8)}...)` : '';
-          newLogs.push({ email, status: `✅ Erfolgreich gesendet${idStr}`, time: new Date().toLocaleTimeString() });
+        let isOk = false;
+        try {
+          const resData = await response.json();
+          isOk = response.ok && (resData.id || resData.success || resData.status === 200);
+        } catch {
+          isOk = response && response.ok;
+        }
+
+        const timeStr = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        if (isOk) {
+          newLogs.push({ email, success: true, status: 'Zugestellt', time: timeStr });
           successfulRecipients.push(email);
         } else {
-          newLogs.push({ email, status: `⚠️ Gesendet (Status: ${response.status})`, time: new Date().toLocaleTimeString() });
-          successfulRecipients.push(email);
+          newLogs.push({ email, success: false, status: 'Fehlgeschlagen', time: timeStr });
         }
       } catch (err) {
-        newLogs.push({ email, status: `❌ Fehler: ${err.message}`, time: new Date().toLocaleTimeString() });
+        const timeStr = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        newLogs.push({ email, success: false, status: 'Fehlgeschlagen', time: timeStr });
       }
     }
 
@@ -949,15 +960,61 @@ Ines Zager · PURE.WHISKY.`);
               </div>
 
               {sendLogs.length > 0 && (
-                <div className="bg-white border border-[#D4C8B8] rounded-3xl p-6 shadow-xs space-y-3">
-                  <h4 className="font-woodblock text-lg uppercase text-[#181F1C]">
-                    Aktueller Versand-Status
-                  </h4>
-                  <div className="divide-y divide-[#E2DDD5] max-h-48 overflow-y-auto">
-                    {sendLogs.map((log, i) => (
-                      <div key={i} className="py-2 flex items-center justify-between text-xs">
-                        <span className="font-bold text-[#181F1C]">{log.email}</span>
-                        <span className="font-craft-mono">{log.status} ({log.time})</span>
+                <div className="bg-white border border-[#D4C8B8] rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-xs space-y-4 text-left">
+                  <div className="flex items-center justify-between border-b border-[#E2DDD5] pb-3">
+                    <div className="flex items-center space-x-2">
+                      <h4 className="font-woodblock text-lg uppercase text-[#181F1C]">
+                        Aktueller Versand-Status
+                      </h4>
+                      <span className="px-2.5 py-0.5 rounded-full bg-[#FAF8F5] border border-[#D4C8B8] text-xs font-craft-mono font-bold text-[#55695E]">
+                        {sendLogs.length} {sendLogs.length === 1 ? 'E-Mail' : 'E-Mails'}
+                      </span>
+                    </div>
+
+                    {sendLogs.length > 10 && (
+                      <div className="flex items-center space-x-1.5 text-xs font-craft-mono">
+                        <button
+                          type="button"
+                          onClick={() => setLogPage(p => Math.max(1, p - 1))}
+                          disabled={logPage === 1}
+                          className="px-2.5 py-1 rounded-lg border border-[#D4C8B8] bg-[#FAF8F5] hover:bg-white disabled:opacity-30 disabled:cursor-not-allowed text-[#181F1C] font-bold transition-colors cursor-pointer"
+                        >
+                          ← Zurück
+                        </button>
+                        <span className="text-[#55695E] px-1">
+                          {logPage} / {Math.ceil(sendLogs.length / 10)}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setLogPage(p => Math.min(Math.ceil(sendLogs.length / 10), p + 1))}
+                          disabled={logPage >= Math.ceil(sendLogs.length / 10)}
+                          className="px-2.5 py-1 rounded-lg border border-[#D4C8B8] bg-[#FAF8F5] hover:bg-white disabled:opacity-30 disabled:cursor-not-allowed text-[#181F1C] font-bold transition-colors cursor-pointer"
+                        >
+                          Weiter →
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="divide-y divide-[#FAF8F5]">
+                    {sendLogs.slice((logPage - 1) * 10, logPage * 10).map((log, i) => (
+                      <div key={i} className="py-2.5 flex items-center justify-between text-xs hover:bg-[#FAF8F5]/70 px-2 rounded-lg transition-colors">
+                        <div className="flex items-center space-x-2.5 truncate pr-2">
+                          <span className={`w-2 h-2 rounded-full shrink-0 ${log.success ? 'bg-emerald-500 ring-2 ring-emerald-100' : 'bg-rose-500 ring-2 ring-rose-100'}`} />
+                          <span className="font-bold text-[#181F1C] truncate">{log.email}</span>
+                        </div>
+                        <div className="flex items-center space-x-3 shrink-0">
+                          <span className={`px-2.5 py-0.5 rounded-full font-craft-mono text-[11px] font-bold border ${
+                            log.success 
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
+                              : 'bg-rose-50 text-rose-800 border-rose-200'
+                          }`}>
+                            {log.status}
+                          </span>
+                          <span className="font-craft-mono text-[11px] text-[#55695E]">
+                            {log.time}
+                          </span>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -1029,8 +1086,9 @@ Ines Zager · PURE.WHISKY.`);
                       </div>
                     )}
 
-                    <div className="pt-2 text-center text-[10px] text-[#55695E] leading-tight">
+                    <div className="pt-2 text-center text-[10px] text-[#55695E] leading-tight space-y-1">
                       <p>PURE.WHISKY. · Ines Zager · Dürerring 1 · 31582 Nienburg</p>
+                      <p className="text-[#7A8C82] underline">Hier mit einem Klick abmelden</p>
                     </div>
                   </div>
                 </div>
@@ -1072,7 +1130,7 @@ Ines Zager · PURE.WHISKY.`);
                   <p className="text-xs">Versendete E-Mails aus diesem Dashboard werden hier automatisch protokolliert.</p>
                 </div>
               ) : (
-                sentCampaigns.map((camp) => (
+                sentCampaigns.slice((historyPage - 1) * 10, historyPage * 10).map((camp) => (
                   <div
                     key={camp.id}
                     className="p-6 hover:bg-[#FAF8F5] transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-4"
@@ -1131,6 +1189,36 @@ Ines Zager · PURE.WHISKY.`);
               )}
             </div>
 
+            {/* Pagination Controls for Sent Campaigns */}
+            {sentCampaigns.length > 10 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between bg-white border border-[#D4C8B8] rounded-2xl p-4 shadow-2xs gap-3">
+                <span className="text-xs text-[#55695E] font-craft-mono">
+                  Zeige {((historyPage - 1) * 10) + 1}–{Math.min(historyPage * 10, sentCampaigns.length)} von {sentCampaigns.length} Kampagnen
+                </span>
+                <div className="flex items-center space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => setHistoryPage(p => Math.max(1, p - 1))}
+                    disabled={historyPage === 1}
+                    className="px-3.5 py-1.5 rounded-xl border border-[#D4C8B8] bg-[#FAF8F5] hover:bg-white disabled:opacity-30 disabled:cursor-not-allowed text-xs font-bold text-[#181F1C] transition-colors cursor-pointer"
+                  >
+                    ← Vorherige
+                  </button>
+                  <span className="text-xs font-craft-mono font-bold text-[#181F1C] px-2">
+                    Seite {historyPage} von {Math.ceil(sentCampaigns.length / 10)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setHistoryPage(p => Math.min(Math.ceil(sentCampaigns.length / 10), p + 1))}
+                    disabled={historyPage >= Math.ceil(sentCampaigns.length / 10)}
+                    className="px-3.5 py-1.5 rounded-xl border border-[#D4C8B8] bg-[#FAF8F5] hover:bg-white disabled:opacity-30 disabled:cursor-not-allowed text-xs font-bold text-[#181F1C] transition-colors cursor-pointer"
+                  >
+                    Nächste →
+                  </button>
+                </div>
+              </div>
+            )}
+
           </div>
         )}
 
@@ -1168,10 +1256,10 @@ Ines Zager · PURE.WHISKY.`);
                       blogEditorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }, 100);
                   }}
-                  className="px-6 py-3 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-sm tracking-wider uppercase transition-all shadow-md flex items-center space-x-2 hover:scale-[1.02] active:scale-[0.98]"
+                  className="px-7 py-3.5 rounded-2xl bg-[#B85D2C] hover:bg-[#9E4C20] text-white font-woodblock text-base tracking-wider uppercase transition-all shadow-lg hover:shadow-xl flex items-center space-x-2.5 hover:scale-[1.02] active:scale-[0.98] ring-4 ring-[#B85D2C]/20 shrink-0 cursor-pointer"
                 >
-                  <Plus className="w-4 h-4" />
-                  <span>Neuen Beitrag schreiben</span>
+                  <Plus className="w-5 h-5 stroke-[2.5]" />
+                  <span>+ Neuen Beitrag erstellen</span>
                 </button>
               )}
             </div>
@@ -1255,38 +1343,32 @@ Ines Zager · PURE.WHISKY.`);
                   </div>
 
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between flex-wrap gap-2">
-                      <label className="font-craft-mono text-xs uppercase tracking-wider text-[#55695E] font-bold">
-                        Bildergalerie & Hauptbild
-                      </label>
-                      <label className="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-white border border-[#D4C8B8] font-woodblock text-xs uppercase tracking-wider text-[#B85D2C] hover:bg-[#E2DDD5] cursor-pointer transition-all shadow-xs hover:scale-[1.02] active:scale-[0.98]">
-                        <Upload className="w-3.5 h-3.5" />
-                        <span>{isCompressingImages ? 'Bilder werden optimiert...' : '+ Bilder vom PC hinzufügen'}</span>
-                        <input type="file" multiple accept="image/*" disabled={isCompressingImages} onChange={handleMultipleBlogImagesUpload} className="hidden" />
-                      </label>
-                    </div>
+                    <label className="block font-craft-mono text-xs uppercase tracking-wider text-[#55695E] font-bold">
+                      Bildergalerie & Hauptbild
+                    </label>
 
-                    {/* Quick URL Input for Cloudflare R2 / Web images */}
-                    <div className="flex items-center space-x-2 bg-[#FAF8F5] p-2 rounded-2xl border border-[#D4C8B8]">
-                      <div className="relative flex-1">
-                        <Link className="w-3.5 h-3.5 text-[#55695E] absolute left-3 top-1/2 -translate-y-1/2" />
-                        <input
-                          type="url"
-                          value={imageUrlInput}
-                          onChange={(e) => setImageUrlInput(e.target.value)}
-                          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddImageUrl(); }}}
-                          placeholder="Oder Bild-URL / Cloudflare R2 Link einfügen..."
-                          className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#D4C8B8] bg-white text-xs text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
-                        />
+                    {/* Prominent High-Visibility Upload Card */}
+                    <label className="flex flex-col items-center justify-center p-6 sm:p-8 rounded-2xl border-2 border-dashed border-[#B85D2C]/40 hover:border-[#B85D2C] bg-[#FAF8F5] hover:bg-[#F5EBE6]/60 transition-all cursor-pointer group shadow-2xs">
+                      <div className="w-12 h-12 rounded-full bg-white border border-[#D4C8B8] group-hover:border-[#B85D2C] flex items-center justify-center text-[#B85D2C] mb-3 group-hover:scale-110 transition-transform shadow-xs">
+                        <Upload className="w-6 h-6" />
                       </div>
-                      <button
-                        type="button"
-                        onClick={handleAddImageUrl}
-                        className="px-4 py-2 rounded-xl bg-[#181F1C] hover:bg-black text-white text-xs font-woodblock uppercase tracking-wider transition-colors shrink-0"
-                      >
-                        + Hinzufügen
-                      </button>
-                    </div>
+                      <div className="text-center space-y-1">
+                        <span className="font-woodblock text-lg text-[#181F1C] uppercase tracking-wide group-hover:text-[#B85D2C] transition-colors block">
+                          {isCompressingImages ? 'Bilder werden optimiert...' : '+ Bilder vom PC hinzufügen'}
+                        </span>
+                        <p className="text-xs text-[#55695E]">
+                          Klicken, um Fotos von Ihrem Computer auszuwählen (JPG, PNG, WebP · automatisch web-optimiert)
+                        </p>
+                      </div>
+                      <input 
+                        type="file" 
+                        multiple 
+                        accept="image/*" 
+                        disabled={isCompressingImages} 
+                        onChange={handleMultipleBlogImagesUpload} 
+                        className="hidden" 
+                      />
+                    </label>
 
                     {currentPostForm.images && currentPostForm.images.length > 0 ? (
                       <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3 p-4 rounded-2xl border border-[#D4C8B8] bg-[#FAF8F5]">
@@ -1323,8 +1405,8 @@ Ines Zager · PURE.WHISKY.`);
                         ))}
                       </div>
                     ) : (
-                      <div className="p-6 text-center rounded-2xl border-2 border-dashed border-[#D4C8B8] text-xs text-[#55695E]">
-                        Noch keine Bilder hinterlegt. Laden Sie ein Bild vom PC hoch oder fügen Sie eine URL ein.
+                      <div className="p-4 text-center rounded-xl border border-dashed border-[#D4C8B8] text-xs text-[#55695E] bg-[#FAF8F5]">
+                        Noch keine Bilder hinzugefügt. Klicken Sie oben auf das Feld, um Bilder vom PC auszuwählen.
                       </div>
                     )}
                   </div>
@@ -1383,9 +1465,10 @@ Ines Zager · PURE.WHISKY.`);
                     </button>
                     <button
                       type="submit"
-                      className="px-8 py-2.5 rounded-xl bg-[#2D6A4F] hover:bg-[#24533E] text-white font-woodblock text-base tracking-wider uppercase shadow-md"
+                      className="px-8 py-3.5 rounded-2xl bg-[#2D6A4F] hover:bg-[#22523D] text-white font-woodblock text-base tracking-wider uppercase shadow-lg hover:shadow-xl transition-all flex items-center space-x-2.5 cursor-pointer hover:scale-[1.02] active:scale-[0.98] ring-4 ring-[#2D6A4F]/20"
                     >
-                      {currentPostForm.id ? 'Änderungen speichern' : 'Beitrag Veröffentlichen'}
+                      <CheckCircle2 className="w-5 h-5 stroke-[2.5]" />
+                      <span>{currentPostForm.id ? 'Änderungen speichern' : 'Beitrag Veröffentlichen'}</span>
                     </button>
                   </div>
                 </form>

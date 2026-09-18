@@ -3,17 +3,16 @@
  * Handles Mollie Test Gateway and Resend Email Dispatch
  */
 
-export const MOLLIE_TEST_API_KEY = 'test_757rbjSksxgtDCCAps98ThDSgpxCaz';
 export const DEFAULT_ADMIN_EMAIL = 'friese.scholz@gmail.com';
 export const SENDER_EMAIL = 'PURE.WHISKY. <noreply@scholz-friese-webdesign.de>';
 export const REPLY_TO_EMAIL = 'info@pure-whisky.com';
 
 export function getMollieKey() {
-  return localStorage.getItem('pure_mollie_key') || MOLLIE_TEST_API_KEY;
+  return import.meta.env?.VITE_MOLLIE_API_KEY || localStorage.getItem('pure_mollie_key') || '';
 }
 
 export function getResendKey() {
-  return localStorage.getItem('pure_resend_key') || (import.meta.env?.VITE_RESEND_API_KEY || '');
+  return import.meta.env?.VITE_RESEND_API_KEY || localStorage.getItem('pure_resend_key') || '';
 }
 
 /**
@@ -76,7 +75,7 @@ export async function createMolliePayment({ orderId, amount, description, redire
 /**
  * Generic email sender via Scholz & Friese Shops Resend Worker
  */
-async function sendResendMail({ to, bcc, subject, html }) {
+async function sendResendMail({ to, bcc, subject, html, attachments }) {
   const recipients = Array.isArray(to) ? [...to] : [to];
   if (bcc) {
     const bccList = Array.isArray(bcc) ? bcc : [bcc];
@@ -92,6 +91,10 @@ async function sendResendMail({ to, bcc, subject, html }) {
     subject,
     html
   };
+
+  if (attachments && attachments.length > 0) {
+    payload.attachments = attachments;
+  }
 
   let response = null;
   let resData = null;
