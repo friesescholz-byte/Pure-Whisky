@@ -206,7 +206,7 @@ export default function CustomersManager({
                   type="text"
                   value={newCust.firstName}
                   onChange={(e) => setNewCust(prev => ({ ...prev, firstName: e.target.value }))}
-                  placeholder="Jürgen"
+                  placeholder="Max"
                   className="w-full text-xs bg-white border border-[#D4C8B8] rounded-lg px-3 py-2 text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
                 />
               </div>
@@ -216,7 +216,7 @@ export default function CustomersManager({
                   type="text"
                   value={newCust.lastName}
                   onChange={(e) => setNewCust(prev => ({ ...prev, lastName: e.target.value }))}
-                  placeholder="Eisner"
+                  placeholder="Mustermann"
                   className="w-full text-xs bg-white border border-[#D4C8B8] rounded-lg px-3 py-2 text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
                 />
               </div>

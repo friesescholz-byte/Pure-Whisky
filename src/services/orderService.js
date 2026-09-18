@@ -3,6 +3,8 @@
  * Handles Mollie Test Gateway and Resend Email Dispatch
  */
 
+import { generateInvoicePdfBase64 } from './invoicePdfGenerator.js';
+
 export const DEFAULT_ADMIN_EMAIL = 'friese.scholz@gmail.com';
 export const SENDER_EMAIL = 'PURE.WHISKY. <noreply@scholz-friese-webdesign.de>';
 export const REPLY_TO_EMAIL = 'info@pure-whisky.com';
@@ -150,17 +152,22 @@ export async function sendOrderConfirmationEmail({ order, adminEmail = DEFAULT_A
     </tr>
   `).join('') || '';
 
+  const invoiceNum = order.invoiceNumber || `A09401${order.orderId}`;
+
   const html = `
     <!DOCTYPE html>
-    <html>
-    <head><meta charset="utf-8"></head>
+    <html lang="de">
+    <head>
+      <meta charset="utf-8">
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
     <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #FAF8F5; margin: 0; padding: 30px 15px;">
       <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #E2DDD5; border-radius: 12px; overflow: hidden;">
         
         <div style="background: #181F1C; padding: 24px 30px; text-align: center;">
           <img src="https://pub-b33108412309406a9a941ddc51e9a5b9.r2.dev/Pure-Whisky/logo-pure-whisky.png" alt="PURE.WHISKY." style="width: 70px; height: 70px; object-fit: contain; margin-bottom: 8px;" />
           <h1 style="color: #FAF8F5; font-size: 20px; margin: 0; font-weight: normal; letter-spacing: 1px;">PURE.WHISKY.</h1>
-          <p style="color: #C5BCB0; font-size: 11px; margin: 4px 0 0 0; text-transform: uppercase; letter-spacing: 2px;">Bestelleingangsbest?tigung</p>
+          <p style="color: #C5BCB0; font-size: 11px; margin: 4px 0 0 0; text-transform: uppercase; letter-spacing: 2px;">Bestelleingangsbestätigung</p>
         </div>
 
         <div style="padding: 30px;">
@@ -168,12 +175,12 @@ export async function sendOrderConfirmationEmail({ order, adminEmail = DEFAULT_A
             Guten Tag ${order.customer.firstName} ${order.customer.lastName},
           </p>
           <p style="font-size: 13px; color: #55695E; line-height: 1.6;">
-            vielen Dank f?r Ihre Bestellung bei <strong>PURE.WHISKY.</strong>! Ihre Bestellung ist unter der Bestellnummer <strong>#${order.orderId}</strong> erfolgreich bei uns eingegangen und wird nun von Ines Zager pers?nlich gepr?ft.
+            vielen Dank für Ihre Bestellung bei <strong>PURE.WHISKY.</strong>! Ihre Bestellung ist unter der Bestellnummer <strong>#${order.orderId}</strong> erfolgreich bei uns eingegangen und wird nun von Ines Zager persönlich geprüft.
           </p>
 
           <div style="background: #FAF8F5; border: 1px solid #E2DDD5; border-radius: 8px; padding: 14px 16px; margin: 20px 0; font-size: 12px; color: #55695E; line-height: 1.5;">
             <strong style="color: #181F1C;">Hinweis zum Kaufvertrag:</strong><br/>
-            Diese E-Mail best?tigt den Eingang Ihrer Bestellung. Der Kaufvertrag kommt rechtswirksam durch die gesonderte Zusendung der offiziellen Rechnung zustande.
+            Diese E-Mail bestätigt den Eingang Ihrer Bestellung. Ihre offizielle Rechnung (<strong>${invoiceNum}</strong>) haben wir Ihnen zusätzlich als PDF-Dokument an diese E-Mail angehängt.
           </div>
 
           <table style="width: 100%; border-collapse: collapse; margin: 24px 0;">
@@ -207,7 +214,7 @@ export async function sendOrderConfirmationEmail({ order, adminEmail = DEFAULT_A
         </div>
 
         <div style="background: #F4F0EA; padding: 18px 30px; text-align: center; font-size: 11px; color: #78887E;">
-          PURE.WHISKY. ? Inhaberin Ines Zager ? D?rerring 1 ? 31582 Nienburg ? Deutschland<br/>
+          PURE.WHISKY. · Inhaberin Ines Zager · Am Urnenfeld 1c · 29339 Wathlingen · Deutschland<br/>
           E-Mail: <a href="mailto:info@pure-whisky.com" style="color: #B85D2C; text-decoration: none;">info@pure-whisky.com</a>
         </div>
 
@@ -216,11 +223,26 @@ export async function sendOrderConfirmationEmail({ order, adminEmail = DEFAULT_A
     </html>
   `;
 
+  // Generate attached Invoice PDF
+  const attachments = [];
+  try {
+    const pdfBase64 = generateInvoicePdfBase64(order);
+    if (pdfBase64) {
+      attachments.push({
+        filename: `Rechnung_${invoiceNum}.pdf`,
+        content: pdfBase64
+      });
+    }
+  } catch (pdfErr) {
+    console.warn('Could not generate PDF attachment for confirmation email:', pdfErr);
+  }
+
   return sendResendMail({
     to: order.customer.email,
     bcc: adminEmail,
-    subject: `Bestelleingangsbest?tigung #${order.orderId} ? PURE.WHISKY.`,
-    html
+    subject: `Bestelleingangsbestätigung #${order.orderId} – PURE.WHISKY.`,
+    html,
+    attachments
   });
 }
 
@@ -252,8 +274,11 @@ export async function sendInvoiceEmail({ order, adminEmail = DEFAULT_ADMIN_EMAIL
 
   const html = `
     <!DOCTYPE html>
-    <html>
-    <head><meta charset="utf-8"></head>
+    <html lang="de">
+    <head>
+      <meta charset="utf-8">
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
     <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #FAFAFA; margin: 0; padding: 40px 15px;">
       <div style="max-width: 650px; margin: 0 auto; background: #ffffff; border: 1px solid #E5E5E5; box-shadow: 0 4px 20px rgba(0,0,0,0.05); padding: 40px;">
         
@@ -332,6 +357,11 @@ export async function sendInvoiceEmail({ order, adminEmail = DEFAULT_ADMIN_EMAIL
           </div>
         </div>
 
+        <!-- Attachment Notice -->
+        <div style="background: #F4F0EA; border: 1px solid #E2DDD5; border-radius: 8px; padding: 12px 16px; margin-bottom: 30px; font-size: 12px; color: #181F1C;">
+          📄 Diese Rechnung liegt dieser E-Mail zusätzlich als offizielle <strong>PDF-Datei</strong> bei.
+        </div>
+
         <!-- Footer -->
         <div style="border-top: 1px solid #E5E5E5; padding-top: 20px; font-size: 10px; color: #888888; line-height: 1.6;">
           <div style="text-align: right; margin-bottom: 12px; color: #000000;">Seite 1 von 1</div>
@@ -361,10 +391,25 @@ export async function sendInvoiceEmail({ order, adminEmail = DEFAULT_ADMIN_EMAIL
     </html>
   `;
 
+  // Generate attached Invoice PDF
+  const attachments = [];
+  try {
+    const pdfBase64 = generateInvoicePdfBase64(order);
+    if (pdfBase64) {
+      attachments.push({
+        filename: `Rechnung_${invoiceNum}.pdf`,
+        content: pdfBase64
+      });
+    }
+  } catch (pdfErr) {
+    console.warn('Could not generate PDF attachment for invoice email:', pdfErr);
+  }
+
   return sendResendMail({
     to: order.customer.email,
     bcc: adminEmail,
-    subject: `Rechnung ${invoiceNum} zu Ihrer Bestellung #${order.orderId} ? PURE.WHISKY.`,
-    html
+    subject: `Rechnung ${invoiceNum} zu Ihrer Bestellung #${order.orderId} – PURE.WHISKY.`,
+    html,
+    attachments
   });
 }

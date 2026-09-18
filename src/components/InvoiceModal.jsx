@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
-import { Printer, X } from 'lucide-react';
+import { Printer, X, Download } from 'lucide-react';
+import { downloadInvoicePdf } from '../services/invoicePdfGenerator';
 
 export default function InvoiceModal({ isOpen, onClose, order }) {
   const printContentRef = useRef(null);
@@ -367,11 +368,20 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
 
         <div className="flex items-center space-x-2">
           <button
-            onClick={handlePrint}
-            className="flex items-center space-x-2 px-4 py-2 bg-[#B85D2C] hover:bg-[#A04E24] text-white text-xs font-semibold rounded-lg transition-all shadow-sm hover:scale-105 active:scale-95 cursor-pointer"
+            onClick={() => downloadInvoicePdf(order)}
+            className="flex items-center space-x-1.5 px-3 py-2 bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-semibold rounded-lg transition-all shadow-sm hover:scale-105 active:scale-95 cursor-pointer"
+            title="Offizielle Rechnung als PDF herunterladen"
           >
-            <Printer className="w-4 h-4" />
-            <span>Drucken / Als PDF speichern</span>
+            <Download className="w-3.5 h-3.5 text-[#B85D2C]" />
+            <span>PDF herunterladen</span>
+          </button>
+
+          <button
+            onClick={handlePrint}
+            className="flex items-center space-x-1.5 px-3 py-2 bg-[#B85D2C] hover:bg-[#A04E24] text-white text-xs font-semibold rounded-lg transition-all shadow-sm hover:scale-105 active:scale-95 cursor-pointer"
+          >
+            <Printer className="w-3.5 h-3.5" />
+            <span>Drucken</span>
           </button>
           
           <button

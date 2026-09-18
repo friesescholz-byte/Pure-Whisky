@@ -292,7 +292,7 @@ export default function CartDrawer({
                       type="text"
                       name="firstName"
                       required
-                      placeholder="Jürgen"
+                      placeholder="Max"
                       value={formData.firstName}
                       onChange={handleInputChange}
                       className="w-full text-sm bg-white border border-[#D4C8B8] rounded-lg px-3 py-2 text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
@@ -304,7 +304,7 @@ export default function CartDrawer({
                       type="text"
                       name="lastName"
                       required
-                      placeholder="Eisner"
+                      placeholder="Mustermann"
                       value={formData.lastName}
                       onChange={handleInputChange}
                       className="w-full text-sm bg-white border border-[#D4C8B8] rounded-lg px-3 py-2 text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
@@ -318,7 +318,7 @@ export default function CartDrawer({
                     type="email"
                     name="email"
                     required
-                    placeholder="juergen_eisner@hotmail.com"
+                    placeholder="max.mustermann@beispiel.de"
                     value={formData.email}
                     onChange={handleInputChange}
                     className="w-full text-sm bg-white border border-[#D4C8B8] rounded-lg px-3 py-2 text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
@@ -334,7 +334,7 @@ export default function CartDrawer({
                     type="text"
                     name="street"
                     required
-                    placeholder="Stiegltzstr 6"
+                    placeholder="Musterstraße 1"
                     value={formData.street}
                     onChange={handleInputChange}
                     className="w-full text-sm bg-white border border-[#D4C8B8] rounded-lg px-3 py-2 text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
@@ -348,7 +348,7 @@ export default function CartDrawer({
                       type="text"
                       name="zip"
                       required
-                      placeholder="83101"
+                      placeholder="10115"
                       value={formData.zip}
                       onChange={handleInputChange}
                       className="w-full text-sm bg-white border border-[#D4C8B8] rounded-lg px-3 py-2 text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
@@ -360,7 +360,7 @@ export default function CartDrawer({
                       type="text"
                       name="city"
                       required
-                      placeholder="Rohrdorf"
+                      placeholder="Berlin"
                       value={formData.city}
                       onChange={handleInputChange}
                       className="w-full text-sm bg-white border border-[#D4C8B8] rounded-lg px-3 py-2 text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
