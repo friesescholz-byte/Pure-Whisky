@@ -455,13 +455,15 @@ export const PHILOSOPHY_PILLARS = [
     id: 'frauenperspektive',
     title: 'Frauenperspektive?',
     tag: 'Haltung',
-    subtitle: 'Keine Marketingfloskel, sondern pure Sensorik & Augenhöhe',
+    subtitle: 'Weiblich. Unabhängig. Und vor allem: ohne Dogmen.',
     image: IMAGES.frauenperspektive,
-    quote: '„Frauen riechen und schmecken oft differenzierter – doch in der Whiskywelt wurden sie jahrzehntelang ignoriert. Zeit für einen echten Perspektivwechsel.“',
+    quote: '„Was ist eigentlich eine weibliche Perspektive auf Whisky? Keine Ahnung. Und genau das ist der Punkt.“',
     paragraphs: [
-      'Whisky galt lange Zeit als reine Männerdomäne mit dunklen Ledersesseln und schwerem Zigarrenrauch. Eine klischeehafte Vorstellung, die an der Realität längst vorbeigeht. Wissenschaftliche Studien zeigen, dass Frauen oft über einen sensibleren Geruchssinn und eine feinere Nuancierung bei Aromen verfügen.',
-      'PURE.WHISKY. steht für einen modernen, sensorisch anspruchsvollen Zugang zu Single Cask Whiskys. Ich wähle Fässer nicht nach Alkoholprozenten oder wuchtigen Marketing-Storys aus, sondern nach Textur, Eleganz, Aromenvielfalt und Trinkfluss.',
-      'Es geht nicht um „Frauen-Whisky“, sondern um Augenhöhe, Respekt vor dem Handwerk und das Aufbrechen überholter Branchenmuster. Jede Flasche lädt dazu ein, Whisky völlig unvoreingenommen neu zu entdecken.'
+      'Was ist eigentlich eine weibliche Perspektive auf Whisky? Keine Ahnung. Und genau das ist der Punkt.',
+      'Ich glaube nicht an Whisky für bestimmte Zielgruppen. Nicht an Regeln, wie man ihn trinken „muss“. Und nicht daran, dass Alter, Farbe oder ein möglichst dunkles Sherryfass automatisch für Qualität stehen. Gut ist, was gefällt.',
+      'PURE.WHISKY. steht für meinen persönlichen Blick auf Scotch Whisky: unabhängig, neugierig und mit einem Faible für unverfälschten Charakter. Mich interessiert die DNA einer Brennerei – und ein Fass, das sie nicht überdeckt, sondern sichtbar macht.',
+      'Geprägt hat mich dabei auch die OurWhisky Foundation, die Frauen in der Whiskywelt vernetzt und fördert. Im Rahmen ihres Mentoring-Programms hatte ich das Glück, Compass Box als Mentor an meiner Seite zu haben – ein Austausch, der meinen eigenen Weg als unabhängige Abfüllerin entscheidend mitgeprägt hat.',
+      'PURE.WHISKY. will Whisky nicht komplizierter machen. Sondern ehrlicher, zugänglicher und ein bisschen weniger vorhersehbar.'
     ]
   },
   {
@@ -473,8 +475,8 @@ export const PHILOSOPHY_PILLARS = [
     quote: '„Als Umweltjuristin kann ich nicht anders: Jedes Fass, jedes Glas und jedes Etikett muss strengsten ökologischen Standards standhalten.“',
     paragraphs: [
       'Die schottische Whisky-Industrie steht vor gewaltigen ökologischen Herausforderungen – von hohem Wasserverbrauch bis zu CO₂-intensiven Transportwegen. Als Juristin für Umwelt- und Energierecht kenne ich die gesetzlichen Hebel und die praktischen Hürden.',
-      'Deshalb wähle ich ausschließlich Brennereien aus, die aktiv in erneuerbare Energien (wie Biomasse bei Tomatin oder Abwärmenutzung bei Glenburgie), Quellenschutz und geschlossene Wasserkreisläufe investieren.',
-      'Auch bei der Verpackung gehe ich keine Kompromisse ein: 100% recyceltes Wild Glass aus Spanien, unlackierter Naturkork, kompostierbare Biopolymer-Kapseln und handgeschöpftes Saatenpapier mit Wildblumen-Samen. Luxus darf keinen Raubbau an der Natur bedeuten.'
+      'Deshalb wähle ich beispielsweise Brennereien aus, die aktiv in erneuerbare Energien (wie Biomasse bei Tomatin oder Abwärmenutzung bei Glenburgie), Quellenschutz und geschlossene Wasserkreisläufe investieren.',
+      'Auch bei der Verpackung gehe ich keine Kompromisse ein: recyceltes Wild Glass aus Spanien, unlackierter Naturkork, kompostierbare Biopolymer-Kapseln und handgeschöpftes Saatenpapier mit Wildblumen-Samen. Luxus darf keinen Raubbau an der Natur bedeuten.'
     ]
   }
 ];
@@ -617,14 +619,19 @@ Bis dato war ich als Mutter von zwei Jungs und einem sicheren, gut bezahlten Job
     image: IMAGES.frauenperspektive,
     images: [IMAGES.frauenperspektive],
     videoUrl: '',
-    excerpt: 'Oder: Was mache ich anders? Ich könnte jetzt schreiben: „PURE.WHISKY. verbindet individuellen Whiskygenuss mit einem Nachhaltigkeitsversprechen und einer frischen Perspektive.“',
-    content: `Oder: Was mache ich anders?
+    excerpt: 'EINE ANDERE PERSPEKTIVE AUF WHISKY: Weiblich. Unabhängig. Und vor allem: ohne Dogmen. Was ist eigentlich eine weibliche Perspektive auf Whisky? Keine Ahnung.',
+    content: `EINE ANDERE PERSPEKTIVE AUF WHISKY
+Weiblich. Unabhängig. Und vor allem: ohne Dogmen.
 
-Ich könnte jetzt schreiben: „PURE.WHISKY. verbindet individuellen Whiskygenuss mit einem Nachhaltigkeitsversprechen und einer frischen, jungen, weiblichen Perspektive.“
+Was ist eigentlich eine weibliche Perspektive auf Whisky? Keine Ahnung. Und genau das ist der Punkt.
 
-Tatsächlich bin ich eine der sehr wenigen weiblichen unabhängige Whiskyabfüllerinnen auf dem europäischen Markt. Und wohl mit Anfang 40 recht frisch hinter den Ohren. Ein denkbar kaum erwähnenswerter Umstand auf den mich aber meine vor allem weibliche! Whiskyfreunde unisono aufmerksam gemacht haben.
+Ich glaube nicht an Whisky für bestimmte Zielgruppen. Nicht an Regeln, wie man ihn trinken „muss“. Und nicht daran, dass Alter, Farbe oder ein möglichst dunkles Sherryfass automatisch für Qualität stehen. Gut ist, was gefällt.
 
-Frauen schmecken und riechen statistisch belegt oft nuancierter. Für mich zählt aber vor allem die kompromisslose sensorische Qualität im Glas – fernab verstaubter Klischees.`
+PURE.WHISKY. steht für meinen persönlichen Blick auf Scotch Whisky: unabhängig, neugierig und mit einem Faible für unverfälschten Charakter. Mich interessiert die DNA einer Brennerei – und ein Fass, das sie nicht überdeckt, sondern sichtbar macht.
+
+Geprägt hat mich dabei auch die OurWhisky Foundation, die Frauen in der Whiskywelt vernetzt und fördert. Im Rahmen ihres Mentoring-Programms hatte ich das Glück, Compass Box als Mentor an meiner Seite zu haben – ein Austausch, der meinen eigenen Weg als unabhängige Abfüllerin entscheidend mitgeprägt hat.
+
+PURE.WHISKY. will Whisky nicht komplizierter machen. Sondern ehrlicher, zugänglicher und ein bisschen weniger vorhersehbar.`
   },
   {
     id: 9,

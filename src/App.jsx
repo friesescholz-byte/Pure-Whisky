@@ -142,7 +142,7 @@ export default function App() {
   // Persistent Blog Posts
   const [blogPosts, setBlogPosts] = useState(() => {
     try {
-      const saved = localStorage.getItem('pure_whisky_posts_v3');
+      const saved = localStorage.getItem('pure_whisky_posts_v4');
       if (saved) return JSON.parse(saved);
     } catch (e) {
       console.error('Failed to parse blog posts from localStorage:', e);
@@ -152,7 +152,7 @@ export default function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem('pure_whisky_posts_v3', JSON.stringify(blogPosts));
+      localStorage.setItem('pure_whisky_posts_v4', JSON.stringify(blogPosts));
     } catch (e) {
       console.warn('LocalStorage limit exceeded when saving blog posts:', e);
     }
@@ -161,7 +161,7 @@ export default function App() {
   // Cross-tab synchronization for blog posts & CRM
   useEffect(() => {
     const handleStorageChange = (e) => {
-      if (e.key === 'pure_whisky_posts_v3' && e.newValue) {
+      if (e.key === 'pure_whisky_posts_v4' && e.newValue) {
         try {
           setBlogPosts(JSON.parse(e.newValue));
         } catch (err) {

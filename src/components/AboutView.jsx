@@ -65,21 +65,43 @@ export default function AboutView({ onNavigateShop, onNavigateHome, onOpenSustai
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-7 space-y-5 text-left order-2 lg:order-1">
               <span className="font-woodblock text-2xl text-[#B85D2C] uppercase block">
-                01 · {lang === 'de' ? 'Frauenperspektive' : 'Women in Whisky'}
+                {lang === 'de' ? 'Frauenperspektive?' : 'Women in Whisky?'}
               </span>
               <h3 className="font-woodblock text-4xl text-[#181F1C] uppercase leading-tight">
-                {lang === 'de' ? 'Neue Nuancen & Mentoring' : 'Fresh Perspectives & Mentorship'}
+                {lang === 'de' ? 'Eine andere Perspektive auf Whisky' : 'A Different Perspective on Whisky'}
               </h3>
               <blockquote className="font-script text-2xl text-[#2D6A4F] italic">
                 {lang === 'de'
-                  ? '„Frauen bringen oft einen feinsinnigen Zugang zu Fassreifung und sensorischer Komplexität mit.“'
-                  : '“Women often bring an exceptionally nuanced approach to cask maturation and sensory depth.”'}
+                  ? '„Weiblich. Unabhängig. Und vor allem: ohne Dogmen.“'
+                  : '“Female. Independent. And above all: without dogmas.”'}
               </blockquote>
-              <p className="text-[#3A4A40] text-lg font-normal leading-relaxed">
-                {lang === 'de'
-                  ? 'Gefördert durch die OurWhisky Foundation und Mentoring von führenden Persönlichkeiten der schottischen Whiskybranche, setze ich mich aktiv für Diversität und zeitgemäße Maßstäbe im Single-Cask-Bereich ein.'
-                  : 'Supported by the global OurWhisky Foundation and guided by leading industry figures, I champion diversity and authentic standards in independent bottling.'}
-              </p>
+              <div className="space-y-4 text-[#3A4A40] text-base sm:text-lg font-normal leading-relaxed">
+                <p>
+                  {lang === 'de'
+                    ? 'Was ist eigentlich eine weibliche Perspektive auf Whisky? Keine Ahnung. Und genau das ist der Punkt.'
+                    : 'What exactly is a female perspective on whisky? No idea. And that is precisely the point.'}
+                </p>
+                <p>
+                  {lang === 'de'
+                    ? 'Ich glaube nicht an Whisky für bestimmte Zielgruppen. Nicht an Regeln, wie man ihn trinken „muss“. Und nicht daran, dass Alter, Farbe oder ein möglichst dunkles Sherryfass automatisch für Qualität stehen. Gut ist, was gefällt.'
+                    : 'I do not believe in whisky for specific target groups. Nor in rules on how one “must” drink it. And not in the assumption that age, colour, or an ultra-dark sherry cask automatically equate to quality. Whatever you like is good.'}
+                </p>
+                <p>
+                  {lang === 'de'
+                    ? 'PURE.WHISKY. steht für meinen persönlichen Blick auf Scotch Whisky: unabhängig, neugierig und mit einem Faible für unverfälschten Charakter. Mich interessiert die DNA einer Brennerei – und ein Fass, das sie nicht überdeckt, sondern sichtbar macht.'
+                    : 'PURE.WHISKY. stands for my personal take on Scotch whisky: independent, curious, and with a passion for unadulterated character. I am drawn to a distillery’s DNA – and a cask that reveals rather than masks it.'}
+                </p>
+                <p>
+                  {lang === 'de'
+                    ? 'Geprägt hat mich dabei auch die OurWhisky Foundation, die Frauen in der Whiskywelt vernetzt und fördert. Im Rahmen ihres Mentoring-Programms hatte ich das Glück, Compass Box als Mentor an meiner Seite zu haben – ein Austausch, der meinen eigenen Weg als unabhängige Abfüllerin entscheidend mitgeprägt hat.'
+                    : 'I was also shaped by the OurWhisky Foundation, which connects and champions women in the whisky world. Through their mentorship programme, I had the privilege of having Compass Box as my mentor – an exchange that decisively guided my journey as an independent bottler.'}
+                </p>
+                <p>
+                  {lang === 'de'
+                    ? 'PURE.WHISKY. will Whisky nicht komplizierter machen. Sondern ehrlicher, zugänglicher und ein bisschen weniger vorhersehbar.'
+                    : 'PURE.WHISKY. does not want to make whisky more complicated. But more honest, accessible, and a little less predictable.'}
+                </p>
+              </div>
             </div>
 
             <div className="lg:col-span-5 order-1 lg:order-2">
@@ -109,7 +131,7 @@ export default function AboutView({ onNavigateShop, onNavigateHome, onOpenSustai
 
             <div className="lg:col-span-7 space-y-5 text-left">
               <span className="font-woodblock text-2xl text-[#B85D2C] uppercase block">
-                02 · {lang === 'de' ? 'Meine Mission' : 'Our Mission'}
+                {lang === 'de' ? 'Meine Mission' : 'Our Mission'}
               </span>
               <h3 className="font-woodblock text-4xl text-[#181F1C] uppercase leading-tight">
                 {lang === 'de' ? 'Single Cask Whisky in Reinform' : 'Single Cask Whisky in Its Purest State'}
@@ -126,8 +148,8 @@ export default function AboutView({ onNavigateShop, onNavigateHome, onOpenSustai
               </p>
               <p className="text-[#3A4A40] text-lg font-normal leading-relaxed">
                 {lang === 'de'
-                  ? 'Ich kaufe nur Fässer, bei denen ich den echten Namen der Brennerei offiziell nennen darf. 100% transparente Herkunft ist mein unbedingter Anspruch.'
-                  : 'I only select casks whose genuine distillery origin I can openly display on the label. 100% provenance transparency is an absolute rule.'}
+                  ? 'Ich kaufe nur Fässer, bei denen ich den echten Namen der Brennerei offiziell nennen darf. Transparente Herkunft ist mein unbedingter Anspruch.'
+                  : 'I only select casks whose genuine distillery origin I can openly display on the label. Provenance transparency is an absolute rule.'}
               </p>
             </div>
           </div>
@@ -136,7 +158,7 @@ export default function AboutView({ onNavigateShop, onNavigateHome, onOpenSustai
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-7 space-y-5 text-left order-2 lg:order-1">
               <span className="font-woodblock text-2xl text-[#B85D2C] uppercase block">
-                03 · {lang === 'de' ? 'Brennerei-Auswahl' : 'Distillery Selection'}
+                {lang === 'de' ? 'Brennerei-Auswahl' : 'Distillery Selection'}
               </span>
               <h3 className="font-woodblock text-4xl text-[#181F1C] uppercase leading-tight">
                 {lang === 'de' ? 'Bewertet nach EMAS & ISO 14001' : 'Assessed under EMAS & ISO 14001'}
@@ -189,7 +211,7 @@ export default function AboutView({ onNavigateShop, onNavigateHome, onOpenSustai
 
             <div className="lg:col-span-7 space-y-5 text-left">
               <span className="font-woodblock text-2xl text-[#B85D2C] uppercase block">
-                04 · {lang === 'de' ? 'Mein Versprechen' : 'Personal Promise'}
+                {lang === 'de' ? 'Mein Versprechen' : 'Personal Promise'}
               </span>
               <h3 className="font-woodblock text-4xl text-[#181F1C] uppercase leading-tight">
                 {lang === 'de' ? 'Kompromisslose Qualität mit gutem Gewissen' : 'Uncompromising Quality with a Clear Conscience'}

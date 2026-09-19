@@ -245,8 +245,8 @@ export default function SustainabilityView({ onNavigateShop, onNavigateHome, onO
                 </p>
                 <p>
                   {lang === 'de'
-                    ? 'Ich wähle für PURE.WHISKY. ausschließlich Brennereien aus, die intakte Flussläufe bewahren, mit geschlossenen Kühlwasserkreisläufen arbeiten und ihren Primärenergiebedarf konsequent dekarbonisieren – wie Tomatin mit über 80 % CO₂-Einsparung durch regionale Holzpellet-Biomasse oder Glenburgie durch hocheffiziente Abwärmerückgewinnung. Auch Reststoffe wie Treber (Draff) und Pot Ale werden zu 100 % als nahrhaftes Futter an lokale Farmen übergeben.'
-                    : 'For PURE.WHISKY., I select casks strictly from distilleries that protect natural watersheds, utilize closed-loop cooling systems, and decarbonize distillation energy – such as Tomatin cutting over 80% CO₂ via local pellet biomass, or Glenburgie utilizing high-efficiency heat recovery. By-products like draff and pot ale are returned 100% to local Scottish farms.'}
+                    ? 'Ich wähle für PURE.WHISKY. beispielsweise Brennereien aus, die intakte Flussläufe bewahren, mit geschlossenen Kühlwasserkreisläufen arbeiten und ihren Primärenergiebedarf konsequent dekarbonisieren – wie Tomatin mit über 80 % CO₂-Einsparung durch regionale Holzpellet-Biomasse oder Glenburgie durch hocheffiziente Abwärmerückgewinnung. Auch Reststoffe wie Treber (Draff) und Pot Ale werden als nahrhaftes Futter an lokale Farmen übergeben.'
+                    : 'For PURE.WHISKY., I select casks from distilleries that protect natural watersheds, utilize closed-loop cooling systems, and decarbonize distillation energy – such as Tomatin cutting over 80% CO₂ via local pellet biomass, or Glenburgie utilizing high-efficiency heat recovery. By-products like draff and pot ale are returned as nutrient-rich feed to local Scottish farms.'}
                 </p>
               </div>
 
@@ -269,10 +269,10 @@ export default function SustainabilityView({ onNavigateShop, onNavigateHome, onO
                 </div>
                 <div className="space-y-2">
                   <h4 className="font-woodblock text-lg text-[#181F1C] tracking-wide uppercase">
-                    {lang === 'de' ? '100% Reststoff-Verwertung' : '100% Upcycled Byproducts'}
+                    {lang === 'de' ? 'Reststoff-Verwertung' : 'Upcycled Byproducts'}
                   </h4>
                   <p className="text-sm text-[#55695E] leading-relaxed">
-                    {lang === 'de' ? 'Treber und Pot Ale gehen lückenlos als hochwertiges Futter an umliegende schottische Bauernhöfe.' : 'Draff and pot ale are recycled completely as nutrient-rich feed for regional Scottish farms.'}
+                    {lang === 'de' ? 'Treber und Pot Ale gehen als hochwertiges Futter an umliegende schottische Bauernhöfe.' : 'Draff and pot ale are recycled as nutrient-rich feed for regional Scottish farms.'}
                   </p>
                 </div>
               </div>
@@ -289,55 +289,55 @@ export default function SustainabilityView({ onNavigateShop, onNavigateHome, onO
                   <span>{lang === 'de' ? 'Dimension 02 · Ökonomie' : 'Pillar 02 · Economy'}</span>
                 </span>
                 <span className="text-xs sm:text-sm font-craft-mono text-[#7A8C80]">
-                  {lang === 'de' ? 'Werterhalt & Augenhöhe' : 'Value & Fair Trade'}
+                  {lang === 'de' ? 'Faire Werte & Partnerschaften' : 'Fair Values & Partnerships'}
                 </span>
               </div>
 
               <div>
                 <h3 className="font-woodblock text-3xl sm:text-4xl text-[#181F1C] uppercase tracking-wide leading-tight">
-                  {lang === 'de' ? 'Wertbeständigkeit statt Spekulationsblase' : 'Real Value instead of Speculative Bubbles'}
+                  {lang === 'de' ? 'Wertschätzung statt Spekulationsbasis' : 'Appreciation Instead of Speculation'}
                 </h3>
                 <p className="font-script text-2xl sm:text-3xl text-[#2D6A4F] mt-1.5">
-                  {lang === 'de' ? 'Faire Werte, Direkteinkauf & Transparenz' : 'Direct Sourcing, Fair Pricing & Transparency'}
+                  {lang === 'de' ? 'Faire Werte, regionale Partnerschaften & Transparenz' : 'Fair Values, Regional Partnerships & Transparency'}
                 </p>
               </div>
 
               <div className="space-y-4 text-base sm:text-lg lg:text-xl text-[#2E3D35] leading-relaxed font-normal">
                 <p>
                   {lang === 'de'
-                    ? 'In einer Whiskylandschaft, die zunehmend von Zwischenhändlern, Auktionshysterie und spekulativ überhöhten Preisen verzerrt wird, setzt PURE.WHISKY. auf radikale Verlässlichkeit und faire Gegenwerte.'
-                    : 'In a whisky landscape increasingly distorted by speculative brokerage, secondary auction hype, and inflated pricing, PURE.WHISKY. stands for unwavering integrity and transparent fairness.'}
+                    ? 'In einer Whiskylandschaft, die zunehmend von Spekulation und künstlich getriebenen Preisen geprägt wird, setzt PURE.WHISKY auf einen bewussten und verantwortungsvollen Umgang mit wirtschaftlichen Ressourcen. Für mich bedeutet nachhaltiges Wirtschaften, den tatsächlichen Wert eines Whiskys anzuerkennen und langfristige Perspektiven für die schottische Whiskybranche zu fördern.'
+                    : 'In a whisky landscape increasingly shaped by speculation and artificially driven prices, PURE.WHISKY focuses on a conscious and responsible use of economic resources. For me, sustainable business means recognising the true value of a whisky and fostering long-term perspectives for the Scottish whisky industry.'}
                 </p>
                 <p>
                   {lang === 'de'
-                    ? 'Ich erwerbe Fässer im direkten, partnerschaftlichen Kontakt mit den Brennmeistern schottischer Destillerien – zu Konditionen auf Augenhöhe. Der Wert einer Abfüllung entsteht nicht durch künstlich verknapptes Marketing, sondern durch die unberührte Reife im Einzelfass. Faire, transparente Preise und dauerhafter Werterhalt für Whiskyliebhaber und Sammler bilden das ökonomische Fundament meiner Arbeit.'
-                    : 'I acquire single casks in direct, trusted partnership with Scottish master distillers. A release’s true value arises from uncompromised maturation in native oak, never from manufactured marketing scarcity. Honest pricing and lasting value for connoisseurs form the cornerstone of my work.'}
+                    ? 'Als unabhängiger Abfüller arbeite ich mit Brokern und weiteren Handelspartnern zusammen. Dabei lege ich Wert auf faire Geschäftsbeziehungen, nachvollziehbare Preise und einen respektvollen Umgang mit den Menschen hinter dem Whisky. Besonders wichtig ist mir, Brennereien zu unterstützen, die auf langfristige Zusammenarbeit mit lokalen Zulieferern und regionalen Partnern setzen.'
+                    : 'As an independent bottler, I work with brokers and other trade partners. In doing so, I value fair business relationships, comprehensible pricing, and respectful collaboration with the people behind the whisky. It is particularly important to me to support distilleries that rely on long-term cooperation with local suppliers and regional partners.'}
                 </p>
               </div>
 
               <div className="pt-8 border-t border-[#D5EBE5] grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
                 <div className="space-y-2">
                   <h4 className="font-woodblock text-lg text-[#181F1C] tracking-wide uppercase">
-                    {lang === 'de' ? 'Ohne Zwischenhändler' : 'No Middlemen'}
+                    {lang === 'de' ? 'Regionale Wertschöpfung' : 'Regional Value Creation'}
                   </h4>
                   <p className="text-sm text-[#55695E] leading-relaxed">
-                    {lang === 'de' ? 'Direkter Fassbezug aus den schottischen Destillerien ohne preistreibende Zwischenhändler.' : 'Direct cask acquisition from Scottish distilleries without margin-inflating brokers.'}
+                    {lang === 'de' ? 'Die schottische Whiskybranche lebt von ihren Regionen und den Menschen, die sie prägen. Ich schätze Brennereien, die lokale Zulieferer einbinden, regionale Wirtschaftskreisläufe stärken und Verantwortung für ihr Umfeld übernehmen.' : 'The Scottish whisky industry thrives on its regions and the people who shape them. I value distilleries that involve local suppliers, strengthen regional economic cycles, and take responsibility for their communities.'}
                   </p>
                 </div>
                 <div className="space-y-2">
                   <h4 className="font-woodblock text-lg text-[#181F1C] tracking-wide uppercase">
-                    {lang === 'de' ? 'Echte Augenhöhe' : 'Equitable Sourcing'}
+                    {lang === 'de' ? 'Faire Partnerschaften' : 'Fair Partnerships'}
                   </h4>
                   <p className="text-sm text-[#55695E] leading-relaxed">
-                    {lang === 'de' ? 'Langfristige, verlässliche Beziehungen zu den Brennmeistern statt anonymer Fass-Brokerage.' : 'Long-term, respectful relationships with distillers rather than anonymous commodity trading.'}
+                    {lang === 'de' ? 'Broker und Handelspartner sind ein wichtiger Bestandteil meiner Arbeit. Entscheidend sind für mich transparente Geschäftsbeziehungen, faire Konditionen und ein respektvoller Umgang mit allen Beteiligten entlang der Wertschöpfungskette.' : 'Brokers and trade partners are an essential part of my work. What matters most to me are transparent business relations, fair terms, and respectful dealings with everyone along the value chain.'}
                   </p>
                 </div>
                 <div className="space-y-2">
                   <h4 className="font-woodblock text-lg text-[#181F1C] tracking-wide uppercase">
-                    {lang === 'de' ? 'Sammler-Stabilität' : 'True Longevity'}
+                    {lang === 'de' ? 'Langfristiger Werterhalt' : 'Long-Term Value'}
                   </h4>
                   <p className="text-sm text-[#55695E] leading-relaxed">
-                    {lang === 'de' ? 'Reale Wertbeständigkeit durch unverfälschte, unfiltrierte Einzelfassabfüllungen in Fassstärke.' : 'Authentic lasting value via unchillfiltered, natural cask-strength single barrel bottlings.'}
+                    {lang === 'de' ? 'Whisky braucht Zeit. Deshalb stehen für mich Qualität, Herkunft und die tatsächliche Reife eines Fasses im Mittelpunkt – nicht kurzfristige Spekulation. Ich möchte dazu beitragen, den Wert schottischen Whiskys langfristig zu bewahren und verantwortungsvoll weiterzugeben.' : 'Whisky takes time. That is why I focus on quality, provenance, and the authentic maturation of a cask – not short-term speculation. I want to contribute to preserving the value of Scotch whisky long-term and passing it on responsibly.'}
                   </p>
                 </div>
               </div>
@@ -354,55 +354,60 @@ export default function SustainabilityView({ onNavigateShop, onNavigateHome, onO
                   <span>{lang === 'de' ? 'Dimension 03 · Soziales' : 'Pillar 03 · Social'}</span>
                 </span>
                 <span className="text-xs sm:text-sm font-craft-mono text-[#7A8C80]">
-                  {lang === 'de' ? 'Mensch & Handwerk' : 'People & Craftsmanship'}
+                  {lang === 'de' ? 'Mensch & Gemeinschaft' : 'People & Community'}
                 </span>
               </div>
 
               <div>
                 <h3 className="font-woodblock text-3xl sm:text-4xl text-[#181F1C] uppercase tracking-wide leading-tight">
-                  {lang === 'de' ? 'Respekt vor Handwerk & radikale Ehrlichkeit' : 'Respect for Craft & Radical Transparency'}
+                  {lang === 'de' ? 'Verantwortung für Menschen & Regionen' : 'Responsibility for People & Regions'}
                 </h3>
                 <p className="font-script text-2xl sm:text-3xl text-[#2D6A4F] mt-1.5">
-                  {lang === 'de' ? 'Familienbetriebe, Manufakturen & offene Transparenz' : 'Family Workshops, Artisans & Full Provenance'}
+                  {lang === 'de' ? 'Regionale Arbeitsplätze, faire Bedingungen & starke Gemeinschaften' : 'Regional Jobs, Fair Conditions & Resilient Communities'}
                 </p>
               </div>
 
               <div className="space-y-4 text-base sm:text-lg lg:text-xl text-[#2E3D35] leading-relaxed font-normal">
                 <p>
                   {lang === 'de'
-                    ? 'Nachhaltigkeit bleibt unvollständig, wenn sie den Menschen und seine Traditionen vergisst. Hinter jeder PURE.WHISKY.-Flasche stehen jahrzehntealte Familiengeschichten und handwerkliche Leidenschaft.'
-                    : 'Sustainability is meaningless if it neglects people and heritage. Behind every PURE.WHISKY. bottling are generations of family heritage, local communities, and dedication.'}
+                    ? 'Nachhaltigkeit bedeutet für mich auch, Verantwortung für die Menschen hinter dem Whisky zu übernehmen. Gerade in abgelegenen Regionen Schottlands können Brennereien eine wichtige Rolle als Arbeitgeber spielen und damit zum Erhalt lokaler Gemeinschaften beitragen.'
+                    : 'For me, sustainability also means taking responsibility for the people behind the whisky. Particularly in remote regions of Scotland, distilleries can play a vital role as employers and help sustain local communities.'}
                 </p>
                 <p>
                   {lang === 'de'
-                    ? 'Von den Stillmen in abgelegenen Highland-Gemeinschaften über spanische Korkbauern in 5. Generation bis zur Manufaktur StamPamPam, die jedes Saatenpapier-Etikett in Handarbeit stempelt: Ich fördere und schütze handwerkliche Betriebe. Bei PURE.WHISKY. wird jede Destillerie offen beim Namen genannt – kein Versteckspiel hinter Phantasienamen.'
-                    : 'From Highland distillery stillmen to 5th-generation Spanish cork farmers and StamPamPam hand-stamping each seed paper label: I support and protect artisanal enterprises. At PURE.WHISKY., every single distillery is openly credited – no generic aliases or hidden origins.'}
+                    ? 'Ein Beispiel ist die Jura Distillery auf der Isle of Jura. Als Arbeitgeber auf einer abgelegenen Insel ist sie Teil der lokalen Wirtschafts- und Sozialstruktur. Solche Betriebe können dazu beitragen, Arbeitsplätze vor Ort zu schaffen und Perspektiven für die Menschen in ihrer Heimat zu erhalten.'
+                    : 'One example is Jura Distillery on the Isle of Jura. As an employer on a remote island, it is integral to the local economic and social fabric. Such businesses help generate local jobs and preserve perspectives for people in their homelands.'}
+                </p>
+                <p>
+                  {lang === 'de'
+                    ? 'Bei PURE.WHISKY möchte ich Brennereien und ihre soziale Verantwortung stärker in den Blick nehmen. Dazu gehören faire Arbeitsbedingungen, langfristige Beschäftigungsmöglichkeiten und ein respektvoller Umgang mit den Menschen und Gemeinden, die den schottischen Whisky prägen.'
+                    : 'At PURE.WHISKY, I want to bring distilleries and their social responsibility into sharper focus. This includes fair working conditions, long-term employment opportunities, and respectful engagement with the people and communities who define Scotch whisky.'}
                 </p>
               </div>
 
               <div className="pt-8 border-t border-[#F3D5E7] grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
                 <div className="space-y-2">
                   <h4 className="font-woodblock text-lg text-[#181F1C] tracking-wide uppercase">
-                    {lang === 'de' ? 'Handwerksschutz' : 'Craft Heritage'}
+                    {lang === 'de' ? 'Regionale Arbeitsplätze' : 'Regional Jobs'}
                   </h4>
                   <p className="text-sm text-[#55695E] leading-relaxed">
-                    {lang === 'de' ? 'Gezielte Förderung von Familienbetrieben wie StamPamPam und spanischen Naturkorkbauern.' : 'Dedicated support for small family workshops like StamPamPam and traditional cork foresters.'}
+                    {lang === 'de' ? 'Brennereien können wichtige Arbeitgeber in ländlichen und abgelegenen Regionen sein. Lokale Beschäftigung stärkt Gemeinden und schafft Perspektiven vor Ort.' : 'Distilleries can be crucial employers in rural and remote areas. Local employment strengthens communities and builds local opportunities.'}
                   </p>
                 </div>
                 <div className="space-y-2">
                   <h4 className="font-woodblock text-lg text-[#181F1C] tracking-wide uppercase">
-                    {lang === 'de' ? 'Faire Arbeit' : 'Fair Labor'}
+                    {lang === 'de' ? 'Faire Arbeitsbedingungen' : 'Fair Working Conditions'}
                   </h4>
                   <p className="text-sm text-[#55695E] leading-relaxed">
-                    {lang === 'de' ? 'Anerkennung und faire Entlohnung der Menschen in schottischen Highland-Gemeinden.' : 'Fair local remuneration for workers across rural Scottish communities.'}
+                    {lang === 'de' ? 'Wertschätzung zeigt sich im Umgang mit den Beschäftigten: durch faire Bedingungen, Sicherheit am Arbeitsplatz und Möglichkeiten zur persönlichen Weiterentwicklung.' : 'Appreciation is reflected in how employees are treated: through fair conditions, workplace safety, and avenues for personal growth.'}
                   </p>
                 </div>
                 <div className="space-y-2">
                   <h4 className="font-woodblock text-lg text-[#181F1C] tracking-wide uppercase">
-                    {lang === 'de' ? 'Echte Namen' : 'Full Provenance'}
+                    {lang === 'de' ? 'Starke Gemeinschaften' : 'Strong Communities'}
                   </h4>
                   <p className="text-sm text-[#55695E] leading-relaxed">
-                    {lang === 'de' ? 'Jede Destillerie wird offen namentlich benannt – ohne Phantasienamen oder Versteckspiel.' : 'Every single distillery is openly credited on label and website – no generic aliases.'}
+                    {lang === 'de' ? 'Verantwortungsvolles Handeln bedeutet auch, die Bedürfnisse der Menschen vor Ort ernst zu nehmen und die Verbindung zwischen Brennerei und Gemeinschaft langfristig zu stärken.' : 'Responsible practice also means taking local needs seriously and strengthening the bond between distillery and community long-term.'}
                   </p>
                 </div>
               </div>
