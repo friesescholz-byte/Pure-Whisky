@@ -6,7 +6,7 @@ import { useLanguage } from '../context/LanguageContext';
 export default function CaskSelectionTrust({ onOpenShop, onOpenAbout, onOpenSustainability }) {
   const { lang, t } = useLanguage();
   const testingImg = IMAGES.ines_testing || 'https://pub-b33108412309406a9a941ddc51e9a5b9.r2.dev/Pure-Whisky/Pure-Whisky-Testing.jpg';
-  const barrelImg = IMAGES.ines_barrel || 'https://pub-b33108412309406a9a941ddc51e9a5b9.r2.dev/Pure-Whisky/ines-zager-fass-lager.webp';
+  const barrelImg = IMAGES.ines_barrel_home || 'https://pub-b33108412309406a9a941ddc51e9a5b9.r2.dev/Pure-Whisky/Pure-Whisky-bILDER04.webp';
   const stampingImg = IMAGES.saatenpapier_label || 'https://pub-b33108412309406a9a941ddc51e9a5b9.r2.dev/Pure-Whisky/packaging-saatenpapier-stempel.webp';
 
   return (

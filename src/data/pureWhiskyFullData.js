@@ -52,6 +52,7 @@ export const IMAGES = {
 
   ines_portrait: `${R2_BASE}ines-zager-schottland-portrait.webp`,
   ines_barrel: `${R2_BASE}ines-zager-fass-lager.webp`,
+  ines_barrel_home: `${R2_BASE}Pure-Whisky-bILDER04.webp`,
   ines_islay: `${R2_BASE}ines-zager-islay-natur.webp`,
   messe_bottlemarket: `${R2_BASE}messe-bottlemarket-bremen-stand.webp`,
   messe_interwhisky: `${R2_BASE}messe-interwhisky-wiesbaden-stand.webp`,

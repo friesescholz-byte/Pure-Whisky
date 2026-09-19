@@ -158,7 +158,7 @@ export const translations = {
     },
     // Footer
     footer: {
-      tagline: 'Single Cask Sustainable Scotch Whisky. Handverlesen, nativer Alkoholgehalt, abgefüllt in 100% recyceltes Wild Glass.',
+      tagline: 'Single Cask Sustainable Scotch Whisky. Handverlesene Einzelfässer in nativer Fassstärke – unverfälscht, transparent und nachhaltig gedacht.',
       quickLinks: 'Navigation',
       legal: 'Rechtliches',
       imprint: 'Impressum',
@@ -332,7 +332,7 @@ export const translations = {
     },
     // Footer
     footer: {
-      tagline: 'Single Cask Sustainable Scotch Whisky. Handpicked, natural cask strength, bottled in 100% recycled Wild Glass.',
+      tagline: 'Single Cask Sustainable Scotch Whisky. Handpicked single casks at natural cask strength – authentic, transparent and sustainably crafted.',
       quickLinks: 'Navigation',
       legal: 'Legal',
       imprint: 'Imprint',
