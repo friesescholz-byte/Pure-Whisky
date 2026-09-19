@@ -9,11 +9,13 @@ export default function CartDrawer({
   cartItems, 
   onUpdateQuantity, 
   onRemoveItem,
-  onCompleteOrder 
+  onCompleteOrder,
+  onOpenLegal 
 }) {
   const { t, lang } = useLanguage();
   const [step, setStep] = useState('cart'); // 'cart' | 'checkout' | 'success'
   const [ageConfirmed, setAgeConfirmed] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [placedOrder, setPlacedOrder] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [mollieCheckoutUrl, setMollieCheckoutUrl] = useState(null);
@@ -26,7 +28,7 @@ export default function CartDrawer({
     zip: '',
     city: '',
     email: '',
-    paymentMethod: 'Mollie Test Gateway (Kreditkarte / Klarna)'
+    paymentMethod: 'Mollie Gateway (Kreditkarte, Klarna, Apple Pay)'
   });
 
   if (!isOpen) return null;
@@ -49,6 +51,10 @@ export default function CartDrawer({
     e.preventDefault();
     if (!formData.email || !formData.firstName || !formData.lastName || !formData.street || !formData.zip || !formData.city) {
       alert(lang === 'de' ? 'Bitte füllen Sie alle Adressfelder aus.' : 'Please fill in all address fields.');
+      return;
+    }
+    if (!termsAccepted) {
+      alert(lang === 'de' ? 'Bitte bestätigen Sie die AGB und die Widerrufsbelehrung.' : 'Please accept the Terms and Cancellation Policy.');
       return;
     }
 
@@ -374,7 +380,7 @@ export default function CartDrawer({
                   <div className="space-y-2">
                     <button
                       type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'Mollie Test Gateway (Kreditkarte / Klarna)' }))}
+                      onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'Mollie Gateway (Kreditkarte, Klarna, Apple Pay)' }))}
                       className={`w-full p-3 rounded-lg border text-left flex items-center justify-between transition-all ${
                         formData.paymentMethod.includes('Mollie')
                           ? 'border-[#B85D2C] bg-[#FAF8F5] text-[#181F1C] font-semibold'
@@ -383,10 +389,10 @@ export default function CartDrawer({
                     >
                       <div className="flex items-center space-x-2.5">
                         <CreditCard className="w-4 h-4 text-[#B85D2C]" />
-                        <span className="text-xs">Mollie Gateway (Kreditkarte, Klarna, Sofort)</span>
+                        <span className="text-xs">Mollie Gateway (Kreditkarte, Klarna, Apple Pay)</span>
                       </div>
                       <span className="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded font-mono">
-                        Test Key
+                        Sicher
                       </span>
                     </button>
 
@@ -420,17 +426,102 @@ export default function CartDrawer({
                 </div>
               </div>
 
-              {/* Footer Total & Order Button */}
-              <div className="p-6 border-t border-[#E2DDD5] bg-[#FAF8F5] space-y-3">
+              {/* Footer Total, Legal Consent & Order Button */}
+              <div className="p-6 border-t border-[#E2DDD5] bg-[#FAF8F5] space-y-4">
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-[#55695E]">{t.cart.total}</span>
                   <span className="font-serif text-xl font-bold text-[#B85D2C]">{total.toFixed(2)} €</span>
                 </div>
 
+                {/* Legal & Terms Checkbox */}
+                <div className="space-y-2 pt-1 border-t border-[#E2DDD5]/70">
+                  <label className="flex items-start space-x-2.5 text-xs text-[#55695E] cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      required
+                      checked={termsAccepted}
+                      onChange={(e) => setTermsAccepted(e.target.checked)}
+                      className="mt-0.5 rounded border-[#D4C8B8] text-[#B85D2C] focus:ring-0 cursor-pointer"
+                    />
+                    <span className="leading-snug">
+                      {lang === 'de' ? (
+                        <>
+                          Ich habe die{' '}
+                          <button
+                            type="button"
+                            onClick={() => onOpenLegal?.('agb')}
+                            className="text-[#181F1C] font-semibold underline underline-offset-2 hover:text-[#B85D2C] cursor-pointer"
+                          >
+                            AGB
+                          </button>{' '}
+                          und die{' '}
+                          <button
+                            type="button"
+                            onClick={() => onOpenLegal?.('widerruf')}
+                            className="text-[#181F1C] font-semibold underline underline-offset-2 hover:text-[#B85D2C] cursor-pointer"
+                          >
+                            Widerrufsbelehrung
+                          </button>{' '}
+                          gelesen und erkläre mich mit deren Geltung einverstanden. Die{' '}
+                          <button
+                            type="button"
+                            onClick={() => onOpenLegal?.('datenschutz')}
+                            className="text-[#181F1C] font-semibold underline underline-offset-2 hover:text-[#B85D2C] cursor-pointer"
+                          >
+                            Datenschutzerklärung
+                          </button>{' '}
+                          habe ich zur Kenntnis genommen.
+                        </>
+                      ) : (
+                        <>
+                          I have read and accept the{' '}
+                          <button
+                            type="button"
+                            onClick={() => onOpenLegal?.('agb')}
+                            className="text-[#181F1C] font-semibold underline underline-offset-2 hover:text-[#B85D2C] cursor-pointer"
+                          >
+                            Terms & Conditions
+                          </button>{' '}
+                          and the{' '}
+                          <button
+                            type="button"
+                            onClick={() => onOpenLegal?.('widerruf')}
+                            className="text-[#181F1C] font-semibold underline underline-offset-2 hover:text-[#B85D2C] cursor-pointer"
+                          >
+                            Cancellation Policy
+                          </button>
+                          . I have taken note of the{' '}
+                          <button
+                            type="button"
+                            onClick={() => onOpenLegal?.('datenschutz')}
+                            className="text-[#181F1C] font-semibold underline underline-offset-2 hover:text-[#B85D2C] cursor-pointer"
+                          >
+                            Privacy Policy
+                          </button>
+                          .
+                        </>
+                      )}
+                    </span>
+                  </label>
+
+                  <div className="flex items-center space-x-1.5 text-[11px] text-[#55695E]">
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#2D6A4F] shrink-0" />
+                    <span>
+                      {lang === 'de' 
+                        ? 'Altersprüfung (18+) bei persönlicher DHL-Zustellung.' 
+                        : 'Age verification (18+) upon DHL delivery.'}
+                    </span>
+                  </div>
+                </div>
+
                 <button
                   type="submit"
-                  disabled={isProcessing}
-                  className="w-full py-4 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white text-xs uppercase tracking-widest font-bold flex items-center justify-center space-x-2 shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer disabled:opacity-50"
+                  disabled={isProcessing || !termsAccepted}
+                  className={`w-full py-4 rounded-lg text-xs uppercase tracking-widest font-bold flex items-center justify-center space-x-2 shadow-md transition-all ${
+                    termsAccepted && !isProcessing
+                      ? 'bg-[#B85D2C] hover:bg-[#A04E24] text-white hover:scale-[1.01] active:scale-[0.99] cursor-pointer'
+                      : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
+                  }`}
                 >
                   {isProcessing ? (
                     <>

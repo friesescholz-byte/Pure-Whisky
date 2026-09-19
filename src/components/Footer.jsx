@@ -71,8 +71,8 @@ export default function Footer({ onOpenLegal, setActiveTab }) {
               <li><button onClick={() => onOpenLegal('datenschutz')} className="hover:text-[#B85D2C] transition-colors">{t.footer.privacy}</button></li>
               <li><button onClick={() => onOpenLegal('agb')} className="hover:text-[#B85D2C] transition-colors">{t.footer.terms}</button></li>
               <li><button onClick={() => onOpenLegal('widerruf')} className="hover:text-[#B85D2C] transition-colors">{t.footer.cancellation}</button></li>
-              <li><button onClick={() => onOpenLegal('versand')} className="hover:text-[#B85D2C] transition-colors whitespace-nowrap">{lang === 'de' ? 'Versand & Zahlung' : 'Shipping & Payment'}</button></li>
-              <li><button onClick={() => onOpenLegal('barrierefreiheit')} className="hover:text-[#B85D2C] transition-colors">{lang === 'de' ? 'Barrierefreiheit' : 'Accessibility'}</button></li>
+              <li><button onClick={() => onOpenLegal('versand')} className="hover:text-[#B85D2C] transition-colors whitespace-nowrap">{t.footer.shipping}</button></li>
+              <li><button onClick={() => onOpenLegal('barrierefreiheit')} className="hover:text-[#B85D2C] transition-colors">{t.footer.accessibility}</button></li>
             </ul>
           </div>
 

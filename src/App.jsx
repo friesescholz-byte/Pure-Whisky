@@ -875,6 +875,7 @@ export default function App() {
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
         onCompleteOrder={handleCompleteOrder}
+        onOpenLegal={setLegalType}
       />
 
       <InvoiceModal

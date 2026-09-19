@@ -165,6 +165,8 @@ export const translations = {
       privacy: 'Datenschutz',
       terms: 'AGB',
       cancellation: 'Widerrufsbelehrung',
+      shipping: 'Versand & Zahlung',
+      accessibility: 'Barrierefreiheit',
       contact: 'Kontakt',
       rights: 'Alle Rechte vorbehalten.',
       disclaimer: 'Abgabe nur an Personen über 18 Jahren. Bitte genießen Sie verantwortungsvoll.'
@@ -337,6 +339,8 @@ export const translations = {
       privacy: 'Privacy Policy',
       terms: 'Terms & Conditions',
       cancellation: 'Right of Withdrawal',
+      shipping: 'Shipping & Payment',
+      accessibility: 'Accessibility',
       contact: 'Contact',
       rights: 'All rights reserved.',
       disclaimer: 'Sales only to persons 18 years of age or older. Please enjoy responsibly.'
