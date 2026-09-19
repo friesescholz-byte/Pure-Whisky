@@ -170,7 +170,7 @@ export const EVENTS_DATA = [
     title: 'InterWhisky Wiesbaden 2026',
     location: 'Kurhaus Wiesbaden, Kurhausplatz 1',
     date: '28. – 30. November 2026',
-    desc: 'Exklusives Master-Tasting mit Hintergrundberichten zu Brennerei-Audits und neuen Fassabfüllungen.',
+    desc: 'Exklusives Master-Tasting mit Hintergrundberichten zu Brennerei-Recherchen und neuen Fassabfüllungen.',
     badge: 'Masterclass'
   },
   {

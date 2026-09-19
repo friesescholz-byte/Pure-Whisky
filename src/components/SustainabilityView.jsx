@@ -27,12 +27,12 @@ export default function SustainabilityView({ onNavigateShop, onNavigateHome, onO
             {t.hero.badge}
           </span>
           <h1 className="font-woodblock text-5xl sm:text-6xl lg:text-7xl text-[#181F1C] tracking-wide uppercase leading-tight">
-            {lang === 'de' ? 'Verantwortung ohne Greenwashing.' : 'Accountability without Greenwashing.'}
+            {lang === 'de' ? 'Nachhaltigkeit' : 'Sustainability'}
           </h1>
           <p className="text-[#3A4A40] text-lg sm:text-xl font-normal leading-relaxed pt-2">
             {lang === 'de' 
-              ? 'Als Umweltjuristin mit über 20 Jahren Berufserfahrung reichen mir keine wohlklingenden Marketingversprechen. Nachhaltigkeit bei PURE.WHISKY. ist eine gelebte Haltung – vom Quellwasser in Schottland bis zum handgestempelten Saatenpapier.'
-              : 'As an environmental lawyer with over 20 years of experience, glossy marketing claims are simply not enough. Sustainability at PURE.WHISKY. is a lived conviction – from natural Scottish spring water to hand-stamped wild flower seed paper.'}
+              ? 'Ein Handlungsprinzip zur Nutzung begrenzter Ressourcen. Ökologische, ökonomische und soziale Aspekte im Einklang – ohne Greenwashing, nachvollziehbar an jedem Fass.'
+              : 'A governing framework for managing finite resources. Bringing ecological, economic, and social dimensions into harmony – transparent and verifiable in every single release.'}
           </p>
         </div>
 
@@ -57,16 +57,28 @@ export default function SustainabilityView({ onNavigateShop, onNavigateHome, onO
               <span className="font-script text-3xl text-[#2D6A4F] block">
                 {lang === 'de' ? 'Persönliche Haltung' : 'Personal Conviction'}
               </span>
-              <h2 className="font-woodblock text-4xl sm:text-5xl text-[#181F1C] tracking-wide uppercase leading-tight">
+              <h2 className="font-woodblock text-3xl sm:text-4xl text-[#181F1C] tracking-wide uppercase leading-tight">
                 {lang === 'de' ? 'Warum Nachhaltigkeit eine Grenze braucht.' : 'Why Sustainability Needs Real Boundaries.'}
               </h2>
             </div>
 
-            <blockquote className="font-serif text-lg sm:text-xl text-[#181F1C] leading-relaxed italic border-l-4 border-[#B85D2C] pl-5">
-              {lang === 'de' 
-                ? '„Seien wir ehrlich, Whisky ist ein Geschäft, das Ressourcen verbraucht. Und nicht jede Brennerei, die fantastischen Whisky destilliert, ist Vorreiter beim Thema Nachhaltigkeit. Deshalb habe ich für mich eine Grenze gezogen und wähle die Fässer für PURE.WHISKY. ausschließlich nach Kriterien aus, die sich an Umweltmanagementsystemen wie EMAS und ISO 14001 orientieren.“'
-                : '“Let’s be honest: whisky is an industry that consumes natural resources. Not every distillery that crafts delicious whisky is a leader in environmental stewardship. That is why I draw a clear line and select casks for PURE.WHISKY. strictly according to criteria rooted in environmental management systems like EMAS and ISO 14001.”'}
-            </blockquote>
+            <div className="space-y-3 font-serif text-base sm:text-lg text-[#181F1C] leading-relaxed border-l-3 border-[#B85D2C] pl-5 italic">
+              {lang === 'de' ? (
+                <>
+                  <p>„Seien wir ehrlich, Whisky ist ein Geschäft. Und jeder versucht seinen Anteil vom Kuchen abzubekommen. Ich auch.</p>
+                  <p>Ich bin mir jedoch meines Verhaltens und der dadurch verursachten Probleme bewusst. Daher versuche ich durch den Fokus auf Nachhaltigkeit meinen kleinen Beitrag zu einer besseren Whiskywelt zu leisten.</p>
+                  <p>Nachhaltigkeit ist aber entgegen der landläufigen Meinung nicht allein gleichzusetzen mit Umweltschutz. Als Begriff, der ursprünglich aus der Forstwirtschaft stammt, geht es dabei um ein Handlungsprinzip zur Nutzung begrenzter Ressourcen. Dabei sind die ökologischen, ökonomischen und sozialen Aspekte in Einklang zu bringen.</p>
+                  <p>Entsprechend bewerte ich jede Brennerei vor dem Erwerb eines Fasses nach ihrem individuellen Beitrag zur Nachhaltigkeit angelehnt an etablierte und mir wohlbekannte Umweltmanagementsysteme wie EMAS und ISO 14001.“</p>
+                </>
+              ) : (
+                <>
+                  <p>“Let’s be honest, whisky is a business. And everyone tries to get their share of the cake. Me too.</p>
+                  <p>However, I am conscious of my actions and the consequences they cause. That is why I strive, through a dedicated focus on sustainability, to make my own small contribution toward a better whisky world.</p>
+                  <p>Contrary to widespread belief, sustainability is not simply synonymous with environmental protection. Originating as a forestry principle, it defines a framework for managing finite resources by balancing ecological, economic, and social dimensions.</p>
+                  <p>Accordingly, prior to acquiring any cask, I assess each distillery’s individual contribution to sustainability, guided by established environmental management systems well known to me, such as EMAS and ISO 14001.”</p>
+                </>
+              )}
+            </div>
 
             <div className="pt-2 flex items-center space-x-3.5">
               <img
@@ -240,9 +252,6 @@ export default function SustainabilityView({ onNavigateShop, onNavigateHome, onO
 
               <div className="pt-8 border-t border-[#EAE4D9] grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
                 <div className="space-y-2">
-                  <span className="text-xs font-woodblock tracking-widest text-[#B88210] uppercase block">
-                    01 · {lang === 'de' ? 'Gewässerschutz' : 'Water Protection'}
-                  </span>
                   <h4 className="font-woodblock text-lg text-[#181F1C] tracking-wide uppercase">
                     {lang === 'de' ? 'Geschlossene Kreisläufe' : 'Closed Cooling Loops'}
                   </h4>
@@ -251,9 +260,6 @@ export default function SustainabilityView({ onNavigateShop, onNavigateHome, onO
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <span className="text-xs font-woodblock tracking-widest text-[#B88210] uppercase block">
-                    02 · {lang === 'de' ? 'Dekarbonisierung' : 'Decarbonization'}
-                  </span>
                   <h4 className="font-woodblock text-lg text-[#181F1C] tracking-wide uppercase">
                     {lang === 'de' ? 'Über 80% CO₂-Senkung' : 'Over 80% CO₂ Cut'}
                   </h4>
@@ -262,9 +268,6 @@ export default function SustainabilityView({ onNavigateShop, onNavigateHome, onO
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <span className="text-xs font-woodblock tracking-widest text-[#B88210] uppercase block">
-                    03 · {lang === 'de' ? 'Kreislaufwirtschaft' : 'Zero Waste'}
-                  </span>
                   <h4 className="font-woodblock text-lg text-[#181F1C] tracking-wide uppercase">
                     {lang === 'de' ? '100% Reststoff-Verwertung' : '100% Upcycled Byproducts'}
                   </h4>
@@ -314,9 +317,6 @@ export default function SustainabilityView({ onNavigateShop, onNavigateHome, onO
 
               <div className="pt-8 border-t border-[#D5EBE5] grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
                 <div className="space-y-2">
-                  <span className="text-xs font-woodblock tracking-widest text-[#00826D] uppercase block">
-                    01 · {lang === 'de' ? 'Direkteinkauf' : 'Direct Trade'}
-                  </span>
                   <h4 className="font-woodblock text-lg text-[#181F1C] tracking-wide uppercase">
                     {lang === 'de' ? 'Ohne Zwischenhändler' : 'No Middlemen'}
                   </h4>
@@ -325,9 +325,6 @@ export default function SustainabilityView({ onNavigateShop, onNavigateHome, onO
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <span className="text-xs font-woodblock tracking-widest text-[#00826D] uppercase block">
-                    02 · {lang === 'de' ? 'Partnerschaft' : 'Partnership'}
-                  </span>
                   <h4 className="font-woodblock text-lg text-[#181F1C] tracking-wide uppercase">
                     {lang === 'de' ? 'Echte Augenhöhe' : 'Equitable Sourcing'}
                   </h4>
@@ -336,9 +333,6 @@ export default function SustainabilityView({ onNavigateShop, onNavigateHome, onO
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <span className="text-xs font-woodblock tracking-widest text-[#00826D] uppercase block">
-                    03 · {lang === 'de' ? 'Werterhalt' : 'Collector Value'}
-                  </span>
                   <h4 className="font-woodblock text-lg text-[#181F1C] tracking-wide uppercase">
                     {lang === 'de' ? 'Sammler-Stabilität' : 'True Longevity'}
                   </h4>
@@ -381,16 +375,13 @@ export default function SustainabilityView({ onNavigateShop, onNavigateHome, onO
                 </p>
                 <p>
                   {lang === 'de'
-                    ? 'Von den Stillmen in abgelegenen Highland-Gemeinschaften über spanische Korkbauern in 5. Generation bis zur Manufaktur StamPamPam, die jedes Saatenpapier-Etikett in Handarbeit stempelt: Wir fördern und schützen handwerkliche Betriebe. Bei PURE.WHISKY. wird jede Destillerie offen beim Namen genannt – kein Versteckspiel hinter Phantasienamen.'
-                    : 'From Highland distillery stillmen to 5th-generation Spanish cork farmers and StamPamPam hand-stamping each seed paper label: We cherish artisanal enterprise. We name every single distillery openly – no undisclosed sources or invented branding.'}
+                    ? 'Von den Stillmen in abgelegenen Highland-Gemeinschaften über spanische Korkbauern in 5. Generation bis zur Manufaktur StamPamPam, die jedes Saatenpapier-Etikett in Handarbeit stempelt: Ich fördere und schütze handwerkliche Betriebe. Bei PURE.WHISKY. wird jede Destillerie offen beim Namen genannt – kein Versteckspiel hinter Phantasienamen.'
+                    : 'From Highland distillery stillmen to 5th-generation Spanish cork farmers and StamPamPam hand-stamping each seed paper label: I support and protect artisanal enterprises. At PURE.WHISKY., every single distillery is openly credited – no generic aliases or hidden origins.'}
                 </p>
               </div>
 
               <div className="pt-8 border-t border-[#F3D5E7] grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
                 <div className="space-y-2">
-                  <span className="text-xs font-woodblock tracking-widest text-[#9D174D] uppercase block">
-                    01 · {lang === 'de' ? 'Manufakturen' : 'Artisans'}
-                  </span>
                   <h4 className="font-woodblock text-lg text-[#181F1C] tracking-wide uppercase">
                     {lang === 'de' ? 'Handwerksschutz' : 'Craft Heritage'}
                   </h4>
@@ -399,9 +390,6 @@ export default function SustainabilityView({ onNavigateShop, onNavigateHome, onO
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <span className="text-xs font-woodblock tracking-widest text-[#9D174D] uppercase block">
-                    02 · {lang === 'de' ? 'Gemeinschaften' : 'Communities'}
-                  </span>
                   <h4 className="font-woodblock text-lg text-[#181F1C] tracking-wide uppercase">
                     {lang === 'de' ? 'Faire Arbeit' : 'Fair Labor'}
                   </h4>
@@ -410,9 +398,6 @@ export default function SustainabilityView({ onNavigateShop, onNavigateHome, onO
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <span className="text-xs font-woodblock tracking-widest text-[#9D174D] uppercase block">
-                    03 · {lang === 'de' ? 'Offenheit' : 'Integrity'}
-                  </span>
                   <h4 className="font-woodblock text-lg text-[#181F1C] tracking-wide uppercase">
                     {lang === 'de' ? 'Echte Namen' : 'Full Provenance'}
                   </h4>
@@ -511,19 +496,19 @@ export default function SustainabilityView({ onNavigateShop, onNavigateHome, onO
                   {lang === 'de' ? 'Verschluss & Versiegelung' : 'Closure & Seal'}
                 </span>
                 <h3 className="font-woodblock text-4xl sm:text-5xl text-[#181F1C] uppercase leading-tight">
-                  {lang === 'de' ? 'Spanischer Naturkork & Biopolymer-Kapsel' : 'Spanish Natural Cork & Biopolymer Capsule'}
+                  {lang === 'de' ? 'Ressourcenschonender Korken & Biopolymer-Kapsel' : 'Resource-Conscious Cork & Biopolymer Capsule'}
                 </h3>
               </div>
 
               <div className="space-y-6 pt-2">
                 <div className="border-l-3 border-[#B85D2C] pl-6 space-y-1.5">
                   <h4 className="font-woodblock text-2xl text-[#181F1C] uppercase tracking-wide">
-                    {lang === 'de' ? 'Spanischer Naturkorken' : 'Spanish Natural Cork'}
+                    {lang === 'de' ? 'Ressourcenschonender Korken' : 'Resource-Conscious Cork'}
                   </h4>
                   <p className="text-[#3A4A40] text-base leading-relaxed font-normal">
                     {lang === 'de'
-                      ? 'Geschnitten aus unbehandeltem Naturkork aus nachhaltig bewirtschafteten spanischen Wäldern in 5. Familiengeneration. Frei von Klebstoffen oder synthetischen Dichtringen.'
-                      : 'Harvested from pristine cork forests in Spain across 5 generations of family stewardship. 100% free from chemical adhesives or synthetic seals.'}
+                      ? 'Ressourcenschonende Korken aus einem Korkgranulat-Aktivkohlegemisch und unbehandeltem Naturkork aus nachhaltig bewirtschafteten spanischen Wäldern. Frei von bedenklichen Klebstoffen oder synthetischen Dichtringen.'
+                      : 'Resource-saving corks crafted from a cork granulate and activated carbon mix alongside untreated natural cork from sustainably managed Spanish forests. Free from harmful adhesives or synthetic seals.'}
                   </p>
                 </div>
 

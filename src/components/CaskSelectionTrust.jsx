@@ -33,8 +33,8 @@ export default function CaskSelectionTrust({ onOpenShop, onOpenAbout, onOpenSust
           </h2>
           <p className="text-[#3A4A40] text-lg sm:text-xl font-normal leading-relaxed pt-1">
             {lang === 'de'
-              ? 'Als unabhängige Abfüllerin verknüpft Ines Zager die Leidenschaft für kompromisslose Single Cask Abfüllungen mit 20 Jahren fundierter Berufserfahrung im Umwelt- und Energiebereich.'
-              : 'As an independent bottler, Ines Zager combines an uncompromising passion for single casks with two decades of legal and practical expertise in environmental sustainability.'}
+              ? 'Als unabhängige Abfüllerin verknüpfe ich die Leidenschaft für kompromisslose Single Cask Abfüllungen mit 20 Jahren fundierter Berufserfahrung im Umwelt- und Energiebereich.'
+              : 'As an independent bottler, I combine my passion for uncompromising single cask releases with 20 years of sound professional experience in the environmental and energy sectors.'}
           </p>
         </div>
 
@@ -58,18 +58,10 @@ export default function CaskSelectionTrust({ onOpenShop, onOpenAbout, onOpenSust
               <h3 className="font-woodblock text-3xl sm:text-4xl lg:text-5xl text-[#181F1C] tracking-wide uppercase leading-tight">
                 {lang === 'de' ? 'Reinheit' : 'Purity'}
               </h3>
-              <p className="font-script text-2xl sm:text-3xl text-[#2D6A4F] leading-snug">
-                {lang === 'de' ? 'Unverdünnt & in nativer Fassstärke.' : 'Undiluted at Natural Cask Strength.'}
-              </p>
-              <p className="text-[#3A4A40] text-base sm:text-lg font-normal leading-relaxed">
+              <p className="text-[#222D27] text-base sm:text-lg font-normal leading-relaxed">
                 {lang === 'de'
                   ? 'Jede Flasche wird unverdünnt in natürlicher Fassstärke ohne Kühlfiltration und ohne Farbstoffe abgefüllt. Die verwendeten Fässer werden so ausgewählt, dass sie die eigentliche DNA der jeweiligen Brennerei unterstreichen und nicht verdecken.'
-                  : 'Every bottle is drawn straight from the barrel without chill-filtration or caramel coloring. Each oak cask is selected to highlight rather than conceal the true DNA of the Scottish distillery.'}
-              </p>
-              <p className="text-[#55695E] text-sm sm:text-base font-normal leading-relaxed">
-                {lang === 'de'
-                  ? 'Kein Verschnitt, keine Glättung durch Kältefiltration, keine künstliche Farbe mit Zuckerkulör. Sie schmecken das unverfälschte Destillat und die authentische Reifung im Holz.'
-                  : 'No blending, no stripping away of natural flavor oils via cold filtration, no synthetic colouring. Experience the pure spirit and organic oak maturation.'}
+                  : 'Every bottle is filled undiluted at natural cask strength without chill-filtration and without colouring. The casks are selected specifically to highlight the authentic DNA of each distillery rather than cover it up.'}
               </p>
               
               <div className="pt-2">
@@ -90,18 +82,10 @@ export default function CaskSelectionTrust({ onOpenShop, onOpenAbout, onOpenSust
               <h3 className="font-woodblock text-3xl sm:text-4xl lg:text-5xl text-[#181F1C] tracking-wide uppercase leading-tight">
                 {lang === 'de' ? 'Nachvollziehbarkeit' : 'Provenance'}
               </h3>
-              <p className="font-script text-2xl sm:text-3xl text-[#2D6A4F] leading-snug">
-                {lang === 'de' ? 'Fundiertes Umwelt- und Fachwissen.' : 'Rooted in Environmental Science & Law.'}
-              </p>
-              <p className="text-[#3A4A40] text-base sm:text-lg font-normal leading-relaxed">
+              <p className="text-[#222D27] text-base sm:text-lg font-normal leading-relaxed">
                 {lang === 'de'
-                  ? 'Die bewusste Auswahl der Brennereien steht im Vordergrund. Ines Zager beschäftigt sich seit rund 20 Jahren beruflich mit Nachhaltigkeits- und Umweltthemen und untersucht deshalb auch die Hintergründe der Brennereien, bevor sie ein Fass erwirbt. Dabei orientiert sie sich unter anderem an Kriterien etablierter Umweltmanagementsysteme wie EMAS und ISO 14001.'
-                  : 'Conscious distillery vetting is paramount. Having worked with environmental management systems for 20 years, Ines Zager audits water usage, energy sourcing, and watershed stewardship before buying any cask, adhering to ISO 14001 and EMAS standards.'}
-              </p>
-              <p className="text-[#55695E] text-sm sm:text-base font-normal leading-relaxed">
-                {lang === 'de'
-                  ? 'Keine anonymen Großhandelskataloge, keine Schein-Zertifikate. Echter Austausch vor Ort, genaue Kenntnis der Produktionsbedingungen und volle Transparenz für Whiskyliebhaber.'
-                  : 'No anonymous commodity broking, no superficial paper certificates. Direct on-site dialogue, complete insight into distillation practices, and genuine transparency for connoisseurs.'}
+                  ? 'Die bewusste Auswahl der Brennereien steht im Vordergrund. Ich beschäftige mich seit rund 20 Jahren beruflich mit Nachhaltigkeits- und Umweltthemen und untersuche deshalb auch die Hintergründe der Brennereien, bevor ich ein Fass erwerbe. Dabei orientiere ich mich unter anderem an Kriterien etablierter Umweltmanagementsysteme wie EMAS und ISO 14001.'
+                  : 'The conscious selection of distilleries takes precedence. Having worked professionally with sustainability and environmental topics for around 20 years, I examine the background of each distillery before acquiring a cask. I am guided, among other things, by the criteria of established environmental management systems such as EMAS and ISO 14001.'}
               </p>
 
               <div className="pt-2">
@@ -142,20 +126,12 @@ export default function CaskSelectionTrust({ onOpenShop, onOpenAbout, onOpenSust
 
             <div className="lg:col-span-6 space-y-4 text-left">
               <h3 className="font-woodblock text-3xl sm:text-4xl lg:text-5xl text-[#181F1C] tracking-wide uppercase leading-tight">
-                {lang === 'de' ? 'Wertigkeit' : 'Craft Value'}
+                {lang === 'de' ? 'Wertigkeit' : 'Craft & Value'}
               </h3>
-              <p className="font-script text-2xl sm:text-3xl text-[#2D6A4F] leading-snug">
-                {lang === 'de' ? 'Ressourcenschonend bis ins Detail.' : 'Resource-conscious in Every Detail.'}
-              </p>
-              <p className="text-[#3A4A40] text-base sm:text-lg font-normal leading-relaxed">
+              <p className="text-[#222D27] text-base sm:text-lg font-normal leading-relaxed">
                 {lang === 'de'
-                  ? 'PURE.WHISKY. setzt unter anderem auf recycelte Glasflaschen, ressourcenschonende Korken aus spanischem Naturkork, Kapselverschlüsse aus vollständig abbaubarem Biopolymer sowie auf mit biologisch abbaubarer Tinte handgestempelte Etiketten aus PFAS-freiem Büttenpapier.'
-                  : 'PURE.WHISKY. relies on 100% post-consumer recycled glass bottles, Spanish natural cork, home-compostable biopolymer capsules, and hand-stamped seed paper labels crafted with non-toxic eco ink.'}
-              </p>
-              <p className="text-[#55695E] text-sm sm:text-base font-normal leading-relaxed">
-                {lang === 'de'
-                  ? 'Jedes einzelne Verpackungselement wurde mit Bedacht gewählt. Kein Erdölplastik, kein chemischer Leim, kein schwerer Wegwerfkarton.'
-                  : 'Every packaging component is consciously selected. Zero petroleum plastics, zero toxic glues, zero bulky gift boxes.'}
+                  ? 'PURE.WHISKY. setzt unter anderem auf recycelte Glasflaschen, ressourcenschonende Korken aus Korkgranulat-Aktivkohlegemisch, Kapselverschlüsse aus vollständig abbaubarem Biopolymer sowie auf mit biologisch abbaubarer Tinte handgestempelte Etiketten aus PFAS-freiem Büttenpapier.'
+                  : 'PURE.WHISKY. relies on recycled glass bottles, resource-saving corks made from a cork granulate and activated carbon mix, capsules made from fully biodegradable biopolymer, and hand-stamped labels made of PFAS-free handmade paper printed with biodegradable ink.'}
               </p>
 
               <div className="pt-2">
@@ -163,7 +139,7 @@ export default function CaskSelectionTrust({ onOpenShop, onOpenAbout, onOpenSust
                   onClick={onOpenAbout}
                   className="inline-flex items-center space-x-2 font-woodblock text-base sm:text-lg uppercase tracking-wider text-[#B85D2C] hover:text-[#A04E24] group transition-colors cursor-pointer"
                 >
-                  <span>{lang === 'de' ? 'Über Ines Zager & ihre Haltung' : 'About Ines Zager & Her Vision'}</span>
+                  <span>{t.hero.btnStory}</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
@@ -178,7 +154,7 @@ export default function CaskSelectionTrust({ onOpenShop, onOpenAbout, onOpenSust
             onClick={onOpenShop}
             className="inline-flex items-center space-x-3 px-10 py-4.5 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-xl tracking-wider uppercase transition-all shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
-            <span>{lang === 'de' ? 'Alle aktuellen Abfüllungen im Shop ansehen' : 'Explore All Current Releases'}</span>
+            <span>{t.hero.btnShop}</span>
             <ArrowRight className="w-5 h-5" />
           </button>
         </div>

@@ -72,20 +72,19 @@ export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct, pr
                 onClick={onOpenAbout}
                 className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-white hover:bg-[#F2EFE9] border border-[#D4C8B8] text-[#181F1C] font-woodblock text-base sm:text-lg tracking-wider uppercase transition-all shadow-xs hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
               >
-                <span>{lang === 'de' ? 'Über Ines Zager & Haltung' : 'About Ines Zager & Vision'}</span>
+                <span>{t.hero.btnStory}</span>
               </button>
             </div>
 
           </div>
 
-          {/* Right Column: 4 Reale Shop-Flaschen in Staffelung mit Farben, Schatten & Zitat (6 cols) */}
-          <div className="lg:col-span-6 flex flex-col items-center justify-center relative w-full">
-            
-            {/* 1. Die 4 echten Shop-Flaschen in originalgetreuer Staffelung mit dezenten Farben & Schatten */}
-            <div className="relative w-full select-none pt-4 pb-2">
+          {/* Right Column: 4 Flaschen gestaffelt nebeneinander + Zitat */}
+          <div className="lg:col-span-6 flex flex-col items-center justify-center relative w-full pt-4 lg:pt-0">
+            {/* 1. Die 4 Flaschen horizontal nebeneinander mit Überlappung */}
+            <div className="relative w-full flex flex-col items-center justify-center select-none">
               
-              {/* Sanfte atmosphärische Gesamterdung */}
-              <div className="absolute inset-0 -inset-y-6 bg-amber-700/5 blur-3xl rounded-full pointer-events-none -z-20" />
+              {/* Optionaler dezentester Lichtkegel hinter den Flaschen */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 sm:w-96 md:w-[480px] h-64 sm:h-72 bg-[#D4C8B8]/30 blur-3xl rounded-full pointer-events-none" />
 
               {/* Flaschen-Reihe mit exakter Ebenen-Staffelung (-space-x) */}
               <div className="flex items-end justify-center -space-x-8 sm:-space-x-12 md:-space-x-14 lg:-space-x-16">
@@ -193,16 +192,14 @@ export default function HeroSection({ onOpenShop, onOpenAbout, onOpenProduct, pr
               />
               <div className="space-y-2 flex-1">
                 <p className="font-serif italic text-base sm:text-lg lg:text-xl text-[#181F1C] leading-relaxed">
-                  {lang === 'de' 
-                    ? '„Hinter jedem Fass soll eine Geschichte stehen, die ich guten Gewissens erzählen kann – über die Brennerei, den Whisky und den respektvollen Umgang mit Ressourcen.“'
-                    : '“Behind every cask there must be a story I can tell with a clear conscience – about the distillery, the whisky, and a deeply respectful stewardship of natural resources.”'}
+                  {t.hero.inesQuote}
                 </p>
                 <div className="flex flex-wrap items-center gap-x-3 pt-1">
                   <span className="font-woodblock text-sm uppercase tracking-wider text-[#181F1C]">
-                    Ines Zager
+                    {t.hero.inesName}
                   </span>
                   <span className="text-xs sm:text-sm font-craft-mono text-[#2D6A4F] font-bold">
-                    {lang === 'de' ? '· Gründerin von PURE.WHISKY. & Umweltjuristin' : '· Founder of PURE.WHISKY. & Environmental Jurist'}
+                    · {t.hero.inesRole}
                   </span>
                 </div>
               </div>

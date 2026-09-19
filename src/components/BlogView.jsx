@@ -1,8 +1,10 @@
 import React from 'react';
 import { ArrowRight, Calendar, User, Play, Sparkles, Image as ImageIcon } from 'lucide-react';
 import { BLOG_POSTS } from '../data/pureWhiskyFullData';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function BlogView({ posts, onOpenPost, onNavigateShop, onNavigateHome }) {
+  const { lang, t } = useLanguage();
   const allPosts = posts || BLOG_POSTS;
 
   return (
@@ -109,7 +111,7 @@ export default function BlogView({ posts, onOpenPost, onNavigateShop, onNavigate
               onClick={onNavigateShop}
               className="inline-flex items-center space-x-3 px-10 py-4.5 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-xl tracking-wider uppercase transition-all shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
             >
-              <span>Zu den Fässern im Shop</span>
+              <span>{lang === 'de' ? 'Zu den Abfüllungen im Shop' : 'View Releases in Shop'}</span>
               <ArrowRight className="w-5 h-5" />
             </button>
           </div>

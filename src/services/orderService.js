@@ -175,12 +175,12 @@ export async function sendOrderConfirmationEmail({ order, adminEmail = DEFAULT_A
             Guten Tag ${order.customer.firstName} ${order.customer.lastName},
           </p>
           <p style="font-size: 13px; color: #55695E; line-height: 1.6;">
-            vielen Dank für Ihre Bestellung bei <strong>PURE.WHISKY.</strong>! Ihre Bestellung ist unter der Bestellnummer <strong>#${order.orderId}</strong> erfolgreich bei uns eingegangen und wird nun von Ines Zager persönlich geprüft.
+            vielen Dank für Ihre Bestellung bei <strong>PURE.WHISKY.</strong>! Ihre Bestellung ist unter der Bestellnummer <strong>#${order.orderId}</strong> erfolgreich bei mir eingegangen und wird nun von mir persönlich geprüft.
           </p>
 
           <div style="background: #FAF8F5; border: 1px solid #E2DDD5; border-radius: 8px; padding: 14px 16px; margin: 20px 0; font-size: 12px; color: #55695E; line-height: 1.5;">
             <strong style="color: #181F1C;">Hinweis zum Kaufvertrag:</strong><br/>
-            Diese E-Mail bestätigt den Eingang Ihrer Bestellung. Ihre offizielle Rechnung (<strong>${invoiceNum}</strong>) haben wir Ihnen zusätzlich als PDF-Dokument an diese E-Mail angehängt.
+            Diese E-Mail bestätigt den Eingang Ihrer Bestellung. Ihre offizielle Rechnung (<strong>${invoiceNum}</strong>) habe ich Ihnen zusätzlich als PDF-Dokument an diese E-Mail angehängt.
           </div>
 
           <table style="width: 100%; border-collapse: collapse; margin: 24px 0;">

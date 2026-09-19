@@ -17,8 +17,8 @@ const FAQ_DATA_EN = [
     a: 'Every bottle is manufactured in Spain from 100% post-consumer recycled glass (PCR), saving melting energy and virgin raw materials. The seal is made from 100% biodegradable plant polymer, sealed with untreated natural Spanish cork.'
   },
   {
-    q: 'How does PURE.WHISKY. audit partner distilleries in Scotland?',
-    a: 'As an environmental jurist, founder Ines Zager inspects partner distilleries on-site. Key benchmarks adhere to recognized environmental management systems (EMAS and ISO 14001): river watershed protection, closed cooling loops, renewable biomass energy, and complete upcycling of spent grain.'
+    q: 'How does PURE.WHISKY. evaluate partner distilleries in Scotland?',
+    a: 'Having worked with environmental management systems for around 20 years, I examine each distillery’s sustainability background prior to acquiring any cask. Key benchmarks adhere to recognized environmental management systems (such as EMAS and ISO 14001): river watershed protection, closed cooling loops, renewable biomass energy, and complete upcycling of spent grain.'
   },
   {
     q: 'How are orders shipped and insured?',

@@ -156,8 +156,8 @@ export default function UnsubscribeView({ onUnsubscribe, onResubscribe, onNaviga
               </p>
               <p className="text-xs text-[#55695E] pt-1">
                 {lang === 'de' 
-                  ? 'Sie erhalten ab sofort keine weiteren Mitteilungen zu neuen Fässern oder Tastings mehr.' 
-                  : 'You will no longer receive any updates on new cask drops or tastings.'}
+                  ? 'Sie erhalten ab sofort keine weiteren Mitteilungen zu neuen Abfüllungen oder Tastings mehr.' 
+                  : 'You will no longer receive any updates on new releases or tastings.'}
               </p>
             </div>
 

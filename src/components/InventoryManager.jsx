@@ -217,7 +217,7 @@ export default function InventoryManager({
             <button
               onClick={onResetProducts}
               className="px-4 py-2.5 rounded-xl bg-white border border-rose-200 text-xs font-craft-mono font-bold text-rose-700 hover:bg-rose-50 transition-colors flex items-center space-x-2"
-              title="Alle Fässer auf Ausgangszustand zurücksetzen"
+              title="Alle Abfüllungen auf Ausgangszustand zurücksetzen"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>Reset</span>
@@ -237,7 +237,7 @@ export default function InventoryManager({
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
           <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#D4C8B8]">
             <span className="text-xs font-craft-mono uppercase text-[#55695E] block font-bold">
-              Aktive Fässer
+              Aktive Abfüllungen
             </span>
             <span className="font-woodblock text-2xl sm:text-3xl text-[#181F1C] mt-1 block">
               {totalCount}

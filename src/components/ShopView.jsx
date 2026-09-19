@@ -67,7 +67,7 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
             PURE.WHISKY.
           </span>
           <h1 className="font-woodblock text-5xl sm:text-6xl lg:text-7xl text-[#181F1C] tracking-wide uppercase">
-            {lang === 'de' ? 'Shop & Einzelfässer' : 'Shop & Single Casks'}
+            {t.shop.heading}
           </h1>
           <p className="text-[#3A4A40] text-lg sm:text-xl max-w-2xl font-normal leading-relaxed">
             {t.shop.subheading}

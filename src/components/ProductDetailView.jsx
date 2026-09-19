@@ -226,8 +226,8 @@ export default function ProductDetailView({
                       </h4>
                       <p className="text-xs text-[#3A4A40]">
                         {lang === 'de'
-                          ? `Vielen Dank! Wir senden Ihnen am ${releaseDateStr} pünktlich den exklusiven Zuteilungs-Link für ${product.name} per E-Mail.`
-                          : `Thank you! We will email you the priority allocation link for ${product.name} on ${releaseDateStr}.`}
+                          ? `Vielen Dank! Ich sende Ihnen am ${releaseDateStr} pünktlich den exklusiven Zuteilungs-Link für ${product.name} per E-Mail.`
+                          : `Thank you! I will email you the priority link for ${product.name} on ${releaseDateStr}.`}
                       </p>
                     </div>
                   ) : (
@@ -381,7 +381,7 @@ export default function ProductDetailView({
                 {lang === 'de' ? 'Entdeckungen' : 'Discoveries'}
               </span>
               <h2 className="font-woodblock text-3xl sm:text-4xl text-[#181F1C] uppercase tracking-wide">
-                {lang === 'de' ? 'Weitere handverlesene Einzelfässer.' : 'Further Handpicked Single Casks.'}
+                {lang === 'de' ? 'Weitere handverlesene Abfüllungen.' : 'Further Handpicked Releases.'}
               </h2>
             </div>
             <button

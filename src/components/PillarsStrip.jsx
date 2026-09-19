@@ -10,8 +10,8 @@ export default function PillarsStrip() {
     },
     {
       scriptTag: 'Umweltrecht',
-      title: 'Juristisches Audit',
-      desc: 'Ines Zager prüft jede Brennerei persönlich vor Ort auf Quellenschutz, Abwasserkreisläufe und nachhaltige Energiegewinnung.',
+      title: 'Brennerei-Auswahl',
+      desc: 'Ines Zager bewertet jede Brennerei sorgfältig auf Quellenschutz, Abwasserkreisläufe und nachhaltige Energiegewinnung.',
       bgImage: 'https://pub-b33108412309406a9a941ddc51e9a5b9.r2.dev/Pure-Whisky/Pure-Whisky-bILDER04.webp'
     },
     {

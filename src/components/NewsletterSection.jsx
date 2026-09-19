@@ -6,7 +6,7 @@ export default function NewsletterSection({ onSubscribe }) {
   const { lang, t } = useLanguage();
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
-  const [caskInterest, setCaskInterest] = useState('Alle Fässer (Highland & Island)');
+  const [caskInterest, setCaskInterest] = useState('Alle Abfüllungen (Highland & Island)');
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e) => {
@@ -92,16 +92,16 @@ export default function NewsletterSection({ onSubscribe }) {
 
             <div>
               <label className="block font-craft-mono text-xs uppercase tracking-wider text-[#55695E] font-bold mb-1.5">
-                {lang === 'de' ? 'Bevorzugte Fass-Kategorie' : 'Preferred Cask Profile'}
+                {lang === 'de' ? 'Bevorzugtes Geschmacksprofil' : 'Preferred Flavour Profile'}
               </label>
               <select
                 value={caskInterest}
                 onChange={(e) => setCaskInterest(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-[#D4C8B8] bg-white text-sm text-[#181F1C] focus:outline-none focus:border-[#B85D2C] font-craft-mono"
               >
-                <option value="Alle Fässer (Highland & Island)">{lang === 'de' ? 'Alle Fässer (Highland & Island)' : 'All Casks (Highland & Island)'}</option>
-                <option value="Rauchige Islay & Peated Fässer">{lang === 'de' ? 'Rauchige Islay & Peated Fässer' : 'Peated & Smoky Casks'}</option>
-                <option value="Fruchtige Bourbon & Refill Fässer">{lang === 'de' ? 'Fruchtige Bourbon & Refill Fässer' : 'Fruity Bourbon & Refill Casks'}</option>
+                <option value="Alle Abfüllungen (Highland & Island)">{lang === 'de' ? 'Alle Abfüllungen (Highland & Island)' : 'All Releases (Highland & Island)'}</option>
+                <option value="Rauchige & torfige Abfüllungen">{lang === 'de' ? 'Rauchige & torfige Abfüllungen' : 'Peated & Smoky Releases'}</option>
+                <option value="Fruchtige Bourbon- & Sherry-Abfüllungen">{lang === 'de' ? 'Fruchtige Bourbon- & Sherry-Abfüllungen' : 'Fruity Bourbon & Sherry Releases'}</option>
                 <option value="Alte Jahrgänge (15+ Jahre)">{lang === 'de' ? 'Alte Jahrgänge (15+ Jahre)' : 'Aged Expressions (15+ Years)'}</option>
               </select>
             </div>

@@ -132,14 +132,14 @@ export default function AboutView({ onNavigateShop, onNavigateHome, onOpenSustai
             </div>
           </div>
 
-          {/* Pillar 3: On-site audit */}
+          {/* Pillar 3: Selection & Standards */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-7 space-y-5 text-left order-2 lg:order-1">
               <span className="font-woodblock text-2xl text-[#B85D2C] uppercase block">
-                03 · {lang === 'de' ? 'Vor-Ort Prüfung' : 'On-Site Environmental Audit'}
+                03 · {lang === 'de' ? 'Brennerei-Auswahl' : 'Distillery Selection'}
               </span>
               <h3 className="font-woodblock text-4xl text-[#181F1C] uppercase leading-tight">
-                {lang === 'de' ? 'Geprüft nach EMAS & ISO 14001' : 'Audited under EMAS & ISO 14001'}
+                {lang === 'de' ? 'Bewertet nach EMAS & ISO 14001' : 'Assessed under EMAS & ISO 14001'}
               </h3>
               <blockquote className="font-script text-2xl text-[#2D6A4F] italic">
                 {lang === 'de'
@@ -148,8 +148,8 @@ export default function AboutView({ onNavigateShop, onNavigateHome, onOpenSustai
               </blockquote>
               <p className="text-[#3A4A40] text-lg font-normal leading-relaxed">
                 {lang === 'de'
-                  ? 'Jede Brennerei besuche ich vor dem Kauf persönlich vor Ort und prüfe sie nach strengen Umweltkriterien, die sich an EMAS und ISO 14001 orientieren. Bewertet werden Wassermanagement, Quellenschutz, regenerative Energie und geschlossene Kreisläufe.'
-                  : 'I inspect every partner distillery on-site across Scotland, evaluating cooling water recirculation, watershed protection, biomass heating, and waste upcycling.'}
+                  ? 'Die Hintergründe jeder Brennerei untersuche ich vor dem Kauf sorgfältig nach Kriterien, die sich an anerkannten Umweltmanagementsystemen wie EMAS und ISO 14001 orientieren. Bewertet werden unter anderem Wassermanagement, Quellenschutz, regenerative Energie und geschlossene Kreisläufe.'
+                  : 'Prior to acquiring any cask, I carefully examine each distillery according to criteria guided by established environmental management systems like EMAS and ISO 14001, assessing watershed protection, cooling water recirculation, biomass energy, and circular resource use.'}
               </p>
               <div className="pt-2">
                 <button
@@ -196,13 +196,13 @@ export default function AboutView({ onNavigateShop, onNavigateHome, onOpenSustai
               </h3>
               <blockquote className="font-script text-2xl text-[#2D6A4F] italic">
                 {lang === 'de'
-                  ? '„Genuss mit bestem Gewissen – persönlich ausgewählt und geprüft.“'
-                  : '“Appreciation with a clear conscience – handpicked and audited in person.”'}
+                  ? '„Genuss mit bestem Gewissen – persönlich ausgewählt und bewertet.“'
+                  : '“Appreciation with a clear conscience – handpicked and evaluated in person.”'}
               </blockquote>
               <p className="text-[#3A4A40] text-lg font-normal leading-relaxed">
                 {lang === 'de'
                   ? 'PURE.WHISKY. bietet unberührten Single Cask Genuss. Jedes Fass, jede Flasche Wild Glass und jeder Partner werden von mir persönlich auf höchste Qualität und echte Nachhaltigkeit geprüft.'
-                  : 'PURE.WHISKY. is committed to pure single cask delight. Every oak barrel, every Wild Glass bottle, and every partner is verified by me for excellence and environmental integrity.'}
+                  : 'PURE.WHISKY. is committed to pure single cask delight. Every oak barrel, every Wild Glass bottle, and every partner is evaluated by me for excellence and environmental integrity.'}
               </p>
             </div>
           </div>

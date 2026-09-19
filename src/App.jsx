@@ -289,6 +289,18 @@ export default function App() {
     });
   };
 
+  const handleAddContact = (contact) => {
+    if (!contact || !contact.email) return;
+    handleAddNewsletterSubscriber({
+      email: contact.email,
+      name: contact.name || '',
+      firstName: contact.firstName || contact.name?.split(' ')[0] || '',
+      lastName: contact.lastName || contact.name?.split(' ').slice(1).join(' ') || '',
+      caskInterest: contact.caskInterest || 'Vorab-Reservierung',
+      source: contact.source || 'vorab-reservierung'
+    });
+  };
+
   const handleToggleNewsletterStatus = (identifier) => {
     const term = (identifier || '').toLowerCase().trim();
     setNewsletterSubs(prev => prev.map(s => {

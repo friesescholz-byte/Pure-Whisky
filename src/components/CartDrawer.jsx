@@ -324,7 +324,7 @@ export default function CartDrawer({
                     className="w-full text-sm bg-white border border-[#D4C8B8] rounded-lg px-3 py-2 text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
                   />
                   <p className="text-[11px] text-[#55695E] mt-1">
-                    {lang === 'de' ? 'Hierhin senden wir Bestätigung & Rechnung.' : 'Where we send your receipt and invoice.'}
+                    {lang === 'de' ? 'Hierhin sende ich Bestätigung & Rechnung.' : 'Where your confirmation and invoice will be sent.'}
                   </p>
                 </div>
 

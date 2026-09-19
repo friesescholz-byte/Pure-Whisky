@@ -743,7 +743,7 @@ Ines Zager · PURE.WHISKY.`);
             }`}
           >
             <Package className="w-4 h-4" />
-            <span>Fässer & Preise (Shop)</span>
+            <span>Abfüllungen & Preise (Shop)</span>
             <span className="ml-1 px-2 py-0.5 bg-black/10 text-xs font-craft-mono font-bold rounded-full">
               {products.length}
             </span>

@@ -11,7 +11,7 @@ export const IMAGES = {
   card_bg_highlands: `${R2_BASE}Pure-Whisky-Fass_01_1.webp`,
   card_bg_islands: `${R2_BASE}Pure-Whisky-bILDER07.webp`,
   
-  // Tasting Photo requested by user for new casks & audit:
+  // Tasting Photo requested by user for new casks & sustainability:
   ines_testing: `${R2_BASE}Pure-Whisky-Testing.jpg`,
   
   // -------------------------------------------------------------
@@ -112,7 +112,7 @@ export const PRODUCTS = [
     },
     sustainability: {
       headline: 'Rettung der Inselgemeinschaft & Soziale Nachhaltigkeit',
-      story: 'Als Brennerei Jura 1963 neu aufgebaut wurde, verhinderte sie die vollständige Entvölkerung der Insel. Bis heute sichert die Destillerie das wirtschaftliche Rückgrat der Inselbevölkerung. Bei Ines Zagers Besuch stand neben dem Quellenschutz vor allem die regionale Wertschöpfung im Fokus.',
+      story: 'Als Brennerei Jura 1963 neu aufgebaut wurde, verhinderte sie die vollständige Entvölkerung der Insel. Bis heute sichert die Destillerie das wirtschaftliche Rückgrat der Inselbevölkerung. Bei meinem Besuch stand neben dem Quellenschutz vor allem die regionale Wertschöpfung im Fokus.',
       image: IMAGES.ines_islay
     }
   },
@@ -202,7 +202,7 @@ export const PRODUCTS = [
     },
     sustainability: {
       headline: 'Pionier der Energiewende & Umweltmanagement',
-      story: 'Bereits 2013 installierte Tomatin als Pionier einen Holzpellet-Biomasse-Kessel, der rund 80% der gesamten Energie liefert und CO₂-Emissionen um über 80% senkt. Durch innovative Wehranlagen wurde der Wasserverbrauch halbiert, während Produktionsabwässer durch ein natürliches Schilf-Rieselfeld gereinigt werden. Ines Zager bewertet diese Maßnahmen als vorbildlich im Sinne moderner Umweltmanagementsysteme.',
+      story: 'Bereits 2013 installierte Tomatin als Pionier einen Holzpellet-Biomasse-Kessel, der rund 80% der gesamten Energie liefert und CO₂-Emissionen um über 80% senkt. Durch innovative Wehranlagen wurde der Wasserverbrauch halbiert, während Produktionsabwässer durch ein natürliches Schilf-Rieselfeld gereinigt werden. Ich bewerte diese Maßnahmen als vorbildlich im Sinne moderner Umweltmanagementsysteme.',
       image: IMAGES.ines_barrel
     }
   },
@@ -234,7 +234,7 @@ export const PRODUCTS = [
     character: ['Lagerfeuerrauch', 'Früchtekuchen', 'Blutorange', 'Milchschokolade & Salzlakritz'],
     intro: 'Das historische Premieren-Fass von PURE.WHISKY. Gereift in einem rauchigen Ex-Laphroaig Fass mit Oloroso Sherry Veredelung – ein gesuchtes Sammlerstück, das binnen kürzester Zeit restlos ausverkauft war.',
     history: {
-      headline: 'Der First Release von Ines Zager',
+      headline: 'Mein persönlicher First Release',
       text: 'Mit dieser Abfüllung begann die Reise von PURE.WHISKY. Ardmore ist eine der wenigen Destillerien in den Highlands, die ihren Malz traditionell über schottischem Torf darren. Die Reifung im Quarter Cask sorgte für maximalen Holzkontakt und eine überwältigende Aromenintensität.',
       image: IMAGES.tasting_springbank
     },
@@ -715,7 +715,7 @@ export const FAQ_DATA = [
   },
   {
     q: 'Wie läuft die Auswahl der Brennereien nach Nachhaltigkeitskriterien ab?',
-    a: 'Ines Zager beschäftigt sich seit rund 20 Jahren beruflich mit Nachhaltigkeits- und Umweltthemen und untersucht deshalb auch die Hintergründe der Brennereien, bevor sie ein Fass erwirbt. Dabei orientiert sie sich unter anderem an Kriterien etablierter Umweltmanagementsysteme wie EMAS und ISO 14001.'
+    a: 'Ich beschäftige mich seit rund 20 Jahren beruflich mit Nachhaltigkeits- und Umweltthemen und untersuche deshalb auch die Hintergründe der Brennereien, bevor ich ein Fass erwerbe. Dabei orientiere ich mich unter anderem an Kriterien etablierter Umweltmanagementsysteme wie EMAS und ISO 14001.'
   },
   {
     q: 'Wie funktioniert die Altersprüfung (18+) bei der Bestellung?',
