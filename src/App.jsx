@@ -102,7 +102,7 @@ export default function App() {
 
   // Persistent Products & Pricing
   const [products, setProducts] = useState(() => {
-    const saved = localStorage.getItem('pure_whisky_products_v2');
+    const saved = localStorage.getItem('pure_whisky_products_v4');
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -115,7 +115,7 @@ export default function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem('pure_whisky_products_v2', JSON.stringify(products));
+      localStorage.setItem('pure_whisky_products_v4', JSON.stringify(products));
     } catch (e) {
       console.warn('Could not save products to localStorage:', e);
     }
@@ -132,7 +132,7 @@ export default function App() {
     if (window.confirm('Möchten Sie alle Fässer, Preise und Verfügbarkeiten auf die Standardwerte zurücksetzen?')) {
       setProducts(PRODUCTS);
       try {
-        localStorage.removeItem('pure_whisky_products_v2');
+        localStorage.removeItem('pure_whisky_products_v4');
       } catch (e) {
         console.error(e);
       }

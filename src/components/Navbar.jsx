@@ -142,6 +142,8 @@ export default function Navbar({ activeTab, setActiveTab, onSelectProduct, cartI
                         <span className="truncate">{prod.region} · {prod.abv}</span>
                         {prod.isUpcoming ? (
                           <span className="text-[#B85D2C] font-bold shrink-0 ml-2">Ab 17.09.</span>
+                        ) : prod.isNew ? (
+                          <span className="text-[#2D6A4F] font-bold shrink-0 ml-2">{lang === 'de' ? 'Neu' : 'New'}</span>
                         ) : !prod.isAvailable ? (
                           <span className="text-neutral-400 font-bold shrink-0 ml-2">Sold Out</span>
                         ) : null}

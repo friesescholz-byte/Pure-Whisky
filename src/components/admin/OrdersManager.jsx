@@ -82,7 +82,7 @@ export default function OrdersManager({
 
         <div className="bg-white border border-amber-200 rounded-2xl p-5 shadow-2xs bg-gradient-to-br from-white to-amber-50/50">
           <span className="text-xs font-craft-mono text-amber-800 uppercase tracking-wider block font-bold">
-            Kaufvertrag Ausstehend
+            Rechnung ausstehend
           </span>
           <div className="flex items-baseline justify-between mt-2">
             <span className="font-woodblock text-3xl text-amber-800">{pendingCount}</span>
@@ -245,7 +245,7 @@ export default function OrdersManager({
                         ) : (
                           <span className="px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-bold flex items-center space-x-1">
                             <Clock className="w-3.5 h-3.5 text-amber-600" />
-                            <span>Rechnung ausstehend (Kaufvertrag offen)</span>
+                            <span>Rechnung ausstehend</span>
                           </span>
                         )}
 

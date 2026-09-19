@@ -108,7 +108,7 @@ export const WHISKY_RELEASES = [
     pricePerLiter: '199,86 € / l',
     isAvailable: false,
     isFeatured: false,
-    badge: 'Ausverkauft · Sammler-Archiv',
+    badge: 'Ausverkauft',
     image: `${R2_BASE}ardmore-11.webp`,
     character: ['Lagerfeuerrauch', 'Früchtekuchen', 'Blutorange', 'Salzlakritz'],
     tastingNotes: {

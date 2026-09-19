@@ -180,14 +180,16 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
                         <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-[#E8EFEA] border border-[#C5D8CC]">
                           <span className="w-2.5 h-2.5 rounded-full bg-[#2D6A4F] shrink-0" />
                           <span className="font-woodblock text-sm sm:text-base text-[#2D6A4F] uppercase tracking-wider">
-                            {lang === 'de' ? `Limitierte Einzelfassabfüllung (${total} Flaschen) · Sofort lieferbar` : `Limited Single Cask (${total} Bottles) · In Stock`}
+                            {product.isNew
+                              ? (lang === 'de' ? `Neu erhältlich (${total} Flaschen) · Sofort lieferbar` : `Newly Available (${total} Bottles) · In Stock`)
+                              : (lang === 'de' ? `Limitierte Einzelfassabfüllung (${total} Flaschen) · Sofort lieferbar` : `Limited Single Cask (${total} Bottles) · In Stock`)}
                           </span>
                         </div>
                       ) : (
                         <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-rose-50 border border-rose-200">
                           <span className="w-2.5 h-2.5 rounded-full bg-rose-600 shrink-0" />
                           <span className="font-woodblock text-sm sm:text-base text-rose-700 uppercase tracking-wider">
-                            {lang === 'de' ? 'Ausverkauft · Sammler-Archiv' : 'Sold Out · Collector Archive'}
+                            {lang === 'de' ? 'Ausverkauft' : 'Sold Out'}
                           </span>
                         </div>
                       )}
@@ -215,7 +217,7 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
                       onClick={() => onOpenProduct(product)}
                       className="px-5 py-3 rounded-lg bg-[#E8EFEA] hover:bg-[#D8E4DC] text-[#181F1C] font-woodblock text-lg tracking-wider uppercase transition-colors cursor-pointer"
                     >
-                      Dossier
+                      {lang === 'de' ? 'Details' : 'Details'}
                     </button>
 
                     {isUpcoming ? (

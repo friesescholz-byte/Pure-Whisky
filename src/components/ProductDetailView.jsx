@@ -185,7 +185,7 @@ export default function ProductDetailView({
                   ) : isAvailable ? (
                     <div className="text-right">
                       <span className="text-[#2D6A4F] text-sm block font-woodblock uppercase">
-                        🟢 {lang === 'de' ? 'Sofort lieferbar' : 'In Stock'}
+                        🟢 {product.isNew ? (lang === 'de' ? 'Neu erhältlich · Sofort lieferbar' : 'Newly Available · In Stock') : (lang === 'de' ? 'Sofort lieferbar' : 'In Stock')}
                       </span>
                       <span className="text-[11px] text-[#55695E] mt-0.5 block">
                         {lang === 'de' ? `Limitierte Einzelfassabfüllung (${total} Flaschen)` : `Limited Single Cask (${total} Bottles)`}
@@ -197,7 +197,7 @@ export default function ProductDetailView({
                         🔴 {lang === 'de' ? 'Ausverkauft' : 'Sold Out'}
                       </span>
                       <span className="text-[11px] text-[#55695E] mt-0.5 block">
-                        {lang === 'de' ? `Sammler-Archiv (${total} Flaschen)` : `Archive (${total} Bottles)`}
+                        {lang === 'de' ? `Ausverkauft (${total} Flaschen)` : `Sold Out (${total} Bottles)`}
                       </span>
                     </div>
                   )}
@@ -297,7 +297,7 @@ export default function ProductDetailView({
                 </div>
               ) : (
                 <div className="p-5 rounded-2xl bg-neutral-100 border border-neutral-200 text-neutral-500 font-woodblock text-xl uppercase text-center">
-                  {lang === 'de' ? 'Dieses Fass ist restlos ausverkauft (Sammler-Archiv)' : 'This release is sold out (Collector Archive)'}
+                  {lang === 'de' ? 'Diese Abfüllung ist restlos ausverkauft' : 'This release is completely sold out'}
                 </div>
               )}
 
@@ -429,7 +429,7 @@ export default function ProductDetailView({
                 <div className="flex items-center justify-between pt-2 border-t border-[#E2DDD5]">
                   <span className="font-woodblock text-xl text-[#181F1C]">{other.price.toFixed(2)} €</span>
                   <span className="font-craft-mono text-xs text-[#B85D2C] font-bold group-hover:underline">
-                    {lang === 'de' ? 'Dossier öffnen →' : 'Open dossier →'}
+                    {lang === 'de' ? 'Details ansehen →' : 'View details →'}
                   </span>
                 </div>
               </div>

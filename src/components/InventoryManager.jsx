@@ -14,7 +14,6 @@ export default function InventoryManager({
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [editingProduct, setEditingProduct] = useState(null);
-  const [showMollieModal, setShowMollieModal] = useState(false);
   const [saveSuccessMsg, setSaveSuccessMsg] = useState('');
 
   // Edit form state
@@ -47,7 +46,7 @@ export default function InventoryManager({
       stock: remaining,
       status: initialStatus,
       releaseDate: pReleaseDate,
-      badge: p.badge || (isUpcoming ? `Release am ${pReleaseDate} · Vorabzugriff` : (isSoldOut ? 'Ausverkauft · Sammler-Archiv' : 'Sofort lieferbar')),
+      badge: p.badge || (isUpcoming ? `Release am ${pReleaseDate} · Vorabzugriff` : (isSoldOut ? 'Ausverkauft' : 'Sofort lieferbar')),
       abv: p.abv || '',
       caskType: p.caskType || '',
       bottleCount: p.bottleCount || (p.bottlesTotal ? `${p.bottlesTotal} Flaschen` : '')
@@ -76,7 +75,7 @@ export default function InventoryManager({
       isUpcoming: isUpcoming,
       soldOut: isSoldOut,
       releaseDate: releaseDateVal,
-      badge: formState.badge.trim() || (isUpcoming ? `Release am ${releaseDateVal} · Vorabzugriff` : (isSoldOut ? 'Ausverkauft · Sammler-Archiv' : 'Sofort lieferbar')),
+      badge: formState.badge.trim() || (isUpcoming ? `Release am ${releaseDateVal} · Vorabzugriff` : (isSoldOut ? 'Ausverkauft' : 'Sofort lieferbar')),
       abv: formState.abv.trim(),
       caskType: formState.caskType.trim(),
       bottleCount: formState.bottleCount.trim()
@@ -107,7 +106,7 @@ export default function InventoryManager({
       bottlesRemaining: remaining,
       badge: isUpcoming 
         ? `Release am ${releaseDateVal} · Vorabzugriff` 
-        : (isSoldOut ? 'Ausverkauft · Sammler-Archiv' : 'Sofort lieferbar')
+        : (isSoldOut ? 'Ausverkauft' : 'Sofort lieferbar')
     };
 
     onUpdateProduct(updated);
@@ -144,146 +143,15 @@ export default function InventoryManager({
   }).length;
   const upcomingCount = products.filter(p => p.isUpcoming === true).length;
   const soldOutCount = products.filter(p => p.soldOut === true || (p.isAvailable === false && !p.isUpcoming)).length;
-  const avgPrice = (products.reduce((acc, p) => acc + (p.price || 0), 0) / (totalCount || 1)).toFixed(2);
-
-  // Mollie Orders API Payload Spec
-  const activeProductsForMollie = products.filter(p => {
-    const isSoldOut = p.soldOut === true || (p.isAvailable === false && !p.isUpcoming);
-    return !isSoldOut && !p.isUpcoming;
-  });
-
-  const mollieSamplePayload = {
-    amount: {
-      currency: 'EUR',
-      value: (activeProductsForMollie[0]?.price || 139).toFixed(2)
-    },
-    orderNumber: 'PW-ORD-839210',
-    lines: activeProductsForMollie.map(p => ({
-      type: 'physical',
-      sku: 'SKU-' + p.id.toUpperCase(),
-      name: p.fullName,
-      quantity: 1,
-      unitPrice: {
-        currency: 'EUR',
-        value: p.price.toFixed(2)
-      },
-      totalAmount: {
-        currency: 'EUR',
-        value: p.price.toFixed(2)
-      },
-      vatRate: '19.00',
-      vatAmount: {
-        currency: 'EUR',
-        value: (p.price * 0.19 / 1.19).toFixed(2)
-      }
-    })),
-    shippingAddress: {
-      streetAndNumber: 'Musterstraße 12',
-      postalCode: '10115',
-      city: 'Berlin',
-      country: 'DE'
-    },
-    redirectUrl: 'https://pure-whisky.com/bestaetigung',
-    webhookUrl: 'https://pure-whisky.com/api/mollie/webhook'
-  };
-
   return (
-    <div className="space-y-8 text-left">
-      {/* Top Header & Overview */}
-      <div className="bg-white border border-[#D4C8B8] rounded-3xl p-6 sm:p-8 shadow-xs">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-[#E2DDD5]">
-          <div>
-            <div className="flex items-center space-x-3">
-              <h2 className="font-woodblock text-2xl sm:text-3xl text-[#181F1C] uppercase tracking-wide">
-                Fass-Depot & Preisverwaltung
-              </h2>
-              <span className="px-3 py-1 bg-[#FAF8F5] border border-[#D4C8B8] text-[#B85D2C] font-craft-mono text-xs font-bold rounded-full">
-                Mollie-Ready
-              </span>
-            </div>
-            <p className="text-sm text-[#55695E] pt-1">
-              Passen Sie Verkaufspreise, Streichpreise, Verfügbarkeiten, Release-Daten und Lagerbestände direkt an. Änderungen sind sofort live im Shop sichtbar.
-            </p>
-          </div>
-
-          <div className="flex items-center space-x-3 flex-wrap gap-2">
-            <button
-              onClick={() => setShowMollieModal(true)}
-              className="px-4 py-2.5 rounded-xl bg-[#FAF8F5] border border-[#D4C8B8] text-xs font-craft-mono font-bold text-[#181F1C] hover:bg-[#E2DDD5] transition-colors flex items-center space-x-2"
-            >
-              <Code className="w-4 h-4 text-[#2D6A4F]" />
-              <span>Mollie API Vorschau</span>
-            </button>
-            <button
-              onClick={onResetProducts}
-              className="px-4 py-2.5 rounded-xl bg-white border border-rose-200 text-xs font-craft-mono font-bold text-rose-700 hover:bg-rose-50 transition-colors flex items-center space-x-2"
-              title="Alle Abfüllungen auf Ausgangszustand zurücksetzen"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Reset</span>
-            </button>
-          </div>
+    <div className="space-y-6 text-left">
+      {/* Success Alert Banner */}
+      {saveSuccessMsg && (
+        <div className="p-4 rounded-2xl bg-[#E8EFEA] border border-[#C5D8CC] text-[#2D6A4F] flex items-center space-x-3 shadow-xs">
+          <CheckCircle2 className="w-5 h-5 shrink-0" />
+          <span className="text-sm font-bold">{saveSuccessMsg}</span>
         </div>
-
-        {/* Success Alert Banner */}
-        {saveSuccessMsg && (
-          <div className="mt-4 p-4 rounded-2xl bg-[#E8EFEA] border border-[#C5D8CC] text-[#2D6A4F] flex items-center space-x-3">
-            <CheckCircle2 className="w-5 h-5 shrink-0" />
-            <span className="text-sm font-bold">{saveSuccessMsg}</span>
-          </div>
-        )}
-
-        {/* KPI Metrics */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
-          <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#D4C8B8]">
-            <span className="text-xs font-craft-mono uppercase text-[#55695E] block font-bold">
-              Aktive Abfüllungen
-            </span>
-            <span className="font-woodblock text-2xl sm:text-3xl text-[#181F1C] mt-1 block">
-              {totalCount}
-            </span>
-            <span className="text-xs text-[#55695E] mt-0.5 block">
-              Ø {avgPrice} € / Flasche
-            </span>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200">
-            <span className="text-xs font-craft-mono uppercase text-emerald-800 block font-bold">
-              Sofort lieferbar
-            </span>
-            <span className="font-woodblock text-2xl sm:text-3xl text-emerald-900 mt-1 block">
-              {availableCount}
-            </span>
-            <span className="text-xs text-emerald-700 mt-0.5 block">
-              Kaufbar im Shop
-            </span>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200">
-            <span className="text-xs font-craft-mono uppercase text-amber-800 block font-bold">
-              Vorab-Zugriff
-            </span>
-            <span className="font-woodblock text-2xl sm:text-3xl text-amber-900 mt-1 block">
-              {upcomingCount}
-            </span>
-            <span className="text-xs text-amber-700 mt-0.5 block">
-              Freies Release-Datum
-            </span>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-stone-100 border border-stone-200">
-            <span className="text-xs font-craft-mono uppercase text-stone-600 block font-bold">
-              Ausverkauft
-            </span>
-            <span className="font-woodblock text-2xl sm:text-3xl text-stone-800 mt-1 block">
-              {soldOutCount}
-            </span>
-            <span className="text-xs text-stone-500 mt-0.5 block">
-              Archivierte Chargen
-            </span>
-          </div>
-        </div>
-      </div>
+      )}
 
       {/* Filter & Search Bar */}
       <div className="bg-white border border-[#D4C8B8] rounded-3xl p-6 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
@@ -819,58 +687,6 @@ export default function InventoryManager({
         </div>
       )}
 
-      {/* Mollie API Payload Preview Modal */}
-      {showMollieModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white border border-[#D4C8B8] rounded-3xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl space-y-6 my-8 text-left">
-            <div className="flex items-start justify-between border-b border-[#E2DDD5] pb-4">
-              <div>
-                <div className="flex items-center space-x-3">
-                  <Code className="w-5 h-5 text-[#2D6A4F]" />
-                  <h3 className="font-woodblock text-2xl text-[#181F1C] uppercase">
-                    Mollie Orders API Payload Vorschau
-                  </h3>
-                </div>
-                <p className="text-xs text-[#55695E] pt-1">
-                  Diese Datenstruktur wird bei der Anbindung an die Mollie API per POST /v2/orders übertragen.
-                </p>
-              </div>
-              <button
-                onClick={() => setShowMollieModal(false)}
-                className="group p-2.5 rounded-full bg-[#FAF8F5] border border-[#D4C8B8] text-stone-500 hover:text-[#181F1C] hover:border-[#B85D2C] hover:bg-white transition-all duration-300 shadow-xs hover:scale-105 active:scale-95"
-                title="Schließen"
-              >
-                <X className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div className="p-4 rounded-2xl bg-[#181F1C] text-[#E2DDD5] font-craft-mono text-xs overflow-x-auto max-h-96">
-                <pre>{JSON.stringify(mollieSamplePayload, null, 2)}</pre>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#D4C8B8] text-xs text-[#55695E] space-y-2">
-                <div className="font-bold text-[#181F1C]">Mollie Integration Checkliste:</div>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li>Preise werden automatisch formatiert als zweistelliger Dezimal-String (<code className="text-[#B85D2C]">139.00</code>).</li>
-                  <li>Die 19% deutsche Mehrwertsteuer ist in jedem Posten vorkalkuliert.</li>
-                  <li>SKUs sind eindeutig anhand der Fass-IDs zugeordnet.</li>
-                  <li>Versandkostenpauschale (6,90 €) wird als separate Bestellzeile (<code className="text-[#B85D2C]">shipping_fee</code>) übergeben.</li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="pt-2 border-t border-[#E2DDD5] flex justify-end">
-              <button
-                onClick={() => setShowMollieModal(false)}
-                className="px-6 py-2.5 rounded-xl bg-[#181F1C] text-white font-woodblock text-sm tracking-wider uppercase hover:bg-black transition-colors"
-              >
-                Schließen
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -678,30 +678,19 @@ Ines Zager · PURE.WHISKY.`);
         
         {/* Header Bar */}
         <div className="bg-white border border-[#D4C8B8] rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-xs mb-6 sm:mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center space-x-3 flex-wrap gap-2">
-              <span className="font-woodblock text-2xl sm:text-3xl lg:text-4xl text-[#181F1C] tracking-wide uppercase">
-                PURE.WHISKY. Verwaltungszentrale
-              </span>
-              <span className="px-3 py-1 bg-[#E8EFEA] border border-[#C5D8CC] text-[#2D6A4F] font-craft-mono text-xs font-bold rounded-full">
-                Angemeldet
-              </span>
-            </div>
-            <p className="text-xs sm:text-sm text-[#55695E]">
-              E-Mail Kampagnen, Versand-Historie, Kunden-CRM und Journal-Verwaltung.
-            </p>
+          <div className="flex items-center space-x-3 flex-wrap gap-2">
+            <span className="font-woodblock text-2xl sm:text-3xl lg:text-4xl text-[#181F1C] tracking-wide uppercase">
+              PURE.WHISKY. Verwaltungszentrale
+            </span>
+            <span className="px-3 py-1 bg-[#E8EFEA] border border-[#C5D8CC] text-[#2D6A4F] font-craft-mono text-xs font-bold rounded-full">
+              Angemeldet
+            </span>
           </div>
 
-          <div className="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto justify-between sm:justify-end">
-            <button
-              onClick={onNavigateBlog}
-              className="px-3.5 sm:px-4 py-2 rounded-xl bg-[#FAF8F5] border border-[#D4C8B8] text-xs font-craft-mono font-bold text-[#181F1C] hover:bg-[#E2DDD5] transition-colors"
-            >
-              Live-Journal ansehen →
-            </button>
+          <div className="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto justify-end">
             <button
               onClick={handleLogout}
-              className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 transition-colors"
+              className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 transition-colors cursor-pointer"
               title="Abmelden"
             >
               <Unlock className="w-4 h-4" />
@@ -1370,7 +1359,7 @@ Ines Zager · PURE.WHISKY.`);
                   className="px-7 py-3.5 rounded-2xl bg-[#B85D2C] hover:bg-[#9E4C20] text-white font-woodblock text-base tracking-wider uppercase transition-all shadow-lg hover:shadow-xl flex items-center space-x-2.5 hover:scale-[1.02] active:scale-[0.98] ring-4 ring-[#B85D2C]/20 shrink-0 cursor-pointer"
                 >
                   <Plus className="w-5 h-5 stroke-[2.5]" />
-                  <span>+ Neuen Beitrag erstellen</span>
+                  <span>Neuen Beitrag erstellen</span>
                 </button>
               )}
             </div>

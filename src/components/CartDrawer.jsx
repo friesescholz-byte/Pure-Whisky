@@ -483,7 +483,7 @@ export default function CartDrawer({
                 </div>
                 <div className="flex justify-between pt-1 border-t border-[#E2DDD5]">
                   <span className="text-[#55695E]">Status:</span>
-                  <span className="text-amber-700 font-semibold">Eingegangen (Kaufvertrag ausstehend)</span>
+                  <span className="text-amber-700 font-semibold">Eingegangen (Rechnung ausstehend)</span>
                 </div>
               </div>
 

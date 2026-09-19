@@ -71,7 +71,188 @@ export const IMAGES = {
 
 export const PRODUCTS = [
   // -------------------------------------------------------------
-  // NOCH VORRÄTIGE ALTE ABFÜLLUNGEN (JURA 15 & GLEN GARIOCH 11)
+  // 4 NEUE ABFÜLLUNGEN (JETZT ERHÄLTLICH · RELEASE SEPTEMBER 2026)
+  // MIT TRANSPARENTEN FLASCHEN FÜR DEN SHOP UND REGIONS-HINTERGRÜNDEN
+  // -------------------------------------------------------------
+  {
+    id: 'glenburgie-11',
+    name: 'Glenburgie 11 Jahre',
+    fullName: 'Glenburgie 11 Jahre 59,2% 1st Fill Oloroso Barrique 2015/2026',
+    region: 'Speyside',
+    distillery: 'Glenburgie Distillery',
+    distilleryLocation: 'Alves, Morayshire, Speyside',
+    age: '11 Jahre',
+    abv: '59,2% vol.',
+    vintage: '2015 / 2026',
+    caskType: '1st Fill Oloroso Barrique',
+    caskNumber: 'Cask 308 of 309',
+    price: 139.90,
+    originalPrice: null,
+    pricePerLiter: '199,86 € / l',
+    isAvailable: true,
+    isUpcoming: false,
+    isNew: true,
+    releaseDate: '17. September 2026',
+    badge: 'Neu erhältlich · Sofort lieferbar',
+    bottlesTotal: 309,
+    bottlesRemaining: 309,
+    image: IMAGES.glenburgie_11_cutout,
+    cutoutImage: IMAGES.glenburgie_11_cutout,
+    cardBg: IMAGES.card_bg_speyside,
+    galleryImages: [IMAGES.glenburgie_11_cutout, IMAGES.glenburgie_11_barrel, IMAGES.card_bg_speyside, IMAGES.ines_testing],
+    character: ['Dunkle Oloroso-Rosinen', 'Getrocknete Feigen', 'Geröstete Haselnüsse', 'Warme Eichenholzwürze'],
+    intro: 'Ein opulenter Speyside-Klassiker in nativer Fassstärke. Über 11 Jahre unberührt in einem handverlesenen First Fill Oloroso Barrique gereift – mit dichter Mahagonifarbe, tiefen Trockenfruchtaromen und samtig-nussigem Schmelz.',
+    history: {
+      headline: 'Das verborgene Juwel von Morayshire',
+      text: 'Gegründet 1810 nahe Alves, gehört Glenburgie zu den traditionsreichsten Brennereien der Speyside. Bekannt für ihre fruchtige und honigsüße Destillat-DNA, entfaltet dieser Single Malt durch die 11-jährige Vollreifung im First Fill Oloroso Barrique eine spektakuläre Komplexität ohne jeglichen Verschnitt.',
+      image: IMAGES.scotland_distillery
+    },
+    tastingNotes: {
+      nose: 'Intensive Oloroso-Schokolade, sonnengetrocknete Sultaninen, reife dunkle Feigen, kandierte Orangenschale und geröstete Haselnüsse.',
+      palate: 'Mächtiger Antritt bei 59,2% vol., samtige Dattelsüße, cremiges Toffee, feine Zedernholznoten und edle Sherry-Gewürze.',
+      finish: 'Außerordentlich langanhaltend, wärmend und tief mit anhaltender Zartbitterschokolade und samtigen Holztanninen.'
+    },
+    sustainability: {
+      headline: 'Wasserkreislauf am Burgie Hill & Regionale Gerste',
+      story: 'Glenburgie bezieht sein reines Brauwasser aus den geschützten Quellen der nahen Burgie Hills. Die Abwärme der Brennblasen wird über moderne Wärmetauscher rückgeführt, um den Primärenergiebedarf signifikant zu senken. Die Prüfung vor Ort bestätigte 100% sortenreine schottische Gerste.',
+      image: IMAGES.ines_testing
+    }
+  },
+  {
+    id: 'fettercairn-15',
+    name: 'Fettercairn 15 Jahre',
+    fullName: 'Fettercairn 15 Jahre 59,9% 1st Fill Rivesaltes Barrique 2011/2026',
+    region: 'Highlands',
+    distillery: 'Fettercairn Distillery',
+    distilleryLocation: 'Fettercairn, Laurencekirk, Aberdeenshire',
+    age: '15 Jahre',
+    abv: '59,9% vol.',
+    vintage: '2011 / 2026',
+    caskType: '1st Fill Rivesaltes Barrique',
+    caskNumber: 'Cask 302 of 302',
+    price: 169.90,
+    originalPrice: null,
+    pricePerLiter: '242,71 € / l',
+    isAvailable: true,
+    isUpcoming: false,
+    isNew: true,
+    releaseDate: '17. September 2026',
+    badge: 'Neu erhältlich · Sofort lieferbar',
+    bottlesTotal: 302,
+    bottlesRemaining: 302,
+    image: IMAGES.fettercairn_15_cutout,
+    cutoutImage: IMAGES.fettercairn_15_cutout,
+    cardBg: IMAGES.card_bg_highlands,
+    galleryImages: [IMAGES.fettercairn_15_cutout, IMAGES.fettercairn_15_barrel, IMAGES.card_bg_highlands, IMAGES.ines_testing],
+    character: ['Kandierte Aprikosen', 'Rivesaltes-Süßwein', 'Sizilianische Blutorange', 'Frische Muskatblüte'],
+    intro: 'Aus der legendären Highland-Brennerei am Fuße der Grampian Mountains mit den weltweit einzigartigen Wasserkühlringen. Vollständig gereift in einem First Fill Barrique des französischen Edel-Süßweins Rivesaltes bei imposanten 59,9% vol.',
+    history: {
+      headline: 'Die legendären Kühlringe der Cairngorms',
+      text: 'Fettercairn kühlt den Hals seiner Kupferbrennblasen von außen mit eiskaltem Bergquellwasser ab. Dieser extreme Kupferkontakt erzeugt einen unvergleichlich feinen, tropisch-floralen Rohbrand. In der Kombination mit einem edlen First Fill Rivesaltes Barrique aus Südfrankreich entstand eine atemberaubende Geschmackssymbiose.',
+      image: IMAGES.scotland_distillery
+    },
+    tastingNotes: {
+      nose: 'Reife Nektarinen, kandierte Aprikose, zarter Waldblütenhonig, süßer französischer Vin Doux Naturel und feines Butter-Shortbread.',
+      palate: 'Cremig und druckvoll mit 59,9% vol., saftige Blutorange, Maracuja-Creme, Toffee und eine subtile Würze von Muskatblüte und Nelke.',
+      finish: 'Sehr elegant, mineralisch-frisch und mit langem, süßfruchtigem Nachhall.'
+    },
+    sustainability: {
+      headline: 'Wasserkreislauf der Cairngorms & Lokale Aufforstung',
+      story: 'Das für die legendären Kühlringe genutzte Quellwasser wird in einem geschlossenen, natürlichen Beckensystem abgekühlt und wiederverwendet. Fettercairn pflanzte vor Ort einen eigenen Wald aus schottischer Stieleiche für zukünftige Fass-Generationen.',
+      image: IMAGES.ines_testing
+    }
+  },
+  {
+    id: 'aultmore-17',
+    name: 'Aultmore 17 Jahre',
+    fullName: 'Aultmore 17 Jahre 54,5% Red Wine Barrique Finish 2009/2026',
+    region: 'Speyside',
+    distillery: 'Aultmore Distillery',
+    distilleryLocation: 'Keith, Banffshire, Speyside',
+    age: '17 Jahre',
+    abv: '54,5% vol.',
+    vintage: '2009 / 2026',
+    caskType: 'Finished in a Red Wine Barrique',
+    caskNumber: 'Cask 156 of 156',
+    price: 189.90,
+    originalPrice: null,
+    pricePerLiter: '271,29 € / l',
+    isAvailable: true,
+    isUpcoming: false,
+    isNew: true,
+    releaseDate: '17. September 2026',
+    badge: 'Neu erhältlich · Nur 156 Flaschen',
+    bottlesTotal: 156,
+    bottlesRemaining: 156,
+    image: IMAGES.aultmore_17_cutout,
+    cutoutImage: IMAGES.aultmore_17_cutout,
+    cardBg: IMAGES.card_bg_speyside,
+    galleryImages: [IMAGES.aultmore_17_cutout, IMAGES.aultmore_17_barrel, IMAGES.card_bg_speyside, IMAGES.ines_testing],
+    character: ['Dunkle Waldbeeren', 'Samtige Weintannine', 'Reife Brombeere', 'Französische Eiche'],
+    intro: 'Aus dem geheimnisvollen „Foggie Moss“ bei Keith. Mit nur 156 handnummerierten Flaschen die seltenste Abfüllung dieses Herbstes. 17 Jahre Reife, vollendet in einem edlen französischen Rotwein-Barrique, verleihen diesem Single Malt ein tiefes rubingoldenes Funkeln.',
+    history: {
+      headline: 'Die Reinheit des Foggie Moss',
+      text: 'Gegründet 1897 von Alexander Edward, galt Aultmore („der große Brand“) unter Kennern schon immer als „Top Dressing“. Die Brennerei liegt abgelegen im nebligen Moorland. Das durch dichten Torf und Heidekraut gefilterte Wasser des Auchinderran Burn verleiht dem Destillat eine kristalline Kräuterfrische, die durch das Rotweinfass meisterhaft abgerundet wird.',
+      image: IMAGES.scotland_coast
+    },
+    tastingNotes: {
+      nose: 'Schwarze Johannisbeere (Cassis), reife Wald-Brombeeren, feines Rosenholz, Bourbon-Vanille und edle Kakaobohne.',
+      palate: 'Seidig-ölig auf der Zunge, delikate samtige Rotweintannine, Kirschkompott, feines Leder und zarte Nelkenwürze.',
+      finish: 'Langanhaltend, trocken-elegant mit Noten von herber Zartbitterschokolade und roten Sommerfrüchten.'
+    },
+    sustainability: {
+      headline: 'Moorschutz im Foggie Moss & Biodiversität',
+      story: 'Das Quellgebiet des Foggie Moss steht unter strengem Naturschutz. Aultmore arbeitet aktiv an der Renaturierung der umgebenden Torfmoore mit, um CO₂ dauerhaft im Boden zu binden und das natürliche Ökosystem zu schützen.',
+      image: IMAGES.ines_testing
+    }
+  },
+  {
+    id: 'highlandpark-18',
+    name: 'Highland Park 18 Jahre',
+    fullName: 'Highland Park 18 Jahre 54,3% Fully Matured in a Bourbon Barrel 2007/2026',
+    region: 'Islands',
+    distillery: 'Highland Park Distillery',
+    distilleryLocation: 'Kirkwall, Orkney Islands',
+    age: '18 Jahre',
+    abv: '54,3% vol.',
+    vintage: '2007 / 2026',
+    caskType: 'Fully Matured in a Bourbon Barrel',
+    caskNumber: 'Cask 240 of 240',
+    price: 219.90,
+    originalPrice: null,
+    pricePerLiter: '314,14 € / l',
+    isAvailable: true,
+    isUpcoming: false,
+    isNew: true,
+    releaseDate: '17. September 2026',
+    badge: 'Neu erhältlich · Orkney Single Cask',
+    bottlesTotal: 240,
+    bottlesRemaining: 240,
+    image: IMAGES.highlandpark_18_cutout,
+    cutoutImage: IMAGES.highlandpark_18_cutout,
+    cardBg: IMAGES.card_bg_islands,
+    galleryImages: [IMAGES.highlandpark_18_cutout, IMAGES.highlandpark_18_barrel, IMAGES.card_bg_islands, IMAGES.ines_testing],
+    character: ['Heidetorf-Rauch', 'Bienenwachs', 'Meersalz-Gischt', 'Bourbon-Vanillemark'],
+    intro: 'Von den windgepeitschten Orkney-Inseln. 18 lange Jahre unberührt gereift in einem erstbefüllten Bourbon Barrel. Der unverwechselbare Hobbister Moor-Heidetorf verleiht diesem seltenen Einzelfass eine maritime, florale Rauchigkeit von monumentaler Tiefe.',
+    history: {
+      headline: 'Wikinger-Erbe & der Hobbister-Moor-Torf',
+      text: 'Highland Park brennt seit 1798 auf Orkney und ist eine der letzten Brennereien, die ihr Malz auf traditionellen Floor Maltings noch selbst wendet. Der hier verwendete Torf stammt aus dem Hobbister Moor – baumlos, dafür reich an jahrhundertealtem Heidekraut. Das Ergebnis ist kein beißender Rauch wie auf Islay, sondern ein sanfter, floral-aromatischer Heideduft.',
+      image: IMAGES.tasting_springbank
+    },
+    tastingNotes: {
+      nose: 'Sanfter, süßer Heidetorfrauch, cremiges Bourbon-Vanillemark, Bienenwachs, blühendes Heidekraut und frische Meeresbrise.',
+      palate: 'Ölig und vielschichtig bei 54,3% vol., reife Birne, getoastete Eiche, salziges Butter-Karamell und eine wärmende Torfglut.',
+      finish: 'Monumental lang, maritim und trocken mit feinem Rauch und anhaltendem Honigwachs-Aroma.'
+    },
+    sustainability: {
+      headline: 'Handwerklicher Torfabbau & Windenergie auf Orkney',
+      story: 'Der Torf im Hobbister Moor wird schonend und nach strengen Zyklen von Hand gestochen, sodass sich die Moorvegetation regenerieren kann. Zudem deckt die Insel Orkney über 100% ihres Strombedarfs aus erneuerbaren Wind- und Gezeitenenergien.',
+      image: IMAGES.ines_testing
+    }
+  },
+
+  // -------------------------------------------------------------
+  // WEITERE VORRÄTIGE ABFÜLLUNGEN (JURA 15 & GLEN GARIOCH 11)
   // -------------------------------------------------------------
   {
     id: 'jura-15',
@@ -90,6 +271,7 @@ export const PRODUCTS = [
     pricePerLiter: '235,57 € / l',
     isAvailable: true,
     isUpcoming: false,
+    isNew: false,
     isFeatured: true,
     badge: 'Sofort lieferbar · 8% Vorteil',
     bottlesTotal: 247,
@@ -133,6 +315,7 @@ export const PRODUCTS = [
     pricePerLiter: '192,71 € / l',
     isAvailable: true,
     isUpcoming: false,
+    isNew: false,
     isFeatured: true,
     badge: 'Bestseller · Sofort lieferbar',
     bottlesTotal: 237,
@@ -180,6 +363,7 @@ export const PRODUCTS = [
     pricePerLiter: '185,57 € / l',
     isAvailable: true,
     isUpcoming: false,
+    isNew: false,
     isFeatured: true,
     badge: 'Sofort lieferbar',
     bottlesTotal: 214,
@@ -223,10 +407,12 @@ export const PRODUCTS = [
     pricePerLiter: '199,86 € / l',
     isAvailable: false,
     isUpcoming: false,
+    isNew: false,
     isFeatured: false,
-    badge: 'Ausverkauft · Sammler-Archiv',
+    badge: 'Ausverkauft',
     bottlesTotal: 109,
     bottlesRemaining: 0,
+    soldOut: true,
     image: IMAGES.ardmore,
     cutoutImage: IMAGES.ardmore,
     cardBg: IMAGES.card_bg_highlands,
@@ -247,183 +433,6 @@ export const PRODUCTS = [
       headline: 'Quellwasser vom Knockandy Hill & Lokale Landwirtschaft',
       story: 'Ardmore bezieht sein Brauwasser aus den unberührten Quellen des Knockandy Hill. Alle anfallenden Destillationsrückstände (Draff und Pot Ale) werden an lokale Farmen in Aberdeenshire als hochwertiges Viehfutter übergeben.',
       image: IMAGES.mission
-    }
-  },
-
-  // -------------------------------------------------------------
-  // 4 NEUE FÄSSER (RELEASE AB 17. SEPTEMBER 2026 · VORABZUGRIFF)
-  // MIT TRANSPARENTEN FLASCHEN FÜR DEN SHOP UND REGIONS-HINTERGRÜNDEN
-  // -------------------------------------------------------------
-  {
-    id: 'glenburgie-11',
-    name: 'Glenburgie 11 Jahre',
-    fullName: 'Glenburgie 11 Jahre 59,2% 1st Fill Oloroso Barrique 2015/2026',
-    region: 'Speyside',
-    distillery: 'Glenburgie Distillery',
-    distilleryLocation: 'Alves, Morayshire, Speyside',
-    age: '11 Jahre',
-    abv: '59,2% vol.',
-    vintage: '2015 / 2026',
-    caskType: '1st Fill Oloroso Barrique',
-    caskNumber: 'Cask 308 of 309',
-    price: 139.90,
-    originalPrice: null,
-    pricePerLiter: '199,86 € / l',
-    isAvailable: false,
-    isUpcoming: true,
-    releaseDate: '17. September 2026',
-    badge: 'Release am 17. September · Vorabzugriff',
-    bottlesTotal: 309,
-    bottlesRemaining: 309,
-    image: IMAGES.glenburgie_11_cutout,
-    cutoutImage: IMAGES.glenburgie_11_cutout,
-    cardBg: IMAGES.card_bg_speyside,
-    galleryImages: [IMAGES.glenburgie_11_cutout, IMAGES.glenburgie_11_barrel, IMAGES.card_bg_speyside, IMAGES.ines_testing],
-    character: ['Dunkle Oloroso-Rosinen', 'Getrocknete Feigen', 'Geröstete Haselnüsse', 'Warme Eichenholzwürze'],
-    intro: 'Ein opulenter Speyside-Klassiker in nativer Fassstärke. Über 11 Jahre unberührt in einem handverlesenen First Fill Oloroso Barrique gereift – mit dichter Mahagonifarbe, tiefen Trockenfruchtaromen und samtig-nussigem Schmelz.',
-    history: {
-      headline: 'Das verborgene Juwel von Morayshire',
-      text: 'Gegründet 1810 nahe Alves, gehört Glenburgie zu den traditionsreichsten Brennereien der Speyside. Bekannt für ihre fruchtige und honigsüße Destillat-DNA, entfaltet dieser Single Malt durch die 11-jährige Vollreifung im First Fill Oloroso Barrique eine spektakuläre Komplexität ohne jeglichen Verschnitt.',
-      image: IMAGES.scotland_distillery
-    },
-    tastingNotes: {
-      nose: 'Intensive Oloroso-Schokolade, sonnengetrocknete Sultaninen, reife dunkle Feigen, kandierte Orangenschale und geröstete Haselnüsse.',
-      palate: 'Mächtiger Antritt bei 59,2% vol., samtige Dattelsüße, cremiges Toffee, feine Zedernholznoten und edle Sherry-Gewürze.',
-      finish: 'Außerordentlich langanhaltend, wärmend und tief mit anhaltender Zartbitterschokolade und samtigen Holztanninen.'
-    },
-    sustainability: {
-      headline: 'Wasserkreislauf am Burgie Hill & Regionale Gerste',
-      story: 'Glenburgie bezieht sein reines Brauwasser aus den geschützten Quellen der nahen Burgie Hills. Die Abwärme der Brennblasen wird über moderne Wärmetauscher rückgeführt, um den Primärenergiebedarf signifikant zu senken. Die Prüfung vor Ort bestätigte 100% sortenreine schottische Gerste.',
-      image: IMAGES.ines_testing
-    }
-  },
-  {
-    id: 'fettercairn-15',
-    name: 'Fettercairn 15 Jahre',
-    fullName: 'Fettercairn 15 Jahre 59,9% 1st Fill Rivesaltes Barrique 2011/2026',
-    region: 'Highlands',
-    distillery: 'Fettercairn Distillery',
-    distilleryLocation: 'Fettercairn, Laurencekirk, Aberdeenshire',
-    age: '15 Jahre',
-    abv: '59,9% vol.',
-    vintage: '2011 / 2026',
-    caskType: '1st Fill Rivesaltes Barrique',
-    caskNumber: 'Cask 302 of 302',
-    price: 169.90,
-    originalPrice: null,
-    pricePerLiter: '242,71 € / l',
-    isAvailable: false,
-    isUpcoming: true,
-    releaseDate: '17. September 2026',
-    badge: 'Release am 17. September · Vorabzugriff',
-    bottlesTotal: 302,
-    bottlesRemaining: 302,
-    image: IMAGES.fettercairn_15_cutout,
-    cutoutImage: IMAGES.fettercairn_15_cutout,
-    cardBg: IMAGES.card_bg_highlands,
-    galleryImages: [IMAGES.fettercairn_15_cutout, IMAGES.fettercairn_15_barrel, IMAGES.card_bg_highlands, IMAGES.ines_testing],
-    character: ['Kandierte Aprikosen', 'Rivesaltes-Süßwein', 'Sizilianische Blutorange', 'Frische Muskatblüte'],
-    intro: 'Aus der legendären Highland-Brennerei am Fuße der Grampian Mountains mit den weltweit einzigartigen Wasserkühlringen. Vollständig gereift in einem First Fill Barrique des französischen Edel-Süßweins Rivesaltes bei imposanten 59,9% vol.',
-    history: {
-      headline: 'Die legendären Kühlringe der Cairngorms',
-      text: 'Fettercairn kühlt den Hals seiner Kupferbrennblasen von außen mit eiskaltem Bergquellwasser ab. Dieser extreme Kupferkontakt erzeugt einen unvergleichlich feinen, tropisch-floralen Rohbrand. In der Kombination mit einem edlen First Fill Rivesaltes Barrique aus Südfrankreich entstand eine atemberaubende Geschmackssymbiose.',
-      image: IMAGES.scotland_distillery
-    },
-    tastingNotes: {
-      nose: 'Reife Nektarinen, kandierte Aprikose, zarter Waldblütenhonig, süßer französischer Vin Doux Naturel und feines Butter-Shortbread.',
-      palate: 'Cremig und druckvoll mit 59,9% vol., saftige Blutorange, Maracuja-Creme, Toffee und eine subtile Würze von Muskatblüte und Nelke.',
-      finish: 'Sehr elegant, mineralisch-frisch und mit langem, süßfruchtigem Nachhall.'
-    },
-    sustainability: {
-      headline: 'Wasserkreislauf der Cairngorms & Lokale Aufforstung',
-      story: 'Das für die legendären Kühlringe genutzte Quellwasser wird in einem geschlossenen, natürlichen Beckensystem abgekühlt und wiederverwendet. Fettercairn pflanzte vor Ort einen eigenen Wald aus schottischer Stieleiche für zukünftige Fass-Generationen.',
-      image: IMAGES.ines_testing
-    }
-  },
-  {
-    id: 'aultmore-17',
-    name: 'Aultmore 17 Jahre',
-    fullName: 'Aultmore 17 Jahre 54,5% Red Wine Barrique Finish 2009/2026',
-    region: 'Speyside',
-    distillery: 'Aultmore Distillery',
-    distilleryLocation: 'Keith, Banffshire, Speyside',
-    age: '17 Jahre',
-    abv: '54,5% vol.',
-    vintage: '2009 / 2026',
-    caskType: 'Finished in a Red Wine Barrique',
-    caskNumber: 'Cask 156 of 156',
-    price: 189.90,
-    originalPrice: null,
-    pricePerLiter: '271,29 € / l',
-    isAvailable: false,
-    isUpcoming: true,
-    releaseDate: '17. September 2026',
-    badge: 'Release am 17. September · Nur 156 Flaschen',
-    bottlesTotal: 156,
-    bottlesRemaining: 156,
-    image: IMAGES.aultmore_17_cutout,
-    cutoutImage: IMAGES.aultmore_17_cutout,
-    cardBg: IMAGES.card_bg_speyside,
-    galleryImages: [IMAGES.aultmore_17_cutout, IMAGES.aultmore_17_barrel, IMAGES.card_bg_speyside, IMAGES.ines_testing],
-    character: ['Dunkle Waldbeeren', 'Samtige Weintannine', 'Reife Brombeere', 'Französische Eiche'],
-    intro: 'Aus dem geheimnisvollen „Foggie Moss“ bei Keith. Mit nur 156 handnummerierten Flaschen die seltenste Abfüllung dieses Herbstes. 17 Jahre Reife, vollendet in einem edlen französischen Rotwein-Barrique, verleihen diesem Single Malt ein tiefes rubingoldenes Funkeln.',
-    history: {
-      headline: 'Die Reinheit des Foggie Moss',
-      text: 'Gegründet 1897 von Alexander Edward, galt Aultmore („der große Brand“) unter Kennern schon immer als „Top Dressing“. Die Brennerei liegt abgelegen im nebligen Moorland. Das durch dichten Torf und Heidekraut gefilterte Wasser des Auchinderran Burn verleiht dem Destillat eine kristalline Kräuterfrische, die durch das Rotweinfass meisterhaft abgerundet wird.',
-      image: IMAGES.scotland_coast
-    },
-    tastingNotes: {
-      nose: 'Schwarze Johannisbeere (Cassis), reife Wald-Brombeeren, feines Rosenholz, Bourbon-Vanille und edle Kakaobohne.',
-      palate: 'Seidig-ölig auf der Zunge, delikate samtige Rotweintannine, Kirschkompott, feines Leder und zarte Nelkenwürze.',
-      finish: 'Langanhaltend, trocken-elegant mit Noten von herber Zartbitterschokolade und roten Sommerfrüchten.'
-    },
-    sustainability: {
-      headline: 'Moorschutz im Foggie Moss & Biodiversität',
-      story: 'Das Quellgebiet des Foggie Moss steht unter strengem Naturschutz. Aultmore arbeitet aktiv an der Renaturierung der umgebenden Torfmoore mit, um CO₂ dauerhaft im Boden zu binden und das natürliche Ökosystem zu schützen.',
-      image: IMAGES.ines_testing
-    }
-  },
-  {
-    id: 'highlandpark-18',
-    name: 'Highland Park 18 Jahre',
-    fullName: 'Highland Park 18 Jahre 54,3% Fully Matured in a Bourbon Barrel 2007/2026',
-    region: 'Islands',
-    distillery: 'Highland Park Distillery',
-    distilleryLocation: 'Kirkwall, Orkney Islands',
-    age: '18 Jahre',
-    abv: '54,3% vol.',
-    vintage: '2007 / 2026',
-    caskType: 'Fully Matured in a Bourbon Barrel',
-    caskNumber: 'Cask 240 of 240',
-    price: 219.90,
-    originalPrice: null,
-    pricePerLiter: '314,14 € / l',
-    isAvailable: false,
-    isUpcoming: true,
-    releaseDate: '17. September 2026',
-    badge: 'Release am 17. September · Orkney Single Cask',
-    bottlesTotal: 240,
-    bottlesRemaining: 240,
-    image: IMAGES.highlandpark_18_cutout,
-    cutoutImage: IMAGES.highlandpark_18_cutout,
-    cardBg: IMAGES.card_bg_islands,
-    galleryImages: [IMAGES.highlandpark_18_cutout, IMAGES.highlandpark_18_barrel, IMAGES.card_bg_islands, IMAGES.ines_testing],
-    character: ['Heidetorf-Rauch', 'Bienenwachs', 'Meersalz-Gischt', 'Bourbon-Vanillemark'],
-    intro: 'Von den windgepeitschten Orkney-Inseln. 18 lange Jahre unberührt gereift in einem erstbefüllten Bourbon Barrel. Der unverwechselbare Hobbister Moor-Heidetorf verleiht diesem seltenen Einzelfass eine maritime, florale Rauchigkeit von monumentaler Tiefe.',
-    history: {
-      headline: 'Wikinger-Erbe & der Hobbister-Moor-Torf',
-      text: 'Highland Park brennt seit 1798 auf Orkney und ist eine der letzten Brennereien, die ihr Malz auf traditionellen Floor Maltings noch selbst wendet. Der hier verwendete Torf stammt aus dem Hobbister Moor – baumlos, dafür reich an jahrhundertealtem Heidekraut. Das Ergebnis ist kein beißender Rauch wie auf Islay, sondern ein sanfter, floral-aromatischer Heideduft.',
-      image: IMAGES.tasting_springbank
-    },
-    tastingNotes: {
-      nose: 'Sanfter, süßer Heidetorfrauch, cremiges Bourbon-Vanillemark, Bienenwachs, blühendes Heidekraut und frische Meeresbrise.',
-      palate: 'Ölig und vielschichtig bei 54,3% vol., reife Birne, getoastete Eiche, salziges Butter-Karamell und eine wärmende Torfglut.',
-      finish: 'Monumental lang, maritim und trocken mit feinem Rauch und anhaltendem Honigwachs-Aroma.'
-    },
-    sustainability: {
-      headline: 'Handwerklicher Torfabbau & Windenergie auf Orkney',
-      story: 'Der Torf im Hobbister Moor wird schonend und nach strengen Zyklen von Hand gestochen, sodass sich die Moorvegetation regenerieren kann. Zudem deckt die Insel Orkney über 100% ihres Strombedarfs aus erneuerbaren Wind- und Gezeitenenergien.',
-      image: IMAGES.ines_testing
     }
   }
 ];
