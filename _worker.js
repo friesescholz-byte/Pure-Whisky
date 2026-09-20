@@ -19,13 +19,48 @@ export default {
       return new Response('OK', { status: 200, headers: corsHeaders });
     }
 
+    // 0b. Settings API for Mollie Key Sync
+    if (request.method === 'GET' && url.pathname === '/api/settings/mollie') {
+      let key = null;
+      if (env && env.PURE_KV) {
+        try { key = await env.PURE_KV.get('mollie_api_key'); } catch {}
+      }
+      return new Response(JSON.stringify({ key: key || '' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    if (request.method === 'POST' && url.pathname === '/api/settings/mollie') {
+      try {
+        const body = await request.json();
+        const newKey = (body.key || '').trim();
+        if (env && env.PURE_KV && newKey) {
+          await env.PURE_KV.put('mollie_api_key', newKey);
+        }
+        return new Response(JSON.stringify({ success: true, key: newKey }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
+      }
+    }
+
     if (url.pathname.startsWith('/api/mollie')) {
       const molliePath = url.pathname.replace(/^\/api\/mollie/, '') + url.search;
       const targetUrl = 'https://api.mollie.com' + molliePath;
 
       const headers = new Headers();
-      const authHeader = request.headers.get('Authorization');
-      if (authHeader) headers.set('Authorization', authHeader);
+      let authHeader = request.headers.get('Authorization');
+      if (!authHeader || authHeader.trim() === 'Bearer' || authHeader.trim() === 'Bearer null' || authHeader.trim() === 'Bearer undefined') {
+        let fallbackKey = null;
+        if (env && env.PURE_KV) {
+          try { fallbackKey = await env.PURE_KV.get('mollie_api_key'); } catch {}
+        }
+        fallbackKey = fallbackKey || env?.MOLLIE_API_KEY || 'test_757rbjSksxgtDCCAps98ThDSgpxCaz';
+        authHeader = `Bearer ${fallbackKey}`;
+      }
+      headers.set('Authorization', authHeader);
+
       const contentType = request.headers.get('Content-Type');
       if (contentType) headers.set('Content-Type', contentType);
       headers.set('Accept', 'application/json');

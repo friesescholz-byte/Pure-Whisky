@@ -14,15 +14,36 @@ export default function SettingsManager({
   );
   const [savedSuccess, setSavedSuccess] = useState(false);
 
+  React.useEffect(() => {
+    fetch('/api/settings/mollie')
+      .then(r => r.json())
+      .then(data => {
+        if (data && data.key && data.key.trim()) {
+          setMollieKey(data.key.trim());
+          localStorage.setItem('pure_mollie_key', data.key.trim());
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (onSaveAdminEmail) {
       onSaveAdminEmail(emailInput.trim());
     }
-    localStorage.setItem('pure_mollie_key', mollieKey.trim());
+    const cleanMollie = mollieKey.trim();
+    localStorage.setItem('pure_mollie_key', cleanMollie);
     if (resendKey) {
       localStorage.setItem('pure_resend_key', resendKey.trim());
     }
+
+    // Sync to Cloudflare KV for all customer checkouts
+    fetch('/api/settings/mollie', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: cleanMollie })
+    }).catch(err => console.warn('Could not sync Mollie key to KV:', err));
+
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 3000);
   };

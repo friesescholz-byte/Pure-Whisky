@@ -22,8 +22,16 @@ export async function onRequest(context) {
   const targetUrl = 'https://api.mollie.com' + molliePath;
 
   const headers = new Headers();
-  const authHeader = request.headers.get('Authorization');
-  if (authHeader) headers.set('Authorization', authHeader);
+  let authHeader = request.headers.get('Authorization');
+  if (!authHeader || authHeader.trim() === 'Bearer' || authHeader.trim() === 'Bearer null' || authHeader.trim() === 'Bearer undefined') {
+    let fallbackKey = null;
+    if (context.env && context.env.PURE_KV) {
+      try { fallbackKey = await context.env.PURE_KV.get('mollie_api_key'); } catch {}
+    }
+    fallbackKey = fallbackKey || context.env?.MOLLIE_API_KEY || 'test_757rbjSksxgtDCCAps98ThDSgpxCaz';
+    authHeader = `Bearer ${fallbackKey}`;
+  }
+  headers.set('Authorization', authHeader);
   const contentType = request.headers.get('Content-Type');
   if (contentType) headers.set('Content-Type', contentType);
   headers.set('Accept', 'application/json');

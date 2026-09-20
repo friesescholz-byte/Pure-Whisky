@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ShoppingBag, Plus, Minus, Trash2, ArrowRight, ShieldCheck, CheckCircle2, ChevronLeft, CreditCard, Send, ExternalLink, Loader2 } from 'lucide-react';
+import { X, ShoppingBag, Plus, Minus, Trash2, ArrowRight, ShieldCheck, CheckCircle2, ChevronLeft, CreditCard, Send, ExternalLink, Loader2, AlertCircle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { createMolliePayment } from '../services/orderService';
 
@@ -19,6 +19,7 @@ export default function CartDrawer({
   const [placedOrder, setPlacedOrder] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [mollieCheckoutUrl, setMollieCheckoutUrl] = useState(null);
+  const [paymentError, setPaymentError] = useState(null);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -49,6 +50,8 @@ export default function CartDrawer({
 
   const handleSubmitOrder = async (e) => {
     e.preventDefault();
+    setPaymentError(null);
+
     if (!formData.email || !formData.firstName || !formData.lastName || !formData.street || !formData.zip || !formData.city) {
       alert(lang === 'de' ? 'Bitte füllen Sie alle Adressfelder aus.' : 'Please fill in all address fields.');
       return;
@@ -63,24 +66,26 @@ export default function CartDrawer({
     const invoiceNumber = `A09401${orderId}`;
     const todayStr = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-    let paymentStatusDetail = 'Online-Zahlung (Kreditkarte, PayPal, Klarna)';
-    let checkoutLink = null;
-
-    // Call Payments API Gateway
+    // Step 1: Call Payments API Gateway
+    let mollieResult = null;
     try {
-      const mollieResult = await createMolliePayment({
+      mollieResult = await createMolliePayment({
         orderId,
         amount: total,
         customerEmail: formData.email.trim(),
         description: `PURE.WHISKY. Bestellung #${orderId}`
       });
-      if (mollieResult.success && mollieResult.checkoutUrl) {
-        checkoutLink = mollieResult.checkoutUrl;
-        setMollieCheckoutUrl(mollieResult.checkoutUrl);
-        paymentStatusDetail = `Online-Zahlung (${mollieResult.paymentId}) – ${formData.email.trim()}`;
-      }
     } catch (mollieErr) {
-      console.warn('Payment checkout initiation error:', mollieErr);
+      console.error('Payment checkout initiation error:', mollieErr);
+      mollieResult = { success: false, error: mollieErr.message };
+    }
+
+    // STRICT CHECK: Mollie must never be bypassed!
+    if (!mollieResult || !mollieResult.success || !mollieResult.checkoutUrl) {
+      setIsProcessing(false);
+      const errorMsg = mollieResult?.error || 'Zahlungsverbindung konnte nicht aufgebaut werden. Bitte prüfen Sie Ihre Verbindung oder versuchen Sie es erneut.';
+      setPaymentError(errorMsg);
+      return;
     }
 
     const newOrder = {
@@ -96,7 +101,7 @@ export default function CartDrawer({
         city: formData.city.trim(),
         email: formData.email.trim()
       },
-      paymentMethod: paymentStatusDetail,
+      paymentMethod: `Online-Zahlung (${mollieResult.paymentId}) – ${formData.email.trim()}`,
       items: cartItems.map(item => ({
         id: item.product.id,
         name: item.product.name,
@@ -108,24 +113,25 @@ export default function CartDrawer({
       total,
       netTotal: total / 1.19,
       vatTotal: total - (total / 1.19),
-      status: 'neu_eingegangen', // 'neu_eingegangen' -> 'rechnung_versendet'
+      status: 'zahlung_ausstehend',
       invoiceSentAt: null,
       contractConcluded: false
     };
 
-    setPlacedOrder(newOrder);
+    // Store pending order in localStorage for completion upon return from Mollie
+    try {
+      localStorage.setItem('pure_whisky_pending_order', JSON.stringify(newOrder));
+    } catch (err) {
+      console.warn('Could not save pending order to localStorage:', err);
+    }
+
+    // Register pending order in state without sending confirmation email yet
     if (onCompleteOrder) {
-      await onCompleteOrder(newOrder);
-    }
-    setIsProcessing(false);
-
-    // If payment gateway returned a direct checkout link, redirect customer immediately to payment
-    if (checkoutLink) {
-      window.location.href = checkoutLink;
-      return;
+      await onCompleteOrder(newOrder, { skipEmail: true });
     }
 
-    setStep('success');
+    // IMMEDIATELY REDIRECT TO MOLLIE
+    window.location.href = mollieResult.checkoutUrl;
   };
 
   const handleResetAndClose = () => {
@@ -383,15 +389,10 @@ export default function CartDrawer({
                 <div className="pt-2">
                   <label className="block text-xs text-[#55695E] mb-2 font-medium">{t.cart.paymentMethod}</label>
                   <div className="p-4 rounded-xl border border-[#D4C8B8] bg-[#FAF8F5] space-y-2.5">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2.5">
-                        <CreditCard className="w-4 h-4 text-[#B85D2C]" />
-                        <span className="text-xs font-bold text-[#181F1C]">
-                          {lang === 'de' ? 'Sichere Online-Zahlung' : 'Secure Online Payment'}
-                        </span>
-                      </div>
-                      <span className="text-[10px] text-emerald-700 bg-emerald-100/70 border border-emerald-200 px-2 py-0.5 rounded-full font-craft-mono font-bold">
-                        SSL 256-Bit
+                    <div className="flex items-center space-x-2.5">
+                      <CreditCard className="w-4 h-4 text-[#B85D2C]" />
+                      <span className="text-xs font-bold text-[#181F1C]">
+                        {lang === 'de' ? 'Sichere Online-Zahlung' : 'Secure Online Payment'}
                       </span>
                     </div>
 
@@ -500,6 +501,16 @@ export default function CartDrawer({
                   </div>
                 </div>
 
+                {paymentError && (
+                  <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs leading-relaxed text-left flex items-start space-x-2">
+                    <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
+                    <div>
+                      <span className="font-bold block mb-0.5">Zahlungsverbindung fehlgeschlagen:</span>
+                      <span>{paymentError}</span>
+                    </div>
+                  </div>
+                )}
+
                 <button
                   type="submit"
                   disabled={isProcessing || !termsAccepted}
@@ -512,7 +523,7 @@ export default function CartDrawer({
                   {isProcessing ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Bestellung wird vorbereitet...</span>
+                      <span>Weiterleitung zu Mollie...</span>
                     </>
                   ) : (
                     <>

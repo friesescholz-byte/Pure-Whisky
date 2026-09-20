@@ -54,7 +54,7 @@ export default function Navbar({ activeTab, setActiveTab, onSelectProduct, cartI
             alt="PURE.WHISKY. Logo"
             className="w-12 h-12 sm:w-14 sm:h-14 object-contain rounded-full border border-[#D4C8B8] shadow-xs group-hover:scale-105 transition-transform"
           />
-          <div className="flex flex-col">
+          <div className="hidden sm:flex flex-col">
             <span className="font-woodblock text-2xl sm:text-3xl text-[#181F1C] tracking-wider uppercase leading-none">
               PURE.WHISKY.
             </span>

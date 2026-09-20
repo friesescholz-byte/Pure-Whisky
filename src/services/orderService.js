@@ -9,8 +9,14 @@ export const DEFAULT_ADMIN_EMAIL = 'friese.scholz@gmail.com';
 export const SENDER_EMAIL = 'PURE.WHISKY. <noreply@scholz-friese-webdesign.de>';
 export const REPLY_TO_EMAIL = 'info@pure-whisky.com';
 
+export const DEFAULT_MOLLIE_KEY = 'test_757rbjSksxgtDCCAps98ThDSgpxCaz';
+
 export function getMollieKey() {
-  return import.meta.env?.VITE_MOLLIE_API_KEY || localStorage.getItem('pure_mollie_key') || '';
+  const customKey = typeof window !== 'undefined' ? localStorage.getItem('pure_mollie_key') : null;
+  if (customKey && customKey.trim()) {
+    return customKey.trim();
+  }
+  return import.meta.env?.VITE_MOLLIE_API_KEY || DEFAULT_MOLLIE_KEY;
 }
 
 export function getResendKey() {
@@ -53,19 +59,20 @@ export async function createMolliePayment({ orderId, amount, description, redire
     });
 
     const data = await response.json();
-    if (response.ok && data.id) {
+    if (response.ok && data.id && data._links?.checkout?.href) {
       return {
         success: true,
         paymentId: data.id,
-        checkoutUrl: data._links?.checkout?.href || null,
+        checkoutUrl: data._links.checkout.href,
         status: data.status,
         raw: data
       };
     } else {
       console.warn('Mollie API response error:', data);
+      const errMsg = data.detail || data.title || (data.extra ? JSON.stringify(data.extra) : 'Zahlung konnte nicht initialisiert werden.');
       return {
         success: false,
-        error: data.detail || data.title || 'Mollie API Error',
+        error: errMsg,
         raw: data
       };
     }

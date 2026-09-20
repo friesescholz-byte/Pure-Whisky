@@ -24,6 +24,7 @@ import InvoiceModal from './components/InvoiceModal';
 import { PRODUCTS, BLOG_POSTS } from './data/pureWhiskyFullData';
 import initialCrmData from './data/initialCrmData.json';
 import { sendOrderConfirmationEmail, sendInvoiceEmail } from './services/orderService';
+import { CheckCircle2 } from 'lucide-react';
 
 function getTabFromUrl() {
   if (typeof window === 'undefined') return 'home';
@@ -267,6 +268,69 @@ export default function App() {
   const [adminEmail, setAdminEmail] = useState(() => {
     return localStorage.getItem('pure_whisky_admin_email') || 'friese.scholz@gmail.com';
   });
+
+  const [paidConfirmationOrder, setPaidConfirmationOrder] = useState(null);
+
+  // Check URL query parameters for return from Mollie payment gateway
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderStatus = urlParams.get('order_status');
+    const orderIdParam = urlParams.get('order_id');
+
+    if (orderStatus === 'paid' && orderIdParam) {
+      // Clear cart
+      setCartItems([]);
+      try { localStorage.removeItem('pure_whisky_cart'); } catch {}
+
+      // Clean query string from URL without reload
+      const cleanUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+
+      // Retrieve pending order if stored
+      let pending = null;
+      try {
+        const saved = localStorage.getItem('pure_whisky_pending_order');
+        if (saved) {
+          pending = JSON.parse(saved);
+          localStorage.removeItem('pure_whisky_pending_order');
+        }
+      } catch (err) {
+        console.warn('Could not parse pending order:', err);
+      }
+
+      setOrders(prev => {
+        const target = pending || prev.find(o => o.orderId === orderIdParam) || {
+          orderId: orderIdParam,
+          invoiceNumber: `A09401${orderIdParam}`,
+          date: new Date().toLocaleDateString('de-DE'),
+          customer: { firstName: 'Kunde', lastName: '', email: '' },
+          items: [],
+          total: 0
+        };
+
+        const updatedOrder = {
+          ...target,
+          orderId: orderIdParam,
+          paymentStatus: 'Bezahlt (Online-Zahlung)',
+          status: 'neu_eingegangen'
+        };
+
+        // Send order confirmation via Resend now that payment has succeeded
+        if (target.customer && target.customer.email) {
+          sendOrderConfirmationEmail({ order: updatedOrder, adminEmail }).catch(e => console.warn(e));
+        }
+
+        setPaidConfirmationOrder(updatedOrder);
+
+        const exists = prev.some(o => o.orderId === orderIdParam);
+        if (exists) {
+          return prev.map(o => o.orderId === orderIdParam ? updatedOrder : o);
+        }
+        return [updatedOrder, ...prev];
+      });
+    }
+  }, [adminEmail]);
 
   const handleSaveAdminEmail = (newEmail) => {
     setAdminEmail(newEmail);
@@ -590,14 +654,16 @@ export default function App() {
     setInvoiceModalOrder(null);
   };
 
-  const handleCompleteOrder = async (newOrder) => {
+  const handleCompleteOrder = async (newOrder, options = {}) => {
     setOrders(prev => [newOrder, ...prev]);
 
-    // Send order confirmation via Resend API
-    try {
-      await sendOrderConfirmationEmail({ order: newOrder, adminEmail });
-    } catch (confErr) {
-      console.warn('Resend order confirmation notice:', confErr);
+    // Send order confirmation via Resend API (only if not waiting for external payment)
+    if (!options.skipEmail) {
+      try {
+        await sendOrderConfirmationEmail({ order: newOrder, adminEmail });
+      } catch (confErr) {
+        console.warn('Resend order confirmation notice:', confErr);
+      }
     }
 
     // Automatically add customer to WooCommerce customers CRM
@@ -621,8 +687,9 @@ export default function App() {
       return [newCust, ...prev];
     });
 
-    // Clear cart
-    setCartItems([]);
+    if (!options.skipEmail) {
+      setCartItems([]);
+    }
   };
 
   const handleAddTestOrder = () => {
@@ -901,6 +968,48 @@ export default function App() {
         type={legalType}
         onClose={() => setLegalType(null)}
       />
+
+      {/* Paid Confirmation Modal upon returning from Mollie */}
+      {paidConfirmationOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white border border-[#D4C8B8] rounded-3xl max-w-md w-full p-8 shadow-2xl space-y-6 text-center relative animate-in fade-in zoom-in-95 duration-200">
+            <div className="w-16 h-16 rounded-full bg-[#2D6A4F]/10 text-[#2D6A4F] flex items-center justify-center mx-auto">
+              <CheckCircle2 className="w-10 h-10" />
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="font-woodblock text-2xl sm:text-3xl uppercase text-[#181F1C]">
+                Zahlung erfolgreich!
+              </h3>
+              <p className="text-xs text-[#55695E] leading-relaxed">
+                Vielen Dank für Ihre Bestellung. Ihre Zahlung wurde bestätigt und die Bestelleingangsbestätigung wurde an <strong>{paidConfirmationOrder.customer?.email}</strong> übermittelt.
+              </p>
+            </div>
+
+            <div className="bg-[#FAF8F5] border border-[#E2DDD5] rounded-xl p-4 text-left text-xs space-y-2">
+              <div className="flex justify-between">
+                <span className="text-[#55695E]">Bestellnummer:</span>
+                <span className="font-bold font-mono text-[#181F1C]">#{paidConfirmationOrder.orderId}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[#55695E]">Zahlungsstatus:</span>
+                <span className="text-[#2D6A4F] font-bold font-craft-mono">🟢 Erfolgreich bezahlt</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[#55695E]">Gesamtbetrag:</span>
+                <span className="font-bold text-[#B85D2C]">{Number(paidConfirmationOrder.total || 0).toFixed(2)} €</span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setPaidConfirmationOrder(null)}
+              className="w-full py-3.5 bg-[#B85D2C] hover:bg-[#A04E24] text-white rounded-xl text-xs uppercase tracking-widest font-bold transition-all shadow-md cursor-pointer"
+            >
+              Zurück zum Shop
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
