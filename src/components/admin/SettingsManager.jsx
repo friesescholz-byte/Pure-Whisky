@@ -67,10 +67,16 @@ export default function SettingsManager({
 
           <div>
             <label className="block text-xs font-craft-mono font-bold text-[#181F1C] uppercase tracking-wider mb-1.5 flex items-center justify-between">
-              <span>Mollie Test API Key</span>
-              <span className="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-mono font-normal">
-                Aktiv verbunden
-              </span>
+              <span>Mollie API-Schlüssel (Live oder Test)</span>
+              {mollieKey.trim().startsWith('live_') ? (
+                <span className="text-[10px] text-emerald-800 bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 rounded-full font-craft-mono font-bold">
+                  🟢 LIVE-MODUS AKTIV
+                </span>
+              ) : (
+                <span className="text-[10px] text-amber-800 bg-amber-100 border border-amber-300 px-2.5 py-0.5 rounded-full font-craft-mono font-bold">
+                  🟡 TEST-MODUS (test_...)
+                </span>
+              )}
             </label>
             <div className="relative">
               <Key className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -78,12 +84,12 @@ export default function SettingsManager({
                 type="text"
                 value={mollieKey}
                 onChange={(e) => setMollieKey(e.target.value)}
-                placeholder="test_..."
+                placeholder="live_... oder test_..."
                 className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-[#D4C8B8] text-xs font-mono text-[#181F1C] bg-[#FAF8F5] focus:outline-none focus:border-[#B85D2C]"
               />
             </div>
-            <p className="text-[11px] text-[#55695E] mt-1">
-              Test-Key für Zahlungsabwicklung (Kreditkarte, iDEAL, PayPal, Sofort). Standard: <code>test_757rbjSksxgtDCCAps98ThDSgpxCaz</code>
+            <p className="text-[11px] text-[#55695E] mt-1 leading-relaxed">
+              Tragen Sie hier Ihren <strong>Live-API-Key</strong> (beginnt mit <code>live_...</code>) aus Ihrem Mollie-Konto ein, um sofort echte Zahlungen zu empfangen. Für Testläufe kann ein <code>test_...</code> Key verwendet werden.
             </p>
           </div>
 

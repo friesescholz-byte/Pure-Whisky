@@ -31,12 +31,16 @@ export async function createMolliePayment({ orderId, amount, description, redire
     },
     description: description || `PURE.WHISKY. Bestellung #${orderId}`,
     redirectUrl: redirectUrl || `${window.location.origin}/?order_status=paid&order_id=${orderId}`,
-    webhookUrl: 'https://pure-whisky.com/api/mollie/webhook',
     metadata: {
       orderId,
       customerEmail
     }
   };
+
+  // Only pass webhookUrl on live public HTTPS domains (Mollie rejects localhost/http webhook URLs)
+  if (typeof window !== 'undefined' && window.location.protocol === 'https:' && !window.location.hostname.includes('localhost')) {
+    payload.webhookUrl = `${window.location.origin}/api/mollie/webhook`;
+  }
 
   try {
     const response = await fetch('/api/mollie/v2/payments', {

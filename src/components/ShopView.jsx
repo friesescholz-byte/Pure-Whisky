@@ -117,7 +117,7 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
             return (
               <div
                 key={product.id}
-                className="bg-white border border-[#D4C8B8] rounded-3xl p-8 sm:p-10 flex flex-col justify-between text-left shadow-xs hover:shadow-md transition-all duration-300"
+                className="bg-white border border-[#D4C8B8] rounded-3xl p-5 sm:p-8 md:p-10 flex flex-col justify-between text-left shadow-xs hover:shadow-md transition-all duration-300"
               >
                 <div>
                   {/* Bottle Stage */}
@@ -217,20 +217,20 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
                 </div>
 
                 {/* Bottom Row */}
-                <div className="pt-8 mt-6 border-t border-[#E2DDD5] flex items-center justify-between">
-                  <div>
-                    <span className="font-woodblock text-3xl sm:text-4xl text-[#181F1C] tracking-wide block">
+                <div className="pt-6 sm:pt-8 mt-6 border-t border-[#E2DDD5] flex flex-col xs:flex-row xs:items-center justify-between gap-4">
+                  <div className="shrink-0">
+                    <span className="font-woodblock text-2xl sm:text-3xl md:text-4xl text-[#181F1C] tracking-wide block whitespace-nowrap">
                       {product.price.toFixed(2)} €
                     </span>
-                    <span className="font-craft-mono text-[10px] text-[#55695E]">
+                    <span className="font-craft-mono text-[10px] text-[#55695E] block whitespace-nowrap">
                       {product.pricePerLiter} · {lang === 'de' ? 'inkl. MwSt.' : 'incl. VAT'}
                     </span>
                   </div>
 
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                     <button
                       onClick={() => onOpenProduct(product)}
-                      className="px-5 py-3 rounded-lg bg-[#E8EFEA] hover:bg-[#D8E4DC] text-[#181F1C] font-woodblock text-lg tracking-wider uppercase transition-colors cursor-pointer"
+                      className="flex-1 xs:flex-none px-4 py-2.5 sm:px-5 sm:py-3 rounded-xl bg-[#E8EFEA] hover:bg-[#D8E4DC] text-[#181F1C] font-woodblock text-sm sm:text-base tracking-wider uppercase transition-colors whitespace-nowrap cursor-pointer text-center"
                     >
                       {lang === 'de' ? 'Details' : 'Details'}
                     </button>
@@ -238,19 +238,19 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
                     {isUpcoming ? (
                       <button
                         onClick={(e) => handleOpenReserveModal(product, e)}
-                        className="px-6 py-3 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-sm cursor-pointer"
+                        className="flex-1 xs:flex-none px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-sm sm:text-base tracking-wider uppercase transition-all shadow-sm whitespace-nowrap cursor-pointer text-center"
                       >
                         {lang === 'de' ? 'Vorabzugriff' : 'Early Access'}
                       </button>
                     ) : isAvailable ? (
                       <button
                         onClick={() => onAddToCart(product)}
-                        className="px-6 py-3 rounded-lg bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-sm cursor-pointer"
+                        className="flex-1 xs:flex-none px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-sm sm:text-base tracking-wider uppercase transition-all shadow-sm whitespace-nowrap cursor-pointer text-center"
                       >
                         {lang === 'de' ? 'In den Korb' : 'Add to Cart'}
                       </button>
                     ) : (
-                      <span className="px-5 py-3 rounded-lg bg-neutral-100 text-neutral-400 font-woodblock text-lg tracking-wider uppercase border border-neutral-200">
+                      <span className="flex-1 xs:flex-none px-4 py-2.5 sm:px-5 sm:py-3 rounded-xl bg-neutral-100 text-neutral-400 font-woodblock text-sm sm:text-base tracking-wider uppercase border border-neutral-200 whitespace-nowrap text-center">
                         {lang === 'de' ? 'Ausverkauft' : 'Sold Out'}
                       </span>
                     )}

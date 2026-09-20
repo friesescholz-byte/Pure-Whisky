@@ -28,7 +28,7 @@ export default function CartDrawer({
     zip: '',
     city: '',
     email: '',
-    paymentMethod: 'Mollie Gateway (Kreditkarte, Klarna, Apple Pay)'
+    paymentMethod: 'Sichere Online-Zahlung'
   });
 
   if (!isOpen) return null;
@@ -63,26 +63,24 @@ export default function CartDrawer({
     const invoiceNumber = `A09401${orderId}`;
     const todayStr = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-    let paymentStatusDetail = formData.paymentMethod;
+    let paymentStatusDetail = 'Online-Zahlung (Kreditkarte, PayPal, Klarna)';
     let checkoutLink = null;
 
-    // Call Mollie Test Payments API if Mollie selected
-    if (formData.paymentMethod.includes('Mollie') || formData.paymentMethod.includes('Kreditkarte')) {
-      try {
-        const mollieResult = await createMolliePayment({
-          orderId,
-          amount: total,
-          customerEmail: formData.email.trim(),
-          description: `PURE.WHISKY. Bestellung #${orderId}`
-        });
-        if (mollieResult.success && mollieResult.checkoutUrl) {
-          checkoutLink = mollieResult.checkoutUrl;
-          setMollieCheckoutUrl(mollieResult.checkoutUrl);
-          paymentStatusDetail = `Mollie (${mollieResult.paymentId}) – ${formData.email.trim()}`;
-        }
-      } catch (mollieErr) {
-        console.warn('Mollie checkout initiation error:', mollieErr);
+    // Call Payments API Gateway
+    try {
+      const mollieResult = await createMolliePayment({
+        orderId,
+        amount: total,
+        customerEmail: formData.email.trim(),
+        description: `PURE.WHISKY. Bestellung #${orderId}`
+      });
+      if (mollieResult.success && mollieResult.checkoutUrl) {
+        checkoutLink = mollieResult.checkoutUrl;
+        setMollieCheckoutUrl(mollieResult.checkoutUrl);
+        paymentStatusDetail = `Online-Zahlung (${mollieResult.paymentId}) – ${formData.email.trim()}`;
       }
+    } catch (mollieErr) {
+      console.warn('Payment checkout initiation error:', mollieErr);
     }
 
     const newOrder = {
@@ -120,6 +118,13 @@ export default function CartDrawer({
       await onCompleteOrder(newOrder);
     }
     setIsProcessing(false);
+
+    // If payment gateway returned a direct checkout link, redirect customer immediately to payment
+    if (checkoutLink) {
+      window.location.href = checkoutLink;
+      return;
+    }
+
     setStep('success');
   };
 
@@ -374,53 +379,34 @@ export default function CartDrawer({
                   </div>
                 </div>
 
-                {/* Payment Selection */}
+                {/* Payment Information */}
                 <div className="pt-2">
                   <label className="block text-xs text-[#55695E] mb-2 font-medium">{t.cart.paymentMethod}</label>
-                  <div className="space-y-2">
-                    <button
-                      type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'Mollie Gateway (Kreditkarte, Klarna, Apple Pay)' }))}
-                      className={`w-full p-3 rounded-lg border text-left flex items-center justify-between transition-all ${
-                        formData.paymentMethod.includes('Mollie')
-                          ? 'border-[#B85D2C] bg-[#FAF8F5] text-[#181F1C] font-semibold'
-                          : 'border-[#E2DDD5] bg-white text-stone-600'
-                      }`}
-                    >
+                  <div className="p-4 rounded-xl border border-[#D4C8B8] bg-[#FAF8F5] space-y-2.5">
+                    <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2.5">
                         <CreditCard className="w-4 h-4 text-[#B85D2C]" />
-                        <span className="text-xs">Mollie Gateway (Kreditkarte, Klarna, Apple Pay)</span>
+                        <span className="text-xs font-bold text-[#181F1C]">
+                          {lang === 'de' ? 'Sichere Online-Zahlung' : 'Secure Online Payment'}
+                        </span>
                       </div>
-                      <span className="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded font-mono">
-                        Sicher
+                      <span className="text-[10px] text-emerald-700 bg-emerald-100/70 border border-emerald-200 px-2 py-0.5 rounded-full font-craft-mono font-bold">
+                        SSL 256-Bit
                       </span>
-                    </button>
+                    </div>
 
-                    <div className="grid grid-cols-2 gap-2.5">
-                      <button
-                        type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'PayPal' }))}
-                        className={`p-3 rounded-lg border text-left flex items-center space-x-2 transition-all ${
-                          formData.paymentMethod === 'PayPal'
-                            ? 'border-[#B85D2C] bg-[#FAF8F5] text-[#181F1C] font-semibold'
-                            : 'border-[#E2DDD5] bg-white text-stone-600'
-                        }`}
-                      >
-                        <CreditCard className="w-4 h-4 text-[#B85D2C]" />
-                        <span className="text-xs">{t.cart.paypal}</span>
-                      </button>
+                    <p className="text-xs text-[#55695E] leading-relaxed">
+                      {lang === 'de'
+                        ? 'Sie werden nach Klick auf Bestellen direkt zur gesicherten Zahlungsseite weitergeleitet. Dort wählen Sie einfach Ihre bevorzugte Methode:'
+                        : 'After placing your order, you will be redirected to the secure checkout page to choose your preferred method:'}
+                    </p>
 
-                      <button
-                        type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'Vorkasse / Banküberweisung' }))}
-                        className={`p-3 rounded-lg border text-left flex items-center space-x-2 transition-all ${
-                          formData.paymentMethod === 'Vorkasse / Banküberweisung'
-                            ? 'border-[#B85D2C] bg-[#FAF8F5] text-[#181F1C] font-semibold'
-                            : 'border-[#E2DDD5] bg-white text-stone-600'
-                        }`}
-                      >
-                        <span className="text-xs">{t.cart.bankTransfer}</span>
-                      </button>
+                    <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                      {['Kreditkarte', 'PayPal', 'Apple Pay', 'Klarna Sofortüberweisung', 'SEPA / iDEAL'].map((m) => (
+                        <span key={m} className="px-2 py-0.5 bg-white border border-[#D4C8B8] text-[10px] font-craft-mono font-medium text-[#181F1C] rounded-md shadow-2xs">
+                          {m}
+                        </span>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -582,15 +568,13 @@ export default function CartDrawer({
                 <div className="w-full space-y-2">
                   <a
                     href={mollieCheckoutUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="w-full py-3.5 bg-[#B85D2C] hover:bg-[#A04E24] text-white rounded-xl text-xs uppercase tracking-widest font-bold flex items-center justify-center space-x-2 shadow-md transition-all hover:scale-[1.01]"
                   >
-                    <span>Mollie Test-Zahlung durchführen</span>
+                    <span>Jetzt sicher online bezahlen</span>
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
-                  <p className="text-[10px] text-neutral-400">
-                    Öffnet das offizielle Mollie Zahlungsfenster im Test-Modus.
+                  <p className="text-[10px] text-[#55695E]">
+                    Kreditkarte, PayPal, Apple Pay oder Sofortüberweisung (SSL-verschlüsselt)
                   </p>
                 </div>
               )}

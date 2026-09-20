@@ -14,6 +14,50 @@ export default {
       return new Response(null, { headers: corsHeaders, status: 204 });
     }
 
+    // 0. Mollie API Proxy & Webhook
+    if (url.pathname === '/api/mollie/webhook') {
+      return new Response('OK', { status: 200, headers: corsHeaders });
+    }
+
+    if (url.pathname.startsWith('/api/mollie')) {
+      const molliePath = url.pathname.replace(/^\/api\/mollie/, '') + url.search;
+      const targetUrl = 'https://api.mollie.com' + molliePath;
+
+      const headers = new Headers();
+      const authHeader = request.headers.get('Authorization');
+      if (authHeader) headers.set('Authorization', authHeader);
+      const contentType = request.headers.get('Content-Type');
+      if (contentType) headers.set('Content-Type', contentType);
+      headers.set('Accept', 'application/json');
+
+      try {
+        let bodyContent = undefined;
+        if (request.method !== 'GET' && request.method !== 'HEAD') {
+          bodyContent = await request.text();
+        }
+
+        const mollieResponse = await fetch(targetUrl, {
+          method: request.method,
+          headers,
+          body: bodyContent
+        });
+
+        const resText = await mollieResponse.text();
+        return new Response(resText, {
+          status: mollieResponse.status,
+          headers: {
+            ...corsHeaders,
+            'Content-Type': mollieResponse.headers.get('Content-Type') || 'application/json'
+          }
+        });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: 'Mollie proxy error: ' + err.message }), {
+          status: 502,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+    }
+
     // 1. API: GET /api/unsubscribers
     if (request.method === 'GET' && url.pathname === '/api/unsubscribers') {
       try {

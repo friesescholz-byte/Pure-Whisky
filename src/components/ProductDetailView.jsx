@@ -173,17 +173,21 @@ export default function ProductDetailView({
             </p>
 
             {/* Price & Purchase / Pre-Reservation Box */}
-            <div className="p-7 rounded-3xl bg-white border border-[#D4C8B8] shadow-xs space-y-6">
+            <div className="p-5 sm:p-7 rounded-3xl bg-white border border-[#D4C8B8] shadow-xs space-y-6">
               
-              <div className="flex items-baseline justify-between border-b border-[#E2DDD5] pb-4">
-                <div>
-                  <span className="font-woodblock text-4xl text-[#181F1C] block">{product.price.toFixed(2)} €</span>
-                  <span className="font-craft-mono text-xs text-[#55695E] font-medium">{product.pricePerLiter} · {lang === 'de' ? 'inkl. MwSt.' : 'incl. VAT'}</span>
+              <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 border-b border-[#E2DDD5] pb-4">
+                <div className="shrink-0">
+                  <span className="font-woodblock text-3xl sm:text-4xl text-[#181F1C] block whitespace-nowrap">
+                    {product.price.toFixed(2)} €
+                  </span>
+                  <span className="font-craft-mono text-xs text-[#55695E] font-medium block whitespace-nowrap">
+                    {product.pricePerLiter} · {lang === 'de' ? 'inkl. MwSt.' : 'incl. VAT'}
+                  </span>
                 </div>
 
-                <div className="text-right font-craft-mono text-xs font-bold">
+                <div className="sm:text-right font-craft-mono text-xs font-bold">
                   {isUpcoming ? (
-                    <div className="text-right">
+                    <div className="sm:text-right">
                       <span className="text-[#B85D2C] text-sm block font-woodblock uppercase">
                         Release am {releaseDateStr}
                       </span>
@@ -192,7 +196,7 @@ export default function ProductDetailView({
                       </span>
                     </div>
                   ) : isAvailable ? (
-                    <div className="text-right">
+                    <div className="sm:text-right">
                       <span className="text-[#2D6A4F] text-sm block font-woodblock uppercase">
                         🟢 {product.isNew ? (lang === 'de' ? 'Neu erhältlich · Sofort lieferbar' : 'Newly Available · In Stock') : (lang === 'de' ? 'Sofort lieferbar' : 'In Stock')}
                       </span>
@@ -201,7 +205,7 @@ export default function ProductDetailView({
                       </span>
                     </div>
                   ) : (
-                    <div className="text-right">
+                    <div className="sm:text-right">
                       <span className="text-rose-600 text-sm block font-woodblock uppercase">
                         🔴 {lang === 'de' ? 'Ausverkauft' : 'Sold Out'}
                       </span>
@@ -271,18 +275,18 @@ export default function ProductDetailView({
                 </div>
               ) : isAvailable ? (
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center border border-[#D4C8B8] rounded-xl bg-[#FAF8F5] p-1 font-craft-mono">
+                  <div className="flex items-center gap-3">
+                    <div className="h-12 flex items-center border border-[#D4C8B8] rounded-xl bg-[#FAF8F5] p-1 font-craft-mono shrink-0">
                       <button
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="px-3 py-2 text-lg font-bold text-[#181F1C] hover:text-[#B85D2C] cursor-pointer"
+                        className="w-9 h-full flex items-center justify-center text-lg font-bold text-[#181F1C] hover:text-[#B85D2C] cursor-pointer"
                       >
                         -
                       </button>
-                      <span className="px-4 py-2 text-base font-bold text-[#181F1C]">{quantity}</span>
+                      <span className="w-8 text-center text-base font-bold text-[#181F1C]">{quantity}</span>
                       <button
                         onClick={() => setQuantity(Math.min(product.bottlesRemaining || 12, quantity + 1))}
-                        className="px-3 py-2 text-lg font-bold text-[#181F1C] hover:text-[#B85D2C] cursor-pointer"
+                        className="w-9 h-full flex items-center justify-center text-lg font-bold text-[#181F1C] hover:text-[#B85D2C] cursor-pointer"
                       >
                         +
                       </button>
@@ -290,9 +294,9 @@ export default function ProductDetailView({
 
                     <button
                       onClick={handleBuy}
-                      className="flex-1 py-4.5 px-8 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-xl tracking-wider uppercase transition-all shadow-md hover:shadow-lg flex items-center justify-center space-x-3 cursor-pointer"
+                      className="h-12 flex-1 px-4 sm:px-8 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-base sm:text-lg tracking-wider uppercase transition-all shadow-md hover:shadow-lg flex items-center justify-center space-x-2 whitespace-nowrap cursor-pointer text-center"
                     >
-                      <ShoppingBag className="w-5 h-5" />
+                      <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                       <span>{lang === 'de' ? 'In den Warenkorb' : 'Add to Cart'}</span>
                     </button>
                   </div>
@@ -322,7 +326,7 @@ export default function ProductDetailView({
                 </div>
                 <div className="flex items-center space-x-2">
                   <Leaf className="w-4 h-4 text-[#2D6A4F]" />
-                  <span>{lang === 'de' ? '100% Estal Wild Glass aus Spanien & Naturkork' : '100% Estal Wild Glass from Spain & Natural Cork'}</span>
+                  <span>{lang === 'de' ? 'Nachhaltig abgefüllt mit edlem Naturkork' : 'Sustainably bottled with natural cork'}</span>
                 </div>
               </div>
 
