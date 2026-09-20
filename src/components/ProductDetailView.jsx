@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronRight, ShoppingBag, ShieldCheck, Droplets, Leaf, Check, Bell, CheckCircle2 } from 'lucide-react';
-import { PRODUCTS } from '../data/pureWhiskyFullData';
+import { PRODUCTS, IMAGES } from '../data/pureWhiskyFullData';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function ProductDetailView({ 
@@ -92,13 +92,23 @@ export default function ProductDetailView({
           {/* Left Column: Stage & Thumbnails (6 cols) */}
           <div className="lg:col-span-6 space-y-4">
             
-            <div className="border border-[#D4C8B8] rounded-3xl h-[500px] sm:h-[580px] flex items-center justify-center shadow-md relative overflow-hidden group bg-neutral-900">
+            <div className="border border-[#D4C8B8] rounded-3xl h-[400px] sm:h-[500px] lg:h-[560px] flex items-center justify-center shadow-md relative overflow-hidden group bg-neutral-900">
               {isFullPhotograph ? (
-                <img
-                  src={activeImage}
-                  alt={product.fullName}
-                  className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
-                />
+                <div className="w-full h-full flex items-center justify-center relative p-3 sm:p-6 overflow-hidden">
+                  {/* Atmospheric blurred ambient background so any aspect ratio fills the box smoothly */}
+                  <img
+                    src={activeImage}
+                    alt=""
+                    aria-hidden="true"
+                    className="absolute inset-0 w-full h-full object-cover filter blur-2xl opacity-40 scale-125 pointer-events-none"
+                  />
+                  <div className="absolute inset-0 bg-black/30" />
+                  <img
+                    src={activeImage}
+                    alt={product.fullName}
+                    className="relative z-10 max-h-full max-w-full object-contain rounded-2xl drop-shadow-[0_20px_35px_rgba(0,0,0,0.85)] group-hover:scale-102 transition-transform duration-500"
+                  />
+                </div>
               ) : (
                 <>
                   <img
@@ -109,11 +119,11 @@ export default function ProductDetailView({
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-black/35" />
                   <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(212,139,56,0.22)_0%,_transparent_65%)]" />
 
-                  <div className="relative z-10 h-full flex flex-col items-center justify-center p-8">
+                  <div className="relative z-10 h-full w-full flex flex-col items-center justify-center p-4 sm:p-8">
                     <img
                       src={activeImage}
                       alt={product.fullName}
-                      className="max-h-[90%] w-auto object-contain drop-shadow-[0_25px_35px_rgba(0,0,0,0.8)] group-hover:scale-106 transition-transform duration-500"
+                      className="max-h-[88%] max-w-[88%] w-auto object-contain drop-shadow-[0_25px_35px_rgba(0,0,0,0.8)] group-hover:scale-105 transition-transform duration-500"
                       loading="eager"
                     />
                     <div className="w-32 h-4 bg-black/75 rounded-full blur-md -mt-2 opacity-85" />
@@ -129,11 +139,11 @@ export default function ProductDetailView({
                   <button
                     key={idx}
                     onClick={() => setSelectedImageIdx(idx)}
-                    className={`w-20 h-20 rounded-xl overflow-hidden border-2 transition-all p-1 shrink-0 ${
+                    className={`w-18 h-18 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all p-1 shrink-0 bg-[#FAF8F5] cursor-pointer ${
                       selectedImageIdx === idx ? 'border-[#B85D2C] shadow-sm' : 'border-[#D4C8B8] opacity-70 hover:opacity-100'
                     }`}
                   >
-                    <img src={imgUrl} alt="Thumbnail" className="w-full h-full object-cover rounded-lg" />
+                    <img src={imgUrl} alt="Thumbnail" className="w-full h-full object-contain rounded-lg" />
                   </button>
                 ))}
               </div>
@@ -147,7 +157,6 @@ export default function ProductDetailView({
             <div className="space-y-2">
               <div className="flex items-center space-x-3">
                 <span className="font-script text-3xl text-[#2D6A4F]">{product.region}</span>
-                <span className="font-craft-mono text-xs uppercase tracking-widest text-[#55695E] font-bold">· {product.caskNumber}</span>
               </div>
 
               <h1 className="font-woodblock text-5xl sm:text-6xl text-[#181F1C] tracking-wide uppercase leading-tight">
@@ -343,7 +352,7 @@ export default function ProductDetailView({
                 {lang === 'de' ? 'Aromatik & Bukett' : 'Aroma & Bouquet'}
               </h3>
               <p className="text-[#3A4A40] text-sm sm:text-base font-normal leading-relaxed">
-                {product.tastingNotes.nose}
+                {product.tastingNotes?.nose || (lang === 'de' ? 'Aromatische Verkostungsnotizen folgen in Kürze.' : 'Tasting notes coming soon.')}
               </p>
             </div>
 
@@ -355,7 +364,7 @@ export default function ProductDetailView({
                 {lang === 'de' ? 'Körper & Textur' : 'Body & Texture'}
               </h3>
               <p className="text-[#3A4A40] text-sm sm:text-base font-normal leading-relaxed">
-                {product.tastingNotes.palate}
+                {product.tastingNotes?.palate || (lang === 'de' ? 'Geschmacksnotizen folgen in Kürze.' : 'Palate notes coming soon.')}
               </p>
             </div>
 
@@ -367,7 +376,7 @@ export default function ProductDetailView({
                 {lang === 'de' ? 'Finish & Tiefe' : 'Finish & Depth'}
               </h3>
               <p className="text-[#3A4A40] text-sm sm:text-base font-normal leading-relaxed">
-                {product.tastingNotes.finish}
+                {product.tastingNotes?.finish || (lang === 'de' ? 'Nachklangnotizen folgen in Kürze.' : 'Finish notes coming soon.')}
               </p>
             </div>
           </div>
@@ -393,47 +402,95 @@ export default function ProductDetailView({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {otherProducts.slice(0, 3).map(other => (
-              <div
-                key={other.id}
-                onClick={() => onSelectOtherProduct(other)}
-                className="bg-white border border-[#D4C8B8] rounded-2xl p-6 shadow-xs hover:shadow-md transition-all cursor-pointer space-y-4 text-left group"
-              >
-                <div className="h-48 rounded-xl bg-[#FAF8F5] border border-[#E2DDD5] flex items-center justify-center p-3 relative overflow-hidden">
-                  <img
-                    src={other.cutoutImage || other.image}
-                    alt={other.name}
-                    className="max-h-full w-auto object-contain group-hover:scale-105 transition-transform"
-                  />
-                  {other.isUpcoming ? (
-                    <span className="absolute top-2 right-2 px-2 py-0.5 bg-[#FAF0EB] text-[#B85D2C] text-[10px] font-craft-mono font-bold rounded">
-                      Release 17.09.
-                    </span>
-                  ) : !other.isAvailable ? (
-                    <span className="absolute top-2 right-2 px-2 py-0.5 bg-rose-100 text-rose-700 text-[10px] font-craft-mono font-bold rounded">
-                      {lang === 'de' ? 'Ausverkauft' : 'Sold Out'}
-                    </span>
-                  ) : null}
-                </div>
+            {otherProducts.slice(0, 3).map(other => {
+              const otherBottle = other.cutoutImage || other.image;
+              const isOtherFullPhoto = typeof otherBottle === 'string' && (
+                otherBottle.includes('20241014') || 
+                otherBottle.includes('full') || 
+                otherBottle.includes('Testing') || 
+                otherBottle.includes('Single-Malt')
+              );
+              const otherCardBg = other.cardBg || IMAGES.card_bg_speyside;
 
-                <div>
-                  <span className="font-script text-xl text-[#2D6A4F]">{other.region}</span>
-                  <h4 className="font-woodblock text-2xl text-[#181F1C] uppercase truncate group-hover:text-[#B85D2C] transition-colors">
-                    {other.name}
-                  </h4>
-                  <p className="text-xs text-[#55695E] font-craft-mono truncate mt-0.5">
-                    {other.caskType} · {other.abv}
-                  </p>
-                </div>
+              return (
+                <div
+                  key={other.id}
+                  onClick={() => onSelectOtherProduct(other)}
+                  className="bg-white border border-[#D4C8B8] rounded-2xl p-6 shadow-xs hover:shadow-md transition-all cursor-pointer space-y-4 text-left group"
+                >
+                  {/* Bottle Stage with Scottish Background */}
+                  <div className="h-56 sm:h-64 relative flex items-center justify-center rounded-xl overflow-hidden border border-[#D4C8B8] shadow-inner bg-neutral-900 group">
+                    {isOtherFullPhoto ? (
+                      <div className="w-full h-full flex items-center justify-center relative p-3 overflow-hidden">
+                        <img
+                          src={otherBottle}
+                          alt=""
+                          aria-hidden="true"
+                          className="absolute inset-0 w-full h-full object-cover filter blur-2xl opacity-40 scale-120 pointer-events-none"
+                        />
+                        <div className="absolute inset-0 bg-black/25" />
+                        <img
+                          src={otherBottle}
+                          alt={other.fullName || other.name}
+                          className="relative z-10 max-h-full max-w-full object-contain rounded-lg drop-shadow-[0_15px_25px_rgba(0,0,0,0.85)] group-hover:scale-104 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                      </div>
+                    ) : (
+                      <>
+                        {/* Layer 1: Background Landscape */}
+                        <img
+                          src={otherCardBg}
+                          alt="Schottische Landschaft"
+                          className="absolute inset-0 w-full h-full object-cover filter brightness-[0.88] contrast-[1.05] blur-[0.5px] scale-105 opacity-90 group-hover:scale-110 group-hover:opacity-100 transition-all duration-700"
+                        />
+                        {/* Layer 2: Atmospheric Vignette */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-black/30" />
+                        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(212,139,56,0.20)_0%,_transparent_65%)]" />
 
-                <div className="flex items-center justify-between pt-2 border-t border-[#E2DDD5]">
-                  <span className="font-woodblock text-xl text-[#181F1C]">{other.price.toFixed(2)} €</span>
-                  <span className="font-craft-mono text-xs text-[#B85D2C] font-bold group-hover:underline">
-                    {lang === 'de' ? 'Details ansehen →' : 'View details →'}
-                  </span>
+                        {/* Layer 3: Foreground Bottle */}
+                        <div className="relative z-10 h-full w-full flex flex-col items-center justify-center p-3">
+                          <img
+                            src={otherBottle}
+                            alt={other.fullName || other.name}
+                            className="max-h-[85%] max-w-[85%] w-auto object-contain drop-shadow-[0_15px_25px_rgba(0,0,0,0.75)] group-hover:scale-106 transition-transform duration-500"
+                            loading="lazy"
+                          />
+                          <div className="w-20 h-3 bg-black/65 rounded-full blur-md -mt-1.5 opacity-80" />
+                        </div>
+                      </>
+                    )}
+
+                    {other.isUpcoming ? (
+                      <span className="absolute top-2.5 right-2.5 z-20 px-2 py-0.5 bg-[#FAF0EB]/95 backdrop-blur-xs text-[#B85D2C] text-[10px] font-craft-mono font-bold rounded shadow-xs">
+                        Release {other.releaseDate ? other.releaseDate.replace('September', '09.') : '17.09.'}
+                      </span>
+                    ) : !other.isAvailable ? (
+                      <span className="absolute top-2.5 right-2.5 z-20 px-2 py-0.5 bg-rose-100/95 backdrop-blur-xs text-rose-700 text-[10px] font-craft-mono font-bold rounded shadow-xs">
+                        {lang === 'de' ? 'Ausverkauft' : 'Sold Out'}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <div>
+                    <span className="font-script text-xl text-[#2D6A4F]">{other.region} Single Malt</span>
+                    <h4 className="font-woodblock text-2xl text-[#181F1C] uppercase truncate group-hover:text-[#B85D2C] transition-colors">
+                      {other.name}
+                    </h4>
+                    <p className="text-xs text-[#55695E] font-craft-mono truncate mt-0.5">
+                      {other.caskType} · {other.abv}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-[#E2DDD5]">
+                    <span className="font-woodblock text-xl text-[#181F1C]">{other.price.toFixed(2)} €</span>
+                    <span className="font-craft-mono text-xs text-[#B85D2C] font-bold group-hover:underline">
+                      {lang === 'de' ? 'Details ansehen →' : 'View details →'}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 

@@ -99,7 +99,7 @@ export const translations = {
       badge: 'Gründerin & Haltung',
       title: 'Whisky mit juristischer Präzision & ökologischem Gewissen',
       lead: 'Als Umweltjuristin und unabhängige Abfüllerin verbinde ich die Leidenschaft für schottischen Spitzenwhisky mit einem fundierten Anspruch an ökologische Nachhaltigkeit.',
-      storyP1: 'Als Umweltjuristin habe ich mich jahrelang mit Umweltmanagementsystemen, Gewässerschutz und industrieller Kreislaufwirtschaft beschäftigt. Gleichzeitig faszinierte mich die schottische Whiskykultur seit meinem ersten Besuch in den Highlands vor über zwanzig Jahren.',
+      storyP1: 'Als Umweltjuristin habe ich mich jahrelang mit Umweltmanagementsystemen, Gewässerschutz und industrieller Kreislaufwirtschaft beschäftigt. Meine Faszination für Whisky begann 1999 bei einem Schüleraustausch in Irland; seit gut 20 Jahren sammle ich leidenschaftlich. 2009 reiste ich das erste Mal nach Schottland – und die schottische Brennkultur ließ mich seither nicht mehr los.',
       storyP2: 'Whisky ist ein ressourcenintensives Produkt: Gerstenanbau, riesige Mengen Kühlwasser, Energieaufwand beim Destillieren und Glasproduktion belasten die Umwelt. Mit PURE.WHISKY. beweise ich, dass herausragende Einzelfass-Qualität und echte Umweltverantwortung kein Widerspruch sind.',
       quote: '„Ich möchte nicht einfach nur eine schöne Flasche Whisky verkaufen. Hinter jedem Fass soll eine Geschichte stehen, die ich guten Gewissens erzählen kann – über die Brennerei, den Whisky und möglichst auch über den Umgang mit Ressourcen.“',
       ctaShop: 'Abfüllungen im Shop entdecken'
@@ -273,7 +273,7 @@ export const translations = {
       badge: 'Founder & Values',
       title: 'Whisky with Juridical Precision & Ecological Conscience',
       lead: 'As an environmental lawyer and independent bottler, I combine a passion for top-tier Scottish single malt with an uncompromising standard of ecological sustainability.',
-      storyP1: 'For many years as an environmental jurist, I dealt with corporate environmental management systems, water protection, and circular economy compliance. At the same time, Scottish whisky heritage has captivated me since my very first journey to the Highlands over twenty years ago.',
+      storyP1: 'For many years as an environmental jurist, I dealt with corporate environmental management systems, water protection, and circular economy compliance. My passion for whisky began in 1999 during a student exchange in Ireland, and I have been collecting with dedication for a good 20 years. In 2009, I traveled to Scotland for the first time – and the Scottish distilling culture has captivated me ever since.',
       storyP2: 'Whisky is an exceptionally resource-intensive spirit: barley farming, vast cooling water requirements, high distillation energy, and heavy virgin glass production impact the planet. With PURE.WHISKY., I demonstrate that world-class single cask excellence and true environmental responsibility belong together.',
       quote: '“I don’t just want to sell a beautiful bottle of whisky. Behind every cask there should be a story I can tell with a clear conscience – about the distillery, the whisky, and as far as possible, about the responsible use of resources.”',
       ctaShop: 'Discover Releases in Shop'

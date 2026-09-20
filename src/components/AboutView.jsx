@@ -161,7 +161,7 @@ export default function AboutView({ onNavigateShop, onNavigateHome, onOpenSustai
                 {lang === 'de' ? 'Brennerei-Auswahl' : 'Distillery Selection'}
               </span>
               <h3 className="font-woodblock text-4xl text-[#181F1C] uppercase leading-tight">
-                {lang === 'de' ? 'Bewertet nach EMAS & ISO 14001' : 'Assessed under EMAS & ISO 14001'}
+                {lang === 'de' ? 'Nachvollziehbarer Bewertungsmaßstab' : 'Transparent Assessment Standards'}
               </h3>
               <blockquote className="font-script text-2xl text-[#2D6A4F] italic">
                 {lang === 'de'
@@ -223,8 +223,8 @@ export default function AboutView({ onNavigateShop, onNavigateHome, onOpenSustai
               </blockquote>
               <p className="text-[#3A4A40] text-lg font-normal leading-relaxed">
                 {lang === 'de'
-                  ? 'PURE.WHISKY. bietet unberührten Single Cask Genuss. Jedes Fass, jede Flasche Wild Glass und jeder Partner werden von mir persönlich auf höchste Qualität und echte Nachhaltigkeit geprüft.'
-                  : 'PURE.WHISKY. is committed to pure single cask delight. Every oak barrel, every Wild Glass bottle, and every partner is evaluated by me for excellence and environmental integrity.'}
+                  ? 'PURE.WHISKY. bietet unberührten Single Cask Genuss. Jedes Fass und jede Flasche werden von mir persönlich auf höchste Qualität und echte Nachhaltigkeit geprüft.'
+                  : 'PURE.WHISKY. is committed to pure single cask delight. Every cask and every bottle is evaluated personally by me for excellence and environmental integrity.'}
               </p>
             </div>
           </div>

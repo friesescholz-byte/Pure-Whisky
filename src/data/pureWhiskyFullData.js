@@ -86,10 +86,10 @@ export const PRODUCTS = [
     abv: '59,2% vol.',
     vintage: '2015 / 2026',
     caskType: '1st Fill Oloroso Barrique',
-    caskNumber: 'Cask 308 of 309',
-    price: 139.90,
+    caskNumber: '#Z15/63004',
+    price: 104.90,
     originalPrice: null,
-    pricePerLiter: '199,86 € / l',
+    pricePerLiter: '149,86 € / l',
     isAvailable: true,
     isUpcoming: false,
     isNew: true,
@@ -102,16 +102,16 @@ export const PRODUCTS = [
     cardBg: IMAGES.card_bg_speyside,
     galleryImages: [IMAGES.glenburgie_11_cutout, IMAGES.glenburgie_11_barrel, IMAGES.card_bg_speyside, IMAGES.ines_testing],
     character: ['Dunkle Oloroso-Rosinen', 'Getrocknete Feigen', 'Geröstete Haselnüsse', 'Warme Eichenholzwürze'],
-    intro: 'Ein opulenter Speyside-Klassiker in nativer Fassstärke. Über 11 Jahre unberührt in einem handverlesenen First Fill Oloroso Barrique gereift – mit dichter Mahagonifarbe, tiefen Trockenfruchtaromen und samtig-nussigem Schmelz.',
+    intro: 'Klassischer Oldschool-Sherrywhisky mit einem Spritzer Zitrusfrische. Fruchtige Süße, Schokolade und Haselnuss verbinden sich mit einer angenehmen Würze und geben dem 11-jährigen viel Tiefe.',
     history: {
       headline: 'Das verborgene Juwel von Morayshire',
       text: 'Gegründet 1810 nahe Alves, gehört Glenburgie zu den traditionsreichsten Brennereien der Speyside. Bekannt für ihre fruchtige und honigsüße Destillat-DNA, entfaltet dieser Single Malt durch die 11-jährige Vollreifung im First Fill Oloroso Barrique eine spektakuläre Komplexität ohne jeglichen Verschnitt.',
       image: IMAGES.scotland_distillery
     },
     tastingNotes: {
-      nose: 'Intensive Oloroso-Schokolade, sonnengetrocknete Sultaninen, reife dunkle Feigen, kandierte Orangenschale und geröstete Haselnüsse.',
-      palate: 'Mächtiger Antritt bei 59,2% vol., samtige Dattelsüße, cremiges Toffee, feine Zedernholznoten und edle Sherry-Gewürze.',
-      finish: 'Außerordentlich langanhaltend, wärmend und tief mit anhaltender Zartbitterschokolade und samtigen Holztanninen.'
+      nose: 'Klassiche Sherryaromen mit Rosinen, dunklen Kirschen und getrockneten Pflaumen. Dazu kommt eine angenehme Buttrigkeit mit etwas Limttenfrische. Süßes Malz, Vanille und dunkles Karamell sorgen für eine cremige Basis, während sich im Hintergrund dezente Nuss- und Gewürznoten zeigen.',
+      palate: 'Vollmundig und intensiv. Dunkle Trockenfrüchte, Pflaumenmus und Sauerkirsche treffen auf Schokolade, Toffee und braunen Zucker. Dazu gesellen sich geröstete Mandeln, Zimt und eine feine Pfefferschärfe und frische grüne Zitrusnoten.',
+      finish: 'Lang und wärmend mit Rosinen, dunkler Schokolade und Orangeat. Gegen Ende etwas trockener mit gerösteten Nüssen einer angenehmen Gewürznote.'
     },
     sustainability: {
       headline: 'Wasserkreislauf am Burgie Hill & Regionale Gerste',
@@ -130,10 +130,10 @@ export const PRODUCTS = [
     abv: '59,9% vol.',
     vintage: '2011 / 2026',
     caskType: '1st Fill Rivesaltes Barrique',
-    caskNumber: 'Cask 302 of 302',
-    price: 169.90,
+    caskNumber: '#Z11/78005',
+    price: 119.90,
     originalPrice: null,
-    pricePerLiter: '242,71 € / l',
+    pricePerLiter: '171,29 € / l',
     isAvailable: true,
     isUpcoming: false,
     isNew: true,
@@ -146,16 +146,16 @@ export const PRODUCTS = [
     cardBg: IMAGES.card_bg_highlands,
     galleryImages: [IMAGES.fettercairn_15_cutout, IMAGES.fettercairn_15_barrel, IMAGES.card_bg_highlands, IMAGES.ines_testing],
     character: ['Kandierte Aprikosen', 'Rivesaltes-Süßwein', 'Sizilianische Blutorange', 'Frische Muskatblüte'],
-    intro: 'Aus der legendären Highland-Brennerei am Fuße der Grampian Mountains mit den weltweit einzigartigen Wasserkühlringen. Vollständig gereift in einem First Fill Barrique des französischen Edel-Süßweins Rivesaltes bei imposanten 59,9% vol.',
+    intro: 'Ein opulenter, likörig-fruchtiger Fettercairn, bei dem der Rivesaltes seine leichten Schokoladennoten mit dem Kokos des Fettercairn verbindet und so an eine bekannte Süßigkeit erinnert.',
     history: {
       headline: 'Die legendären Kühlringe der Cairngorms',
       text: 'Fettercairn kühlt den Hals seiner Kupferbrennblasen von außen mit eiskaltem Bergquellwasser ab. Dieser extreme Kupferkontakt erzeugt einen unvergleichlich feinen, tropisch-floralen Rohbrand. In der Kombination mit einem edlen First Fill Rivesaltes Barrique aus Südfrankreich entstand eine atemberaubende Geschmackssymbiose.',
       image: IMAGES.scotland_distillery
     },
     tastingNotes: {
-      nose: 'Reife Nektarinen, kandierte Aprikose, zarter Waldblütenhonig, süßer französischer Vin Doux Naturel und feines Butter-Shortbread.',
-      palate: 'Cremig und druckvoll mit 59,9% vol., saftige Blutorange, Maracuja-Creme, Toffee und eine subtile Würze von Muskatblüte und Nelke.',
-      finish: 'Sehr elegant, mineralisch-frisch und mit langem, süßfruchtigem Nachhall.'
+      nose: 'Reife gelbe Pflaumen, dazu Rosinen und kandierte Orangenschale. Süße Honig- und Karamellnoten verbinden sich mit feiner Vanille und nussiger Würze. Im Hintergrund etwas Holz und dunkler Honig.',
+      palate: 'Aprikosenmarmelade, trifft auf Toffee, Vanille und Milchschokolade. Dazu gesellen sich Orangenzeste, Kokos und eine feinsäuerliche, weinige Würze. Die Rivesaltes-Vollreifung verleiht ihm eine üppige, dessertartige Süße mit viel Tiefe.',
+      finish: 'Lang und wärmend mit Schokolade, Honig und karamellisierter Orange. Etwas Eichenwürze und eine leicht nussige Trockenheit sorgen gegen Ende für Balance.'
     },
     sustainability: {
       headline: 'Wasserkreislauf der Cairngorms & Lokale Aufforstung',
@@ -174,10 +174,10 @@ export const PRODUCTS = [
     abv: '54,5% vol.',
     vintage: '2009 / 2026',
     caskType: 'Finished in a Red Wine Barrique',
-    caskNumber: 'Cask 156 of 156',
-    price: 189.90,
+    caskNumber: '#302991',
+    price: 109.90,
     originalPrice: null,
-    pricePerLiter: '271,29 € / l',
+    pricePerLiter: '157,00 € / l',
     isAvailable: true,
     isUpcoming: false,
     isNew: true,
@@ -190,16 +190,16 @@ export const PRODUCTS = [
     cardBg: IMAGES.card_bg_speyside,
     galleryImages: [IMAGES.aultmore_17_cutout, IMAGES.aultmore_17_barrel, IMAGES.card_bg_speyside, IMAGES.ines_testing],
     character: ['Dunkle Waldbeeren', 'Samtige Weintannine', 'Reife Brombeere', 'Französische Eiche'],
-    intro: 'Aus dem geheimnisvollen „Foggie Moss“ bei Keith. Mit nur 156 handnummerierten Flaschen die seltenste Abfüllung dieses Herbstes. 17 Jahre Reife, vollendet in einem edlen französischen Rotwein-Barrique, verleihen diesem Single Malt ein tiefes rubingoldenes Funkeln.',
+    intro: 'Ein eleganter, fruchtbetonter Aultmore, bei dem das Rotweinfass für zusätzliche Tiefe, Beerenfrucht und Würze sorgt, ohne den heidehonigartigen Aultmore-Charakter zu überdecken.',
     history: {
       headline: 'Die Reinheit des Foggie Moss',
       text: 'Gegründet 1897 von Alexander Edward, galt Aultmore („der große Brand“) unter Kennern schon immer als „Top Dressing“. Die Brennerei liegt abgelegen im nebligen Moorland. Das durch dichten Torf und Heidekraut gefilterte Wasser des Auchinderran Burn verleiht dem Destillat eine kristalline Kräuterfrische, die durch das Rotweinfass meisterhaft abgerundet wird.',
       image: IMAGES.scotland_coast
     },
     tastingNotes: {
-      nose: 'Schwarze Johannisbeere (Cassis), reife Wald-Brombeeren, feines Rosenholz, Bourbon-Vanille und edle Kakaobohne.',
-      palate: 'Seidig-ölig auf der Zunge, delikate samtige Rotweintannine, Kirschkompott, feines Leder und zarte Nelkenwürze.',
-      finish: 'Langanhaltend, trocken-elegant mit Noten von herber Zartbitterschokolade und roten Sommerfrüchten.'
+      nose: 'Fast pappsüß im ersten Eindruck. Bald treffen dann reife dunkle Beeren, Kirschen und Pflaumen auf die typische Aultmore-Charakteristik von Honig, Heu und leicht grasigen Noten. Dazu gesellen sich Vanille, etwas dunkle Schokolade und warme Gewürze.',
+      palate: 'Cremig und vollmundig. Rote Trauben, Himbeeren und Sauerkirschen verbinden sich mit Toffee, Malz und Vanille. Dahinter zeigen sich würzige, herbere Noten von Holz und Leder. Die Rotweinfassreifung bringt eine angenehme Fruchtigkeit und leichte Tanninstruktur.',
+      finish: 'Mittellang bis lang, warm und sehr würzig. Karamell, Trockenfrüchte und rote Beeren bleiben präsent, begleitet von etwas Eichenwürze und einer feinen, trockenen Rotwein-Note.'
     },
     sustainability: {
       headline: 'Moorschutz im Foggie Moss & Biodiversität',
@@ -218,32 +218,32 @@ export const PRODUCTS = [
     abv: '54,3% vol.',
     vintage: '2007 / 2026',
     caskType: 'Fully Matured in a Bourbon Barrel',
-    caskNumber: 'Cask 240 of 240',
-    price: 219.90,
+    caskNumber: '#800429',
+    price: 119.90,
     originalPrice: null,
-    pricePerLiter: '314,14 € / l',
+    pricePerLiter: '171,29 € / l',
     isAvailable: true,
     isUpcoming: false,
     isNew: true,
     releaseDate: '17. September 2026',
     badge: 'Neu erhältlich · Orkney Single Cask',
-    bottlesTotal: 240,
-    bottlesRemaining: 240,
+    bottlesTotal: 210,
+    bottlesRemaining: 210,
     image: IMAGES.highlandpark_18_cutout,
     cutoutImage: IMAGES.highlandpark_18_cutout,
     cardBg: IMAGES.card_bg_islands,
     galleryImages: [IMAGES.highlandpark_18_cutout, IMAGES.highlandpark_18_barrel, IMAGES.card_bg_islands, IMAGES.ines_testing],
     character: ['Heidetorf-Rauch', 'Bienenwachs', 'Meersalz-Gischt', 'Bourbon-Vanillemark'],
-    intro: 'Von den windgepeitschten Orkney-Inseln. 18 lange Jahre unberührt gereift in einem erstbefüllten Bourbon Barrel. Der unverwechselbare Hobbister Moor-Heidetorf verleiht diesem seltenen Einzelfass eine maritime, florale Rauchigkeit von monumentaler Tiefe.',
+    intro: 'Ein ausgewogener Highland Park, bei dem das Bourbon-Fass die cremige, vanillige Seite betonen. Die charakteristische Kombination aus Heidekraut, Honigsüße und sanftem Rauch sorgt für die typische Orkney-DNA.',
     history: {
       headline: 'Wikinger-Erbe & der Hobbister-Moor-Torf',
       text: 'Highland Park brennt seit 1798 auf Orkney und ist eine der letzten Brennereien, die ihr Malz auf traditionellen Floor Maltings noch selbst wendet. Der hier verwendete Torf stammt aus dem Hobbister Moor – baumlos, dafür reich an jahrhundertealtem Heidekraut. Das Ergebnis ist kein beißender Rauch wie auf Islay, sondern ein sanfter, floral-aromatischer Heideduft.',
       image: IMAGES.tasting_springbank
     },
     tastingNotes: {
-      nose: 'Sanfter, süßer Heidetorfrauch, cremiges Bourbon-Vanillemark, Bienenwachs, blühendes Heidekraut und frische Meeresbrise.',
-      palate: 'Ölig und vielschichtig bei 54,3% vol., reife Birne, getoastete Eiche, salziges Butter-Karamell und eine wärmende Torfglut.',
-      finish: 'Monumental lang, maritim und trocken mit feinem Rauch und anhaltendem Honigwachs-Aroma.'
+      nose: 'Honig, Vanille und cremiges Karamell treffen auf reife Birnen und gelbe Früchte. Dazu feine Heidekrautnoten, etwas Orangenabrieb und eine dezente, elegante Rauchigkeit. Im Hintergrund süßes Malz und leicht würzige Eiche.',
+      palate: 'Klassisch Highland Park mit Vanillecreme, Honig und Toffee. Dazu kommen grüne Birne, Trockenkräuter, Bratapfel und etwas Zitrusfrucht. Der typische Highland-Park-Rauch bleibt eher im Hintergrund und verbindet sich mit Heidekraut, Malz und einer milden Pfeffernote. Das Bourbonfass bringt vor allem Vanille, Süße und weiche Holzwürze.',
+      finish: 'Lang, warm und harmonisch. Honig, Vanille und Malz bleiben präsent, begleitet von trockenem Heidekraut, dezenter Eiche und einem feinen, leicht salzigen Rauch.'
     },
     sustainability: {
       headline: 'Handwerklicher Torfabbau & Windenergie auf Orkney',

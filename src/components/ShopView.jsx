@@ -119,6 +119,22 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
             const total = product.bottlesTotal || (product.bottleCount ? parseInt(product.bottleCount) : 240);
             const releaseDateStr = product.releaseDate || '17. September 2026';
 
+            const isCutout = displayBottle && (
+              displayBottle.includes('Pure-Whisky-Fass_0') ||
+              displayBottle.includes('Pure-Whisky0') ||
+              (displayBottle.startsWith('data:image/') && displayBottle.includes('png'))
+            );
+            const isFullPhoto = !isCutout && (
+              typeof displayBottle === 'string' && (
+                displayBottle.includes('-barrel') || 
+                displayBottle.includes('-full') || 
+                displayBottle.includes('Single-Malt') || 
+                displayBottle.includes('20241014') ||
+                displayBottle.includes('Testing') ||
+                displayBottle.startsWith('data:image/jpeg')
+              )
+            );
+
             return (
               <div
                 key={product.id}
@@ -127,30 +143,50 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
                 <div>
                   {/* Bottle Stage */}
                   <div 
-                    className="h-80 sm:h-96 relative flex items-center justify-center cursor-pointer rounded-2xl mb-6 p-6 overflow-hidden border border-[#D4C8B8] group shadow-inner bg-neutral-900"
+                    className="h-72 sm:h-88 md:h-96 relative flex items-center justify-center cursor-pointer rounded-2xl mb-6 overflow-hidden border border-[#D4C8B8] group shadow-inner bg-neutral-900"
                     onClick={() => onOpenProduct(product)}
                   >
-                    {/* Layer 1: Background Landscape */}
-                    <img
-                      src={product.cardBg}
-                      alt="Schottische Landschaft"
-                      className="absolute inset-0 w-full h-full object-cover filter brightness-[0.88] contrast-[1.05] blur-[1px] scale-105 opacity-90 group-hover:scale-110 group-hover:opacity-100 transition-all duration-700"
-                    />
-                    
-                    {/* Layer 2: Soft Atmospheric Lighting Vignette */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-black/30" />
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(212,139,56,0.20)_0%,_transparent_65%)]" />
+                    {isFullPhoto ? (
+                      <div className="w-full h-full flex items-center justify-center relative p-3 sm:p-5 overflow-hidden">
+                        <img
+                          src={displayBottle}
+                          alt=""
+                          aria-hidden="true"
+                          className="absolute inset-0 w-full h-full object-cover filter blur-2xl opacity-40 scale-120 pointer-events-none"
+                        />
+                        <div className="absolute inset-0 bg-black/25" />
+                        <img
+                          src={displayBottle}
+                          alt={product.fullName}
+                          className="relative z-10 max-h-full max-w-full object-contain rounded-xl drop-shadow-[0_15px_30px_rgba(0,0,0,0.85)] group-hover:scale-104 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                      </div>
+                    ) : (
+                      <>
+                        {/* Layer 1: Background Landscape */}
+                        <img
+                          src={product.cardBg || IMAGES.card_bg_speyside}
+                          alt="Schottische Landschaft"
+                          className="absolute inset-0 w-full h-full object-cover filter brightness-[0.88] contrast-[1.05] blur-[1px] scale-105 opacity-90 group-hover:scale-110 group-hover:opacity-100 transition-all duration-700"
+                        />
+                        
+                        {/* Layer 2: Soft Atmospheric Lighting Vignette */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-black/30" />
+                        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(212,139,56,0.20)_0%,_transparent_65%)]" />
 
-                    {/* Layer 3: Foreground Bottle */}
-                    <div className="relative z-10 h-full flex flex-col items-center justify-center">
-                      <img
-                        src={displayBottle}
-                        alt={product.fullName}
-                        className="max-h-[90%] w-auto object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.7)] group-hover:scale-106 transition-transform duration-500"
-                        loading="lazy"
-                      />
-                      <div className="w-24 sm:w-28 h-3.5 bg-black/65 rounded-full blur-md -mt-2 opacity-80" />
-                    </div>
+                        {/* Layer 3: Foreground Bottle */}
+                        <div className="relative z-10 h-full w-full flex flex-col items-center justify-center p-3 sm:p-6">
+                          <img
+                            src={displayBottle}
+                            alt={product.fullName}
+                            className="max-h-[88%] max-w-[88%] w-auto object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.7)] group-hover:scale-106 transition-transform duration-500"
+                            loading="lazy"
+                          />
+                          <div className="w-24 sm:w-28 h-3.5 bg-black/65 rounded-full blur-md -mt-2 opacity-80" />
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   <div className="space-y-3">

@@ -20,6 +20,8 @@ export default function AdminView({
   onNavigateBlog,
   products = [],
   onUpdateProduct,
+  onCreateProduct,
+  onDeleteProduct,
   onResetProducts,
   onNavigateProduct,
   // Orders & Invoices Props
@@ -802,6 +804,8 @@ Ines Zager · PURE.WHISKY.`);
           <InventoryManager
             products={products}
             onUpdateProduct={onUpdateProduct}
+            onCreateProduct={onCreateProduct}
+            onDeleteProduct={onDeleteProduct}
             onResetProducts={onResetProducts}
             onNavigateProduct={onNavigateProduct}
           />
