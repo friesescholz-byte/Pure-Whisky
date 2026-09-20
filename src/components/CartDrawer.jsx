@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, ShoppingBag, Plus, Minus, Trash2, ArrowRight, ShieldCheck, CheckCircle2, ChevronLeft, CreditCard, Send, ExternalLink, Loader2, AlertCircle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
-import { createMolliePayment } from '../services/orderService';
+import { createMolliePayment, syncOrderToServer } from '../services/orderService';
 
 export default function CartDrawer({ 
   isOpen, 
@@ -128,6 +128,13 @@ export default function CartDrawer({
     // Register pending order in state without sending confirmation email yet
     if (onCompleteOrder) {
       await onCompleteOrder(newOrder, { skipEmail: true });
+    }
+
+    // Await sync pending order to Cloudflare KV server database so it is saved before redirect
+    try {
+      await syncOrderToServer(newOrder);
+    } catch (syncErr) {
+      console.warn('Order KV sync notice:', syncErr);
     }
 
     // IMMEDIATELY REDIRECT TO MOLLIE

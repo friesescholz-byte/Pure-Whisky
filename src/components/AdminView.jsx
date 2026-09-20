@@ -29,6 +29,7 @@ export default function AdminView({
   onSendInvoice,
   onViewInvoice,
   onAddTestOrder,
+  onRefreshOrders,
   // WooCommerce Customers CRM Props
   wooCustomers = [],
   onAddWooCustomer,
@@ -793,6 +794,7 @@ Ines Zager · PURE.WHISKY.`);
             onSendInvoice={onSendInvoice}
             onViewInvoice={onViewInvoice}
             onAddTestOrder={onAddTestOrder}
+            onRefreshOrders={onRefreshOrders}
             adminEmail={adminEmail}
           />
         )}

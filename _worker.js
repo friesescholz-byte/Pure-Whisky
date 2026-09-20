@@ -16,6 +16,36 @@ export default {
 
     // 0. Mollie API Proxy & Webhook
     if (url.pathname === '/api/mollie/webhook') {
+      try {
+        if (request.method === 'POST') {
+          const bodyText = await request.text();
+          const params = new URLSearchParams(bodyText);
+          const paymentId = params.get('id');
+
+          if (paymentId && env && env.PURE_KV) {
+            let serverKey = await env.PURE_KV.get('mollie_api_key') || env?.MOLLIE_API_KEY || 'test_757rbjSksxgtDCCAps98ThDSgpxCaz';
+            const mollieRes = await fetch(`https://api.mollie.com/v2/payments/${paymentId}`, {
+              headers: { 'Authorization': `Bearer ${serverKey}` }
+            });
+            const payment = await mollieRes.json();
+            if (payment && payment.status === 'paid' && payment.metadata && payment.metadata.orderId) {
+              const orderId = payment.metadata.orderId;
+              const rawOrders = await env.PURE_KV.get('pure_orders');
+              let orders = rawOrders ? JSON.parse(rawOrders) : [];
+              if (Array.isArray(orders)) {
+                const idx = orders.findIndex(o => o.orderId === orderId);
+                if (idx >= 0) {
+                  orders[idx].status = 'neu_eingegangen';
+                  orders[idx].paymentStatus = `Bezahlt (${payment.method || 'Online-Zahlung'})`;
+                  await env.PURE_KV.put('pure_orders', JSON.stringify(orders));
+                }
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Webhook exception:', err);
+      }
       return new Response('OK', { status: 200, headers: corsHeaders });
     }
 
@@ -42,6 +72,59 @@ export default {
         });
       } catch (err) {
         return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
+      }
+    }
+
+    // 0c. Orders API for Cross-Device Synchronization
+    if (url.pathname === '/api/orders') {
+      if (request.method === 'GET') {
+        let orders = [];
+        if (env && env.PURE_KV) {
+          try {
+            const raw = await env.PURE_KV.get('pure_orders');
+            if (raw) orders = JSON.parse(raw);
+          } catch (e) {
+            console.warn('Could not read pure_orders from KV:', e);
+          }
+        }
+        return new Response(JSON.stringify({ orders: Array.isArray(orders) ? orders : [] }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      if (request.method === 'POST') {
+        try {
+          const body = await request.json();
+          let orders = [];
+          if (env && env.PURE_KV) {
+            try {
+              const raw = await env.PURE_KV.get('pure_orders');
+              if (raw) orders = JSON.parse(raw);
+            } catch (e) {}
+          }
+          if (!Array.isArray(orders)) orders = [];
+
+          if (Array.isArray(body)) {
+            orders = body;
+          } else if (body && body.orderId) {
+            const idx = orders.findIndex(o => o.orderId === body.orderId);
+            if (idx >= 0) {
+              orders[idx] = { ...orders[idx], ...body };
+            } else {
+              orders.unshift(body);
+            }
+          }
+
+          if (env && env.PURE_KV) {
+            await env.PURE_KV.put('pure_orders', JSON.stringify(orders));
+          }
+
+          return new Response(JSON.stringify({ success: true, orders }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        } catch (err) {
+          return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
+        }
       }
     }
 

@@ -23,7 +23,12 @@ import InvoiceModal from './components/InvoiceModal';
 
 import { PRODUCTS, BLOG_POSTS } from './data/pureWhiskyFullData';
 import initialCrmData from './data/initialCrmData.json';
-import { sendOrderConfirmationEmail, sendInvoiceEmail } from './services/orderService';
+import { 
+  sendOrderConfirmationEmail, 
+  sendInvoiceEmail,
+  syncOrderToServer,
+  fetchOrdersFromServer
+} from './services/orderService';
 import { CheckCircle2 } from 'lucide-react';
 
 function getTabFromUrl() {
@@ -287,27 +292,45 @@ export default function App() {
       const cleanUrl = window.location.pathname;
       window.history.replaceState({}, document.title, cleanUrl);
 
-      // Retrieve pending order if stored
-      let pending = null;
-      try {
-        const saved = localStorage.getItem('pure_whisky_pending_order');
-        if (saved) {
-          pending = JSON.parse(saved);
-          localStorage.removeItem('pure_whisky_pending_order');
+      (async () => {
+        // Retrieve pending order if stored
+        let target = null;
+        try {
+          const saved = localStorage.getItem('pure_whisky_pending_order');
+          if (saved) {
+            target = JSON.parse(saved);
+            localStorage.removeItem('pure_whisky_pending_order');
+          }
+        } catch (err) {
+          console.warn('Could not parse pending order:', err);
         }
-      } catch (err) {
-        console.warn('Could not parse pending order:', err);
-      }
 
-      setOrders(prev => {
-        const target = pending || prev.find(o => o.orderId === orderIdParam) || {
-          orderId: orderIdParam,
-          invoiceNumber: `A09401${orderIdParam}`,
-          date: new Date().toLocaleDateString('de-DE'),
-          customer: { firstName: 'Kunde', lastName: '', email: '' },
-          items: [],
-          total: 0
-        };
+        // If not in localStorage, look up in current state or fetch from server KV
+        if (!target || !target.customer?.email) {
+          const existingInState = orders.find(o => o.orderId === orderIdParam);
+          if (existingInState) {
+            target = existingInState;
+          } else {
+            try {
+              const serverOrders = await fetchOrdersFromServer();
+              const foundInServer = serverOrders?.find(o => o.orderId === orderIdParam);
+              if (foundInServer) target = foundInServer;
+            } catch (e) {
+              console.warn('Could not fetch server orders on return:', e);
+            }
+          }
+        }
+
+        if (!target) {
+          target = {
+            orderId: orderIdParam,
+            invoiceNumber: `A09401${orderIdParam}`,
+            date: new Date().toLocaleDateString('de-DE'),
+            customer: { firstName: 'Kunde', lastName: '', email: '' },
+            items: [],
+            total: 0
+          };
+        }
 
         const updatedOrder = {
           ...target,
@@ -316,21 +339,59 @@ export default function App() {
           status: 'neu_eingegangen'
         };
 
-        // Send order confirmation via Resend now that payment has succeeded
-        if (target.customer && target.customer.email) {
-          sendOrderConfirmationEmail({ order: updatedOrder, adminEmail }).catch(e => console.warn(e));
-        }
+        // Update local React state and localStorage
+        setOrders(prev => {
+          const exists = prev.some(o => o.orderId === orderIdParam);
+          const next = exists 
+            ? prev.map(o => o.orderId === orderIdParam ? updatedOrder : o)
+            : [updatedOrder, ...prev];
+          try { localStorage.setItem('pure_whisky_orders', JSON.stringify(next)); } catch {}
+          return next;
+        });
 
         setPaidConfirmationOrder(updatedOrder);
 
-        const exists = prev.some(o => o.orderId === orderIdParam);
-        if (exists) {
-          return prev.map(o => o.orderId === orderIdParam ? updatedOrder : o);
+        // Sync to server KV so ALL devices see the paid order immediately
+        await syncOrderToServer(updatedOrder);
+
+        // Send order confirmation to customer (no attachments) and admin alert to info@pure-whisky.com
+        if (target.customer && target.customer.email && !target.confirmationEmailSent) {
+          updatedOrder.confirmationEmailSent = true;
+          try {
+            await sendOrderConfirmationEmail({ order: updatedOrder, adminEmail });
+            await syncOrderToServer(updatedOrder);
+          } catch (e) {
+            console.warn('Could not send confirmation email:', e);
+          }
         }
-        return [updatedOrder, ...prev];
-      });
+      })();
     }
-  }, [adminEmail]);
+  }, [adminEmail, orders]);
+
+  const handleRefreshOrders = async () => {
+    try {
+      const serverOrders = await fetchOrdersFromServer();
+      if (serverOrders && Array.isArray(serverOrders) && serverOrders.length > 0) {
+        setOrders(prev => {
+          const map = new Map();
+          serverOrders.forEach(o => map.set(o.orderId, o));
+          prev.forEach(o => {
+            if (!map.has(o.orderId)) map.set(o.orderId, o);
+          });
+          const merged = Array.from(map.values());
+          try { localStorage.setItem('pure_whisky_orders', JSON.stringify(merged)); } catch {}
+          return merged;
+        });
+      }
+    } catch (e) {
+      console.warn('Could not refresh orders from KV:', e);
+    }
+  };
+
+  // Automatically sync orders from Cloudflare KV on mount and whenever navigating to admin
+  useEffect(() => {
+    handleRefreshOrders();
+  }, [activeTab]);
 
   const handleSaveAdminEmail = (newEmail) => {
     setAdminEmail(newEmail);
@@ -621,21 +682,20 @@ export default function App() {
     const dateStr = now.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
     const timeStr = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
 
-    setOrders(prev => prev.map(o => {
-      if (o.orderId === orderId) {
-        return {
-          ...o,
-          status: 'rechnung_versendet',
-          contractConcluded: true,
-          invoiceSentAt: `${dateStr}, ${timeStr} Uhr`
-        };
-      }
-      return o;
-    }));
+    const updatedOrder = {
+      ...(targetOrder || {}),
+      orderId,
+      status: 'rechnung_versendet',
+      contractConcluded: true,
+      invoiceSentAt: `${dateStr}, ${timeStr} Uhr`
+    };
+
+    setOrders(prev => prev.map(o => o.orderId === orderId ? updatedOrder : o));
+    syncOrderToServer(updatedOrder);
 
     if (targetOrder) {
       try {
-        await sendInvoiceEmail({ order: { ...targetOrder, date: dateStr }, adminEmail });
+        await sendInvoiceEmail({ order: { ...updatedOrder, date: dateStr }, adminEmail });
       } catch (mailErr) {
         console.warn('Resend invoice dispatch notice:', mailErr);
       }
@@ -656,6 +716,7 @@ export default function App() {
 
   const handleCompleteOrder = async (newOrder, options = {}) => {
     setOrders(prev => [newOrder, ...prev]);
+    syncOrderToServer(newOrder);
 
     // Send order confirmation via Resend API (only if not waiting for external payment)
     if (!options.skipEmail) {
@@ -884,6 +945,7 @@ export default function App() {
             onSendInvoice={handleSendInvoice}
             onViewInvoice={handleOpenInvoice}
             onAddTestOrder={handleAddTestOrder}
+            onRefreshOrders={handleRefreshOrders}
             // WooCommerce Customers CRM Props
             wooCustomers={wooCustomers}
             onAddWooCustomer={handleAddWooCustomer}

@@ -149,7 +149,132 @@ async function sendResendMail({ to, bcc, subject, html, attachments }) {
 const formatEur = (val) => Number(val || 0).toFixed(2).replace('.', ',') + ' €';
 
 /**
- * Sends order entry confirmation to customer with BCC to admin
+ * Sync single order to Cloudflare KV for cross-device visibility
+ */
+export async function syncOrderToServer(order) {
+  try {
+    const res = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(order),
+      keepalive: true
+    });
+    return await res.json();
+  } catch (err) {
+    console.warn('Could not sync order to server KV:', err);
+    return null;
+  }
+}
+
+/**
+ * Fetch all orders from Cloudflare KV
+ */
+export async function fetchOrdersFromServer() {
+  try {
+    const res = await fetch('/api/orders');
+    const data = await res.json();
+    if (data && Array.isArray(data.orders)) {
+      return data.orders;
+    }
+    return [];
+  } catch (err) {
+    console.warn('Could not fetch orders from server KV:', err);
+    return [];
+  }
+}
+
+/**
+ * Sends separate Admin Notification about new order to Ines Zager & admin
+ */
+export async function sendAdminNewOrderNotification({ order, adminEmail = DEFAULT_ADMIN_EMAIL }) {
+  const itemsList = order.items?.map(item => `
+    <tr>
+      <td style="padding: 8px 10px; border-bottom: 1px solid #e5e5e5; font-size: 13px;">
+        <strong>${item.name}</strong><br/>
+        <span style="font-size: 11px; color: #666;">${item.caskInfo || 'Single Cask'}</span>
+      </td>
+      <td style="padding: 8px 10px; border-bottom: 1px solid #e5e5e5; text-align: center; font-size: 13px;">${item.quantity}</td>
+      <td style="padding: 8px 10px; border-bottom: 1px solid #e5e5e5; text-align: right; font-size: 13px; font-weight: bold;">${formatEur(item.price * item.quantity)}</td>
+    </tr>
+  `).join('') || '';
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="de">
+    <head><meta charset="utf-8"></head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f4f4f5; margin: 0; padding: 25px;">
+      <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 10px; overflow: hidden;">
+        
+        <div style="background: #181F1C; padding: 20px; text-align: center;">
+          <h2 style="color: #ffffff; margin: 0; font-size: 18px; letter-spacing: 1px;">🔔 NEUE BESTELLUNG EINGEGANGEN</h2>
+          <p style="color: #B85D2C; margin: 5px 0 0 0; font-size: 14px; font-weight: bold;">Bestellung #${order.orderId} · ${formatEur(order.total)}</p>
+        </div>
+
+        <div style="padding: 25px; color: #181F1C; font-size: 13px; line-height: 1.6;">
+          <p style="font-size: 15px; margin-top: 0;">
+            Hallo Ines, es ist soeben eine neue Bestellung im Shop eingegangen!
+          </p>
+
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin: 15px 0;">
+            <strong style="color: #0f172a; font-size: 14px;">Kundendaten:</strong><br/>
+            <strong>Name:</strong> ${order.customer.firstName} ${order.customer.lastName}<br/>
+            <strong>E-Mail:</strong> <a href="mailto:${order.customer.email}" style="color: #B85D2C;">${order.customer.email}</a><br/>
+            <strong>Lieferadresse:</strong><br/>
+            ${order.customer.street}<br/>
+            ${order.customer.zip} ${order.customer.city}<br/>
+            <strong>Zahlungsstatus:</strong> <span style="color: #15803d; font-weight: bold;">${order.paymentMethod || 'Online-Zahlung (Mollie)'}</span>
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+            <thead>
+              <tr style="background: #f1f5f9; text-align: left;">
+                <th style="padding: 8px 10px; font-size: 11px; text-transform: uppercase;">Artikel</th>
+                <th style="padding: 8px 10px; font-size: 11px; text-transform: uppercase; text-align: center;">Menge</th>
+                <th style="padding: 8px 10px; font-size: 11px; text-transform: uppercase; text-align: right;">Gesamt</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsList}
+            </tbody>
+          </table>
+
+          <div style="text-align: right; font-size: 14px; font-weight: bold; margin-bottom: 20px;">
+            Gesamtbetrag: <span style="color: #B85D2C; font-size: 17px;">${formatEur(order.total)}</span> (inkl. Versand & 19% MwSt.)
+          </div>
+
+          <div style="background: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; padding: 15px; text-align: center;">
+            <p style="margin: 0 0 8px 0; color: #92400e; font-weight: bold;">Aktion im Admin-Dashboard erforderlich:</p>
+            <p style="margin: 0; font-size: 12px; color: #78350f; line-height: 1.5;">
+              Die Bestellung ist im Admin-Dashboard unter <strong>Bestellungen</strong> hinterlegt. Sobald Sie die Bestellung geprüft haben, versenden Sie dort mit einem Klick die offizielle Rechnung als PDF an den Kunden, um den Kaufvertrag rechtswirksam zu schließen.
+            </p>
+          </div>
+        </div>
+
+        <div style="background: #f8fafc; padding: 15px; text-align: center; font-size: 11px; color: #64748b; border-top: 1px solid #e2e8f0;">
+          PURE.WHISKY. Bestellsystem · Automatische Benachrichtigung
+        </div>
+
+      </div>
+    </body>
+    </html>
+  `;
+
+  // Always deliver to both Ines Zager and adminEmail
+  const recipients = ['info@pure-whisky.com'];
+  if (adminEmail && !recipients.includes(adminEmail)) {
+    recipients.push(adminEmail);
+  }
+
+  return sendResendMail({
+    to: recipients,
+    subject: `🔔 Neue Bestellung #${order.orderId} eingegangen (${formatEur(order.total)}) – ${order.customer.firstName} ${order.customer.lastName}`,
+    html
+  });
+}
+
+/**
+ * Sends order entry confirmation to customer (NO PDF INVOICE ATTACHED)
+ * Explicitly states that the purchase contract will only be concluded when the official invoice is sent from the admin panel.
  */
 export async function sendOrderConfirmationEmail({ order, adminEmail = DEFAULT_ADMIN_EMAIL }) {
   const itemsHtml = order.items?.map(item => `
@@ -162,8 +287,6 @@ export async function sendOrderConfirmationEmail({ order, adminEmail = DEFAULT_A
       <td style="padding: 10px 12px; border-bottom: 1px solid #f0ede6; font-size: 13px; text-align: right; color: #181F1C;">${formatEur(item.price * item.quantity)}</td>
     </tr>
   `).join('') || '';
-
-  const invoiceNum = order.invoiceNumber || `A09401${order.orderId}`;
 
   const html = `
     <!DOCTYPE html>
@@ -190,8 +313,8 @@ export async function sendOrderConfirmationEmail({ order, adminEmail = DEFAULT_A
           </p>
 
           <div style="background: #FAF8F5; border: 1px solid #E2DDD5; border-radius: 8px; padding: 14px 16px; margin: 20px 0; font-size: 12px; color: #55695E; line-height: 1.5;">
-            <strong style="color: #181F1C;">Hinweis zum Kaufvertrag:</strong><br/>
-            Diese E-Mail bestätigt den Eingang Ihrer Bestellung. Ihre offizielle Rechnung (<strong>${invoiceNum}</strong>) habe ich Ihnen zusätzlich als PDF-Dokument an diese E-Mail angehängt.
+            <strong style="color: #181F1C;">Wichtiger Hinweis zum Kaufvertrag:</strong><br/>
+            Diese E-Mail bestätigt lediglich den Eingang Ihrer Bestellung. Die Verfügbarkeitsprüfung Ihrer handverlesenen Einzelflaschen erfolgt persönlich durch mich. Nach erfolgreicher Prüfung erhalten Sie in Kürze Ihre offizielle Rechnung in einer separaten E-Mail. Erst mit Zusendung dieser Rechnung kommt der Kaufvertrag rechtswirksam zustande.
           </div>
 
           <table style="width: 100%; border-collapse: collapse; margin: 24px 0;">
@@ -234,27 +357,17 @@ export async function sendOrderConfirmationEmail({ order, adminEmail = DEFAULT_A
     </html>
   `;
 
-  // Generate attached Invoice PDF
-  const attachments = [];
-  try {
-    const pdfBase64 = generateInvoicePdfBase64(order);
-    if (pdfBase64) {
-      attachments.push({
-        filename: `Rechnung_${invoiceNum}.pdf`,
-        content: pdfBase64
-      });
-    }
-  } catch (pdfErr) {
-    console.warn('Could not generate PDF attachment for confirmation email:', pdfErr);
-  }
-
-  return sendResendMail({
+  // 1. Send customer confirmation email (WITHOUT attachments)
+  const customerPromise = sendResendMail({
     to: order.customer.email,
-    bcc: adminEmail,
     subject: `Bestelleingangsbestätigung #${order.orderId} – PURE.WHISKY.`,
-    html,
-    attachments
+    html
   });
+
+  // 2. Send dedicated Admin Notification to Ines Zager and adminEmail
+  const adminPromise = sendAdminNewOrderNotification({ order, adminEmail });
+
+  return Promise.allSettled([customerPromise, adminPromise]);
 }
 
 /**
@@ -416,9 +529,14 @@ export async function sendInvoiceEmail({ order, adminEmail = DEFAULT_ADMIN_EMAIL
     console.warn('Could not generate PDF attachment for invoice email:', pdfErr);
   }
 
+  const bccRecipients = ['info@pure-whisky.com'];
+  if (adminEmail && !bccRecipients.includes(adminEmail)) {
+    bccRecipients.push(adminEmail);
+  }
+
   return sendResendMail({
     to: order.customer.email,
-    bcc: adminEmail,
+    bcc: bccRecipients,
     subject: `Rechnung ${invoiceNum} zu Ihrer Bestellung #${order.orderId} – PURE.WHISKY.`,
     html,
     attachments

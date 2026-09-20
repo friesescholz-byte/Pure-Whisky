@@ -10,6 +10,7 @@ export default function OrdersManager({
   onSendInvoice, 
   onViewInvoice, 
   onAddTestOrder,
+  onRefreshOrders,
   adminEmail = 'friese.scholz@gmail.com'
 }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -171,17 +172,27 @@ export default function OrdersManager({
           </button>
         </div>
 
-        {/* Accordion Controls (Expand All / Collapse All) */}
+        {/* Accordion Controls (Expand All / Collapse All & Refresh) */}
         <div className="flex items-center space-x-2 text-xs shrink-0 self-end md:self-auto">
+          {onRefreshOrders && (
+            <button
+              onClick={onRefreshOrders}
+              className="px-2.5 py-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#E2DDD5] text-[#181F1C] font-craft-mono transition-colors flex items-center space-x-1.5 border border-[#D4C8B8] cursor-pointer"
+              title="Bestellungen live von Cloudflare KV synchronisieren"
+            >
+              <RefreshCw className="w-3.5 h-3.5 text-[#B85D2C]" />
+              <span>Live Synchronisieren</span>
+            </button>
+          )}
           <button
             onClick={expandAll}
-            className="px-2.5 py-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#E2DDD5] text-[#55695E] hover:text-[#181F1C] font-craft-mono transition-colors"
+            className="px-2.5 py-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#E2DDD5] text-[#55695E] hover:text-[#181F1C] font-craft-mono transition-colors cursor-pointer"
           >
             Alle aufklappen
           </button>
           <button
             onClick={collapseAll}
-            className="px-2.5 py-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#E2DDD5] text-[#55695E] hover:text-[#181F1C] font-craft-mono transition-colors"
+            className="px-2.5 py-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#E2DDD5] text-[#55695E] hover:text-[#181F1C] font-craft-mono transition-colors cursor-pointer"
           >
             Alle zuklappen
           </button>
