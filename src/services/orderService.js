@@ -49,12 +49,15 @@ export async function createMolliePayment({ orderId, amount, description, redire
   }
 
   try {
+    const headers = { 'Content-Type': 'application/json' };
+    const customKey = typeof window !== 'undefined' ? localStorage.getItem('pure_mollie_key') : null;
+    if (customKey && customKey.trim()) {
+      headers['Authorization'] = `Bearer ${customKey.trim()}`;
+    }
+
     const response = await fetch('/api/mollie/v2/payments', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      },
+      headers,
       body: JSON.stringify(payload)
     });
 
@@ -402,54 +405,55 @@ export async function sendInvoiceEmail({ order, adminEmail = DEFAULT_ADMIN_EMAIL
     <head>
       <meta charset="utf-8">
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <title>Rechnung_${invoiceNum}</title>
     </head>
-    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #FAFAFA; margin: 0; padding: 40px 15px;">
-      <div style="max-width: 650px; margin: 0 auto; background: #ffffff; border: 1px solid #E5E5E5; box-shadow: 0 4px 20px rgba(0,0,0,0.05); padding: 40px;">
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #FAF8F5; margin: 0; padding: 30px 15px; color: #000000;">
+      <div style="max-width: 680px; margin: 0 auto; background: #ffffff; border: 1px solid #E2DDD5; border-radius: 8px; padding: 40px 35px; box-sizing: border-box;">
         
-        <!-- Logo Top-Left -->
-        <div style="margin-bottom: 24px;">
-          <img src="https://pub-b33108412309406a9a941ddc51e9a5b9.r2.dev/Pure-Whisky/logo-pure-whisky.png" alt="PURE.WHISKY." style="width: 90px; height: 90px; object-fit: contain;" />
+        <!-- Header Row: Official Round Logo (Top-Left) -->
+        <div style="margin-bottom: 16px;">
+          <img src="https://pub-b33108412309406a9a941ddc51e9a5b9.r2.dev/Pure-Whisky/logo-pure-whisky.png" alt="PURE.WHISKY." style="width: 108px; height: 108px; object-fit: contain; display: block;" />
         </div>
 
-        <!-- Sender Subline -->
-        <div style="font-size: 10px; color: #888888; margin-bottom: 20px;">
+        <!-- Sender Line -->
+        <div style="font-size: 10px; color: #777777; margin-bottom: 24px; letter-spacing: 0.01em;">
           PURE.WHISKY. – Am Urnenfeld 1c – 29339 Wathlingen – info@pure-whisky.com
         </div>
 
         <!-- Recipient Address -->
-        <div style="font-size: 13px; line-height: 1.5; color: #000000; margin-bottom: 40px;">
-          <div style="font-size: 14px;">${order.customer.firstName} ${order.customer.lastName}</div>
-          ${order.customer.street ? `<div>${order.customer.street}</div>` : ''}
-          <div>${order.customer.zip} ${order.customer.city}</div>
+        <div style="font-size: 13px; line-height: 1.45; color: #000000; margin-bottom: 30px;">
+          <div style="font-weight: normal; font-size: 13.5px;">${order.customer?.firstName || ''} ${order.customer?.lastName || ''}</div>
+          ${order.customer?.street ? `<div>${order.customer.street}</div>` : ''}
+          <div>${order.customer?.zip || ''} ${order.customer?.city || ''}</div>
         </div>
 
-        <!-- Heading -->
-        <h1 style="font-size: 24px; font-weight: bold; color: #000000; margin: 0 0 24px 0; text-transform: uppercase; letter-spacing: 0.5px;">
+        <!-- Document Title: RECHNUNG -->
+        <div style="font-size: 24px; font-weight: bold; color: #000000; text-transform: uppercase; letter-spacing: -0.01em; margin-bottom: 16px;">
           RECHNUNG
-        </h1>
+        </div>
 
-        <!-- Metadata -->
-        <table style="width: 100%; font-size: 12px; color: #000000; line-height: 1.6; margin-bottom: 30px;">
+        <!-- Metadata Grid -->
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 13px; line-height: 1.5; color: #000000;">
           <tr>
-            <td style="vertical-align: top;">
-              <div>Rechnungsnummer: <strong>${invoiceNum}</strong></div>
-              <div>Bestellnummer: <strong>${order.orderId}</strong></div>
-              <div>Zahlungsart: <strong>${order.paymentMethod || 'PayPal'}</strong></div>
+            <td style="vertical-align: top; padding: 0;">
+              <div>Rechnungsnummer: ${invoiceNum}</div>
+              <div>Bestellnummer: ${order.orderId}</div>
+              <div>Zahlungsart: ${order.paymentMethod || 'PayPal'}</div>
             </td>
-            <td style="vertical-align: top; text-align: right;">
-              <div>Datum: <strong>${dateStr}</strong></div>
+            <td style="vertical-align: top; text-align: right; padding: 0;">
+              <div>Datum: ${dateStr}</div>
             </td>
           </tr>
         </table>
 
-        <!-- Table -->
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+        <!-- Positions Table -->
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
           <thead>
-            <tr style="background: #F2F2F2;">
-              <th style="padding: 10px; font-size: 12px; font-weight: bold; color: #000000; text-align: left;">Bezeichnung</th>
-              <th style="padding: 10px; font-size: 12px; font-weight: bold; color: #000000; text-align: center; width: 60px;">Anzahl</th>
-              <th style="padding: 10px; font-size: 12px; font-weight: bold; color: #000000; text-align: right; width: 90px;">Preis</th>
-              <th style="padding: 10px; font-size: 12px; font-weight: bold; color: #000000; text-align: right; width: 90px;">Gesamt</th>
+            <tr style="background-color: #F2F2F2;">
+              <th style="width: 54%; text-align: left; font-size: 12.5px; font-weight: bold; color: #000000; padding: 8px 10px; border: none;">Bezeichnung</th>
+              <th style="width: 12%; text-align: center; font-size: 12.5px; font-weight: bold; color: #000000; padding: 8px 10px; border: none;">Anzahl</th>
+              <th style="width: 17%; text-align: right; font-size: 12.5px; font-weight: bold; color: #000000; padding: 8px 10px; border: none;">Preis</th>
+              <th style="width: 17%; text-align: right; font-size: 12.5px; font-weight: bold; color: #000000; padding: 8px 10px; border: none;">Gesamt</th>
             </tr>
           </thead>
           <tbody>
@@ -457,54 +461,50 @@ export async function sendInvoiceEmail({ order, adminEmail = DEFAULT_ADMIN_EMAIL
           </tbody>
         </table>
 
-        <!-- Totals -->
-        <div style="width: 280px; margin-left: auto; font-size: 12px; color: #000000; margin-bottom: 50px;">
-          <div style="display: flex; justify-content: space-between; padding: 4px 0;">
-            <span>Zwischensumme / Subtotal</span>
-            <span>${formatEur(subtotal)}</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; padding: 4px 0;">
-            <span>Versand / Shipping</span>
-            <span>${formatEur(shipping)}</span>
-          </div>
-          <div style="border-top: 1px solid #000000; border-bottom: 2px solid #000000; font-size: 15px; font-weight: bold; padding: 8px 0; margin: 4px 0; display: flex; justify-content: space-between;">
-            <span>Gesamt</span>
-            <span>${formatEur(total)}</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; font-size: 11px; color: #888888; padding: 2px 0;">
-            <span>Netto / net value</span>
-            <span>${formatEur(net)}</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; font-size: 11px; color: #888888; padding: 2px 0;">
-            <span>MwSt. / VAT 19 %</span>
-            <span>${formatEur(vat)}</span>
-          </div>
+        <!-- Totals Calculation Block -->
+        <div style="width: 100%; margin-bottom: 40px;">
+          <table style="width: 270px; margin-left: auto; border-collapse: collapse; font-size: 13px; color: #000000;">
+            <tr>
+              <td style="padding: 4px 0;">Zwischensumme / Subtotal</td>
+              <td style="padding: 4px 0; text-align: right;">${formatEur(subtotal)}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0;">Versand / Shipping</td>
+              <td style="padding: 4px 0; text-align: right;">${formatEur(shipping)}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; font-size: 16px; font-weight: bold; border-top: 2px solid #000000; border-bottom: 1px solid #000000;">Gesamt</td>
+              <td style="padding: 8px 0; font-size: 16px; font-weight: bold; text-align: right; border-top: 2px solid #000000; border-bottom: 1px solid #000000;">${formatEur(total)}</td>
+            </tr>
+            <tr>
+              <td style="padding: 3px 0 1px 0; font-size: 11px; color: #777777;">Netto / net value</td>
+              <td style="padding: 3px 0 1px 0; font-size: 11px; color: #777777; text-align: right;">${formatEur(net)}</td>
+            </tr>
+            <tr>
+              <td style="padding: 1px 0; font-size: 11px; color: #777777;">MwSt. / VAT 19 %</td>
+              <td style="padding: 1px 0; font-size: 11px; color: #777777; text-align: right;">${formatEur(vat)}</td>
+            </tr>
+          </table>
         </div>
 
-        <!-- Attachment Notice -->
-        <div style="background: #F4F0EA; border: 1px solid #E2DDD5; border-radius: 8px; padding: 12px 16px; margin-bottom: 30px; font-size: 12px; color: #181F1C;">
-          📄 Diese Rechnung liegt dieser E-Mail zusätzlich als offizielle <strong>PDF-Datei</strong> bei.
-        </div>
-
-        <!-- Footer -->
-        <div style="border-top: 1px solid #E5E5E5; padding-top: 20px; font-size: 10px; color: #888888; line-height: 1.6;">
-          <div style="text-align: right; margin-bottom: 12px; color: #000000;">Seite 1 von 1</div>
+        <!-- 3-Column Footer -->
+        <div style="border-top: 1px solid #CCCCCC; padding-top: 15px; font-size: 11px; color: #777777; line-height: 1.45;">
+          <div style="text-align: right; font-size: 11px; color: #333333; margin-bottom: 10px;">Seite 1 von 1</div>
           <table style="width: 100%; border-collapse: collapse;">
             <tr>
               <td style="vertical-align: top; width: 33%;">
-                <strong style="color: #555555;">Bankverbindung</strong><br/>
-                Kontoinhaber: Ines Zager<br/>
-                IBAN: DE18 2707 0369 0056 5085 00
+                <strong style="color: #555555; display: block; margin-bottom: 3px;">Bankverbindung</strong>
+                <div>Kontoinhaber: Ines Zager</div>
+                <div style="font-family: monospace; font-size: 10px;">IBAN: DE18 2707 0369 0056 5085 00</div>
               </td>
               <td style="vertical-align: top; width: 33%;">
-                <strong style="color: #555555;">Kontaktiere uns</strong><br/>
-                Email: <a href="mailto:info@pure-whisky.com" style="color: #888888; text-decoration: none;">info@pure-whisky.com</a>
+                <strong style="color: #555555; display: block; margin-bottom: 3px;">Kontaktiere uns</strong>
+                <div>Email: <a href="mailto:info@pure-whisky.com" style="color: #777777; text-decoration: none;">info@pure-whisky.com</a></div>
               </td>
               <td style="vertical-align: top; width: 34%;">
-                <strong style="color: #555555;">PURE.WHISKY.</strong><br/>
-                Am Urnenfeld 1c<br/>
-                29339 Wathlingen<br/>
-                Deutschland
+                <strong style="color: #555555; display: block; margin-bottom: 3px;">PURE.WHISKY.</strong>
+                <div>Am Urnenfeld 1c</div>
+                <div>29339 Wathlingen</div>
               </td>
             </tr>
           </table>
