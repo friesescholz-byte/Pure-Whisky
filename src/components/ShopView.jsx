@@ -1,12 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { Search, X, CheckCircle2 } from 'lucide-react';
+import { X, CheckCircle2 } from 'lucide-react';
 import { PRODUCTS } from '../data/pureWhiskyFullData';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onNavigateHome, products = PRODUCTS }) {
   const { lang, t } = useLanguage();
   const [regionFilter, setRegionFilter] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
 
   // Pre-reservation Modal State for Upcoming Releases
   const [preReserveProduct, setPreReserveProduct] = useState(null);
@@ -17,16 +16,9 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
   const filteredProducts = useMemo(() => {
     return products.filter(p => {
       if (regionFilter !== 'all' && p.region.toLowerCase() !== regionFilter.toLowerCase()) return false;
-      if (searchQuery.trim() !== '') {
-        const q = searchQuery.toLowerCase();
-        const matchesName = p.name.toLowerCase().includes(q) || p.fullName.toLowerCase().includes(q);
-        const matchesDistillery = p.distillery.toLowerCase().includes(q);
-        const matchesChar = p.character && p.character.some(c => c.toLowerCase().includes(q));
-        if (!matchesName && !matchesDistillery && !matchesChar) return false;
-      }
       return true;
     });
-  }, [products, regionFilter, searchQuery]);
+  }, [products, regionFilter]);
 
   const handleOpenReserveModal = (product, e) => {
     if (e) e.stopPropagation();
@@ -75,38 +67,25 @@ export default function ShopView({ onOpenProduct, onAddToCart, onPreReserve, onN
         </div>
 
         {/* Clean Filter Bar */}
-        <div className="bg-white border border-[#D4C8B8] rounded-xl p-5 mb-12 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 shadow-xs">
-          <div className="flex flex-wrap items-center gap-2">
-            {[
-              { id: 'all', label: lang === 'de' ? 'Alle Regionen' : 'All Regions' },
-              { id: 'highlands', label: 'Highlands' },
-              { id: 'speyside', label: 'Speyside' },
-              { id: 'islands', label: 'Islands' },
-            ].map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setRegionFilter(tab.id)}
-                className={`px-5 py-2.5 font-woodblock text-lg tracking-wider uppercase rounded-lg transition-all cursor-pointer ${
-                  regionFilter === tab.id
-                    ? 'bg-[#181F1C] text-white shadow-xs'
-                    : 'bg-[#E8EFEA] text-[#181F1C] hover:bg-[#D8E4DC]'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="relative sm:w-72">
-            <Search className="w-4 h-4 text-[#55695E] absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder={lang === 'de' ? 'Suchen nach Fass oder Aroma...' : 'Search cask or tasting note...'}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 text-sm bg-[#FAF8F5] border border-[#D4C8B8] rounded-lg text-[#181F1C] placeholder-[#7A8C82] focus:outline-none focus:border-[#B85D2C] focus:bg-white"
-            />
-          </div>
+        <div className="bg-white border border-[#D4C8B8] rounded-xl p-5 mb-12 flex flex-wrap items-center gap-2 shadow-xs">
+          {[
+            { id: 'all', label: lang === 'de' ? 'Alle Regionen' : 'All Regions' },
+            { id: 'highlands', label: 'Highlands' },
+            { id: 'speyside', label: 'Speyside' },
+            { id: 'islands', label: 'Islands' },
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setRegionFilter(tab.id)}
+              className={`px-5 py-2.5 font-woodblock text-lg tracking-wider uppercase rounded-lg transition-all cursor-pointer ${
+                regionFilter === tab.id
+                  ? 'bg-[#181F1C] text-white shadow-xs'
+                  : 'bg-[#E8EFEA] text-[#181F1C] hover:bg-[#D8E4DC]'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
         {/* Product Cards Grid */}
