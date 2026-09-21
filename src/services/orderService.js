@@ -338,6 +338,7 @@ export async function sendAdminNewOrderNotification({ order, adminEmail = DEFAUL
             <strong>Lieferadresse:</strong><br/>
             ${order.customer.street}<br/>
             ${order.customer.zip} ${order.customer.city}<br/>
+            ${order.customer.country || 'Deutschland'}<br/>
             <strong>Zahlungsstatus:</strong> <span style="color: #15803d; font-weight: bold;">${order.paymentMethod || 'Online-Zahlung (Mollie)'}</span>
           </div>
 
@@ -474,7 +475,8 @@ export async function sendOrderConfirmationEmail({ order, adminEmail = DEFAULT_A
             <p style="margin: 0 0 4px 0; font-weight: bold; color: #181F1C;">Lieferadresse:</p>
             ${order.customer.firstName} ${order.customer.lastName}<br/>
             ${order.customer.street}<br/>
-            ${order.customer.zip} ${order.customer.city}
+            ${order.customer.zip} ${order.customer.city}<br/>
+            ${order.customer.country || 'Deutschland'}
           </div>
         </div>
 

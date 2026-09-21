@@ -427,6 +427,16 @@ Datum:
                 <p className="text-xs text-[#55695E] mt-3">
                   • <strong>Packstationen & Filialen:</strong> Eine Lieferung an DHL-Packstationen oder Filialen ist möglich, sofern die Sendung dort unter Vorlage eines Personalausweises bzw. Reisepasses zur Altersverifikation abgeholt werden kann.
                 </p>
+
+                <div className="mt-4 p-4 rounded-xl bg-[#FAF8F5] border border-[#D4C8B8] text-xs space-y-1">
+                  <div className="font-bold text-[#181F1C] flex items-center space-x-2">
+                    <span className="text-sm">🇩🇪</span>
+                    <span>Liefergebiet: Ausschließlich Deutschland</span>
+                  </div>
+                  <p className="text-[#55695E] leading-relaxed">
+                    Aus zoll- und verbrauchsteuerrechtlichen Gründen für hochprozentige Spirituosen (Alkoholsteuergesetz) beliefern wir derzeit <strong>ausschließlich Lieferadressen innerhalb der Bundesrepublik Deutschland</strong>. Ein Versand ins Ausland (einschließlich EU-Ausland, Schweiz und Vereinigtes Königreich) ist ausgeschlossen.
+                  </p>
+                </div>
               </div>
 
               <div>

@@ -28,6 +28,7 @@ export default function CartDrawer({
     street: '',
     zip: '',
     city: '',
+    country: 'Deutschland',
     email: '',
     paymentMethod: 'Sichere Online-Zahlung'
   });
@@ -57,6 +58,15 @@ export default function CartDrawer({
       alert(lang === 'de' ? 'Bitte füllen Sie alle Adressfelder aus.' : 'Please fill in all address fields.');
       return;
     }
+
+    const cleanZip = formData.zip.trim();
+    if (!/^[0-9]{5}$/.test(cleanZip)) {
+      alert(lang === 'de' 
+        ? 'Bitte geben Sie eine gültige 5-stellige deutsche Postleitzahl ein. Eine Lieferung ins Ausland ist aus verbrauchsteuer- und zollrechtlichen Gründen für Spirituosen leider nicht möglich.' 
+        : 'Please enter a valid 5-digit German postal code. International shipping is not available due to tax and customs regulations.');
+      return;
+    }
+
     if (!termsAccepted) {
       alert(lang === 'de' ? 'Bitte bestätigen Sie die AGB und die Widerrufsbelehrung.' : 'Please accept the Terms and Cancellation Policy.');
       return;
@@ -93,8 +103,9 @@ export default function CartDrawer({
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
         street: formData.street.trim(),
-        zip: formData.zip.trim(),
+        zip: cleanZip,
         city: formData.city.trim(),
+        country: 'Deutschland',
         email: formData.email.trim()
       },
       items: cartItems.map(item => ({
@@ -219,12 +230,17 @@ export default function CartDrawer({
                     </div>
                   ) : (
                     <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#E2DDD5] text-xs text-[#3A4A40] space-y-1">
-                      <div className="flex items-center space-x-2 font-bold text-[#181F1C]">
-                        <ShieldCheck className="w-4 h-4 text-[#2D6A4F]" />
-                        <span>Versicherter DHL GoGreen Versand</span>
+                      <div className="flex items-center justify-between font-bold text-[#181F1C]">
+                        <div className="flex items-center space-x-2">
+                          <ShieldCheck className="w-4 h-4 text-[#2D6A4F]" />
+                          <span>Versicherter DHL GoGreen Versand</span>
+                        </div>
+                        <span className="text-[10px] font-craft-mono font-bold text-[#2D6A4F] bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                          🇩🇪 Nur Deutschland
+                        </span>
                       </div>
                       <p className="text-[11px] text-[#55695E]">
-                        Versand innerhalb von 2–4 Werktagen · Pauschal 6,90 € inkl. Alterssichtprüfung (ab 18 Jahren).
+                        Lieferung innerhalb von 2–4 Werktagen · Pauschal 6,90 € inkl. 18+ Alterssichtprüfung bei Zustellung.
                       </p>
                     </div>
                   )
@@ -379,6 +395,27 @@ export default function CartDrawer({
                       className="w-full text-sm bg-white border border-[#D4C8B8] rounded-lg px-3 py-2 text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
                     />
                   </div>
+                </div>
+
+                {/* Country / Lieferland (Strictly DE only) */}
+                <div>
+                  <label className="block text-xs text-[#55695E] mb-1">
+                    {lang === 'de' ? 'Lieferland' : 'Delivery Country'} *
+                  </label>
+                  <div className="flex items-center justify-between w-full text-sm bg-[#FAF8F5] border border-[#D4C8B8] rounded-lg px-3 py-2 text-[#181F1C]">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-base">🇩🇪</span>
+                      <span className="font-semibold">{lang === 'de' ? 'Deutschland' : 'Germany'}</span>
+                    </div>
+                    <span className="text-[10px] font-craft-mono font-bold text-[#2D6A4F] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      {lang === 'de' ? 'Ausschließlich Deutschland' : 'Germany only'}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-[#55695E] mt-1 leading-relaxed">
+                    {lang === 'de' 
+                      ? 'Lieferung ausschließlich innerhalb Deutschlands (DHL GoGreen inkl. 18+ Alterssichtprüfung).' 
+                      : 'Delivery strictly within Germany (DHL GoGreen incl. 18+ age verification).'}
+                  </p>
                 </div>
 
                 {/* Payment Information */}

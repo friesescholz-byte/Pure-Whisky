@@ -52,6 +52,7 @@ export function buildInvoicePdf(order) {
   const customerName = `${order.customer?.firstName || ''} ${order.customer?.lastName || ''}`.trim() || 'Kunde';
   const customerStreet = order.customer?.street || '';
   const customerCity = `${order.customer?.zip || ''} ${order.customer?.city || ''}`.trim();
+  const customerCountry = order.customer?.country || 'Deutschland';
 
   let custY = 54;
   doc.text(customerName, margin, custY);
@@ -62,6 +63,10 @@ export function buildInvoicePdf(order) {
   if (customerCity) {
     custY += 4.5;
     doc.text(customerCity, margin, custY);
+  }
+  if (customerCountry) {
+    custY += 4.5;
+    doc.text(customerCountry, margin, custY);
   }
 
   // 4. DOCUMENT TITLE: RECHNUNG

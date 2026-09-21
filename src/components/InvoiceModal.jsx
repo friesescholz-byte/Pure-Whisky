@@ -214,6 +214,7 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
         <div>${order.customer?.firstName || ''} ${order.customer?.lastName || ''}</div>
         ${order.customer?.street ? `<div>${order.customer.street}</div>` : ''}
         <div>${order.customer?.zip || ''} ${order.customer?.city || ''}</div>
+        <div>${order.customer?.country || 'Deutschland'}</div>
       </div>
 
       <div class="title">RECHNUNG</div>
@@ -424,6 +425,9 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
             {order.customer?.street && <div>{order.customer.street}</div>}
             <div>
               {order.customer?.zip} {order.customer?.city}
+            </div>
+            <div>
+              {order.customer?.country || 'Deutschland'}
             </div>
           </div>
 
