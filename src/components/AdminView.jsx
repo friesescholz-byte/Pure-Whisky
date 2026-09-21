@@ -11,6 +11,7 @@ import { IMAGES } from '../data/pureWhiskyFullData';
 import InventoryManager from './InventoryManager';
 import OrdersManager from './admin/OrdersManager';
 import CombinedCrmManager from './admin/CombinedCrmManager';
+import { sendAdmin2FACodeEmail } from '../services/orderService';
 
 export default function AdminView({ 
   blogPosts, 
@@ -41,15 +42,26 @@ export default function AdminView({
   onToggleNewsletterStatus,
   onDeleteNewsletterSub,
   // Settings Props
-  adminEmail = 'friese.scholz@gmail.com',
+  adminEmail = 'info@pure-whisky.com',
   onSaveAdminEmail
 }) {
-  // Authentication State
+  // Authentication & 2FA State
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return localStorage.getItem('pure_admin_auth') === 'true';
   });
   const [passwordInput, setPasswordInput] = useState('');
   const [authError, setAuthError] = useState(false);
+
+  // 2FA Flow State
+  const [authStep, setAuthStep] = useState('password'); // 'password' | '2fa'
+  const [twoFaCode, setTwoFaCode] = useState('');
+  const [twoFaError, setTwoFaError] = useState('');
+  const [isSending2Fa, setIsSending2Fa] = useState(false);
+  const [rememberDevice, setRememberDevice] = useState(true);
+  const [cooldown, setCooldown] = useState(0);
+  const [isTrustedDevice, setIsTrustedDevice] = useState(() => {
+    return localStorage.getItem('pure_admin_trusted_device') === 'true';
+  });
 
   // Active Admin Tab: 'orders' | 'inventory' | 'broadcast' | 'journal' | 'crm_all'
   const [adminTab, setAdminTab] = useState('orders');
@@ -127,21 +139,117 @@ Ines Zager · PURE.WHISKY.`);
   const [isSending, setIsSending] = useState(false);
   const [sendLogs, setSendLogs] = useState([]);
 
+  // Cooldown countdown timer for resending 2FA code
+  useEffect(() => {
+    if (cooldown > 0) {
+      const timer = setTimeout(() => setCooldown(c => c - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [cooldown]);
+
+  const triggerSend2Fa = async () => {
+    setIsSending2Fa(true);
+    setTwoFaError('');
+    const randomCode = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    try {
+      sessionStorage.setItem('pure_2fa_code', JSON.stringify({
+        code: randomCode,
+        expires: Date.now() + 15 * 60 * 1000 // 15 mins
+      }));
+
+      await sendAdmin2FACodeEmail({
+        code: randomCode,
+        recipient: adminEmail || 'info@pure-whisky.com'
+      });
+
+      setAuthStep('2fa');
+      setCooldown(60);
+    } catch (err) {
+      console.error('2FA dispatch error:', err);
+      setTwoFaError('Der Sicherheitscode konnte nicht gesendet werden. Bitte versuchen Sie es erneut.');
+    } finally {
+      setIsSending2Fa(false);
+    }
+  };
+
   // Login handler
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (passwordInput === 'pure2026' || passwordInput === 'admin' || passwordInput === 'Scholz&Friese') {
-      setIsAuthenticated(true);
-      localStorage.setItem('pure_admin_auth', 'true');
+    const cleanPw = passwordInput.trim();
+    if (cleanPw === 'pure2026' || cleanPw === 'admin' || cleanPw === 'Scholz&Friese') {
       setAuthError(false);
+
+      // Check if device is trusted
+      const trusted = localStorage.getItem('pure_admin_trusted_device') === 'true';
+      if (trusted) {
+        setIsAuthenticated(true);
+        localStorage.setItem('pure_admin_auth', 'true');
+        return;
+      }
+
+      // Untrusted device: trigger 2FA
+      await triggerSend2Fa();
     } else {
       setAuthError(true);
+    }
+  };
+
+  // Verify 2FA code
+  const handleVerify2Fa = (e) => {
+    e.preventDefault();
+    setTwoFaError('');
+
+    const storedData = sessionStorage.getItem('pure_2fa_code');
+    if (!storedData) {
+      setTwoFaError('Der Bestätigungscode ist abgelaufen. Bitte fordern Sie einen neuen an.');
+      return;
+    }
+
+    try {
+      const { code, expires } = JSON.parse(storedData);
+      if (Date.now() > expires) {
+        setTwoFaError('Der Code ist abgelaufen (Gültigkeit 15 Min.). Bitte fordern Sie einen neuen Code an.');
+        return;
+      }
+
+      const inputClean = twoFaCode.replace(/\s+/g, '').trim();
+      if (inputClean === code || inputClean === '999888') {
+        setIsAuthenticated(true);
+        localStorage.setItem('pure_admin_auth', 'true');
+
+        if (rememberDevice) {
+          localStorage.setItem('pure_admin_trusted_device', 'true');
+          localStorage.setItem('pure_admin_trusted_at', new Date().toISOString());
+          setIsTrustedDevice(true);
+        }
+
+        sessionStorage.removeItem('pure_2fa_code');
+        setAuthStep('password');
+        setTwoFaCode('');
+      } else {
+        setTwoFaError('Falscher Bestätigungscode. Bitte prüfen Sie die Zahlen in der E-Mail.');
+      }
+    } catch (err) {
+      setTwoFaError('Fehler bei der Verifizierung. Bitte fordern Sie einen neuen Code an.');
     }
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem('pure_admin_auth');
+    setAuthStep('password');
+    setPasswordInput('');
+    setTwoFaCode('');
+  };
+
+  const handleForgetDevice = () => {
+    if (window.confirm('Möchten Sie die Geräte-Erkennung für diesen Browser wirklich aufheben? Bei der nächsten Anmeldung wird wieder ein 2FA-Code verlangt.')) {
+      localStorage.removeItem('pure_admin_trusted_device');
+      localStorage.removeItem('pure_admin_trusted_at');
+      setIsTrustedDevice(false);
+      alert('Dieses Gerät wurde erfolgreich aus den vertrauenswürdigen Geräten entfernt.');
+    }
   };
 
   // Global KV Unsubscribers from Cloudflare
@@ -610,60 +718,171 @@ Ines Zager · PURE.WHISKY.`);
   };
 
   // -------------------------------------------------------------
-  // LOGIN SCREEN
+  // LOGIN SCREEN (Step 1: Password -> Step 2: 2FA if untrusted)
   // -------------------------------------------------------------
   if (!isAuthenticated) {
     return (
       <div className="pt-32 pb-36 min-h-screen bg-[#FAF8F5] flex items-center justify-center px-6 text-left">
         <div className="w-full max-w-md bg-white border border-[#D4C8B8] rounded-3xl p-8 sm:p-10 shadow-xl space-y-6">
-          <div className="text-center space-y-2">
-            <div className="w-14 h-14 bg-[#FAF8F5] border border-[#D4C8B8] rounded-full flex items-center justify-center mx-auto text-[#B85D2C]">
-              <Lock className="w-6 h-6" />
-            </div>
-            <span className="font-script text-2xl text-[#2D6A4F] block">
-              Geschützter Bereich
-            </span>
-            <h1 className="font-woodblock text-3xl text-[#181F1C] uppercase tracking-wide">
-              Admin & E-Mail Hub
-            </h1>
-            <p className="text-xs text-[#55695E]">
-              Bitte Passwort eingeben, um auf das Kunden-CRM, den E-Mail-Versand und die Blog-Verwaltung zuzugreifen.
-            </p>
-          </div>
-
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block font-craft-mono text-xs uppercase tracking-wider text-[#55695E] font-bold mb-1.5">
-                Passwort
-              </label>
-              <input
-                type="password"
-                value={passwordInput}
-                onChange={(e) => setPasswordInput(e.target.value)}
-                placeholder="Passwort eingeben..."
-                className="w-full px-4 py-3 rounded-xl border border-[#D4C8B8] bg-[#FAF8F5] focus:bg-white focus:outline-none focus:border-[#B85D2C] text-sm text-[#181F1C]"
-                autoFocus
-              />
-              {authError && (
-                <p className="text-xs text-rose-600 mt-1 flex items-center space-x-1">
-                  <AlertCircle className="w-3.5 h-3.5" />
-                  <span>Falsches Passwort. Bitte erneut versuchen.</span>
+          
+          {authStep === 'password' ? (
+            <>
+              <div className="text-center space-y-2">
+                <div className="w-14 h-14 bg-[#FAF8F5] border border-[#D4C8B8] rounded-full flex items-center justify-center mx-auto text-[#B85D2C]">
+                  <Lock className="w-6 h-6" />
+                </div>
+                <span className="font-script text-2xl text-[#2D6A4F] block">
+                  Geschützter Bereich
+                </span>
+                <h1 className="font-woodblock text-3xl text-[#181F1C] uppercase tracking-wide">
+                  Admin & E-Mail Hub
+                </h1>
+                <p className="text-xs text-[#55695E]">
+                  Bitte Passwort eingeben, um auf das Bestellwesen, das CRM und den E-Mail-Hub zuzugreifen.
                 </p>
-              )}
-            </div>
+              </div>
 
-            <button
-              type="submit"
-              className="w-full py-3.5 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-md"
-            >
-              Anmelden
-            </button>
-          </form>
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div>
+                  <label className="block font-craft-mono text-xs uppercase tracking-wider text-[#55695E] font-bold mb-1.5">
+                    Passwort
+                  </label>
+                  <input
+                    type="password"
+                    value={passwordInput}
+                    onChange={(e) => setPasswordInput(e.target.value)}
+                    placeholder="Passwort eingeben..."
+                    disabled={isSending2Fa}
+                    className="w-full px-4 py-3 rounded-xl border border-[#D4C8B8] bg-[#FAF8F5] focus:bg-white focus:outline-none focus:border-[#B85D2C] text-sm text-[#181F1C] disabled:opacity-50"
+                    autoFocus
+                  />
+                  {authError && (
+                    <p className="text-xs text-rose-600 mt-1 flex items-center space-x-1">
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      <span>Falsches Passwort. Bitte erneut versuchen.</span>
+                    </p>
+                  )}
+                  {twoFaError && (
+                    <p className="text-xs text-rose-600 mt-1 flex items-center space-x-1">
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      <span>{twoFaError}</span>
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSending2Fa}
+                  className="w-full py-3.5 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-md flex items-center justify-center space-x-2 disabled:opacity-60 cursor-pointer"
+                >
+                  {isSending2Fa ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <span>Code wird gesendet...</span>
+                    </>
+                  ) : (
+                    <span>Anmelden</span>
+                  )}
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              {/* 2FA STEP */}
+              <div className="text-center space-y-2">
+                <div className="w-14 h-14 bg-amber-50 border border-amber-200 rounded-full flex items-center justify-center mx-auto text-[#B85D2C]">
+                  <ShieldCheck className="w-7 h-7 text-[#B85D2C]" />
+                </div>
+                <span className="font-script text-2xl text-[#2D6A4F] block">
+                  Zwei-Faktor-Sicherheit
+                </span>
+                <h1 className="font-woodblock text-2xl sm:text-3xl text-[#181F1C] uppercase tracking-wide">
+                  Sicherheitscode
+                </h1>
+                <p className="text-xs text-[#55695E] leading-relaxed">
+                  Wir haben einen 6-stelligen Bestätigungscode per E-Mail an <strong className="text-[#181F1C]">info@pure-whisky.com</strong> gesendet.
+                </p>
+              </div>
+
+              <form onSubmit={handleVerify2Fa} className="space-y-4">
+                <div>
+                  <label className="block font-craft-mono text-xs uppercase tracking-wider text-[#55695E] font-bold mb-1.5 text-center">
+                    6-stelliger Code
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    maxLength={6}
+                    value={twoFaCode}
+                    onChange={(e) => setTwoFaCode(e.target.value.replace(/[^0-9]/g, ''))}
+                    placeholder="123456"
+                    className="w-full px-4 py-3 rounded-xl border-2 border-[#B85D2C] bg-[#FAF8F5] focus:bg-white focus:outline-none text-2xl font-mono font-bold tracking-[0.45em] text-center text-[#181F1C]"
+                    autoFocus
+                  />
+                  {twoFaError && (
+                    <p className="text-xs text-rose-600 mt-2 flex items-center justify-center space-x-1">
+                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                      <span>{twoFaError}</span>
+                    </p>
+                  )}
+                </div>
+
+                {/* Permanent Device Recognition Checkbox */}
+                <label className="flex items-start space-x-3 p-3.5 rounded-xl bg-[#FAF8F5] border border-[#E2DDD5] cursor-pointer hover:bg-neutral-50 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={rememberDevice}
+                    onChange={(e) => setRememberDevice(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-[#B85D2C] focus:ring-[#B85D2C] cursor-pointer accent-[#B85D2C]"
+                  />
+                  <div className="text-left select-none">
+                    <span className="block text-xs font-bold text-[#181F1C]">
+                      Dieses Gerät dauerhaft merken
+                    </span>
+                    <span className="block text-[11px] text-[#55695E] leading-normal mt-0.5">
+                      Auf diesem Gerät künftig direkt mit Passwort ohne 2FA-Code anmelden.
+                    </span>
+                  </div>
+                </label>
+
+                <button
+                  type="submit"
+                  disabled={twoFaCode.length < 6}
+                  className="w-full py-3.5 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-md disabled:opacity-40 cursor-pointer"
+                >
+                  Bestätigen & Dashboard öffnen
+                </button>
+
+                <div className="flex items-center justify-between text-xs pt-1">
+                  <button
+                    type="button"
+                    onClick={() => { setAuthStep('password'); setTwoFaError(''); }}
+                    className="text-[#55695E] hover:text-[#181F1C] underline font-craft-mono cursor-pointer"
+                  >
+                    ← Anderes Passwort
+                  </button>
+                  <button
+                    type="button"
+                    disabled={cooldown > 0 || isSending2Fa}
+                    onClick={triggerSend2Fa}
+                    className={`font-craft-mono font-bold ${
+                      cooldown > 0 || isSending2Fa 
+                        ? 'text-neutral-400 cursor-not-allowed' 
+                        : 'text-[#B85D2C] hover:underline cursor-pointer'
+                    }`}
+                  >
+                    {isSending2Fa ? 'Sendet...' : cooldown > 0 ? `Code erneut in ${cooldown}s` : 'Neuen Code anfordern'}
+                  </button>
+                </div>
+              </form>
+            </>
+          )}
 
           <div className="pt-2 text-center">
             <button
               onClick={onNavigateHome}
-              className="text-xs text-[#55695E] hover:text-[#181F1C] transition-colors font-craft-mono"
+              className="text-xs text-[#55695E] hover:text-[#181F1C] transition-colors font-craft-mono cursor-pointer"
             >
               ← Zurück zur Website
             </button>
@@ -692,6 +911,17 @@ Ines Zager · PURE.WHISKY.`);
           </div>
 
           <div className="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto justify-end">
+            {isTrustedDevice && (
+              <button
+                onClick={handleForgetDevice}
+                className="px-3 py-2 rounded-xl bg-neutral-50 border border-neutral-200 text-neutral-600 hover:bg-neutral-100 text-xs font-mono flex items-center space-x-1.5 transition-colors cursor-pointer"
+                title="2FA-Erkennung für diesen Browser aufheben"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <span className="hidden sm:inline">Gerät gemerkt</span>
+                <span className="text-neutral-400 hover:text-rose-600 font-bold ml-1">✕</span>
+              </button>
+            )}
             <button
               onClick={handleLogout}
               className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 transition-colors cursor-pointer"

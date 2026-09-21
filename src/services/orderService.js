@@ -260,14 +260,26 @@ export async function sendAdminNewOrderNotification({ order, adminEmail = DEFAUL
             Gesamtbetrag: <span style="color: #B85D2C; font-size: 17px;">${formatEur(order.total)}</span> (inkl. Versand & 19% MwSt.)
           </div>
 
-          <div style="background: #fffbeb; border: 1px solid #fef3c7; border-radius: 10px; padding: 20px; text-align: center; margin: 20px 0;">
-            <p style="margin: 0 0 8px 0; color: #92400e; font-weight: bold; font-size: 14px;">Aktion im Admin-Dashboard erforderlich:</p>
-            <p style="margin: 0 0 16px 0; font-size: 12px; color: #78350f; line-height: 1.5;">
-              Die Bestellung ist im Admin-Dashboard unter <strong>Bestellungen</strong> hinterlegt. Sobald Sie die Bestellung geprüft haben, versenden Sie dort mit einem Klick die offizielle Rechnung als PDF an den Kunden, um den Kaufvertrag rechtswirksam zu schließen.
+          <div style="background: #fffbeb; border: 1px solid #fef3c7; border-radius: 12px; padding: 22px 18px; text-align: center; margin: 25px 0;">
+            <p style="margin: 0 0 6px 0; color: #92400e; font-weight: bold; font-size: 15px;">Aktion im Admin-Dashboard erforderlich:</p>
+            <p style="margin: 0 0 18px 0; font-size: 12.5px; color: #78350f; line-height: 1.5; max-width: 480px; margin-left: auto; margin-right: auto;">
+              Die Bestellung ist im Admin-Dashboard hinterlegt. Bitte dort mit einem Klick die offizielle Rechnung als PDF an den Kunden versenden, um den Kaufvertrag rechtswirksam zu schließen:
             </p>
-            <a href="https://pure-whisky.com/admin" target="_blank" style="display: inline-block; background-color: #B85D2C; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 13px; letter-spacing: 0.5px;">
-              👉 Direkt zum Admin-Dashboard & Rechnung versenden
-            </a>
+            
+            <!-- Bulletproof Button -->
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+              <tr>
+                <td align="center" style="border-radius: 10px; background-color: #B85D2C; box-shadow: 0 3px 8px rgba(184, 93, 44, 0.25);">
+                  <a href="${typeof window !== 'undefined' && window.location.origin && !window.location.origin.includes('localhost') ? window.location.origin : 'https://pure-whisky.com'}/admin" target="_blank" style="display: inline-block; padding: 14px 28px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 13.5px; font-weight: bold; color: #ffffff; text-decoration: none; border-radius: 10px; letter-spacing: 0.3px;">
+                    👉 ZUM ADMIN-DASHBOARD & RECHNUNG VERSENDEN
+                  </a>
+                </td>
+              </tr>
+            </table>
+
+            <p style="font-size: 11px; color: #92400e; margin: 12px 0 0 0;">
+              Direkter Link: <a href="${typeof window !== 'undefined' && window.location.origin && !window.location.origin.includes('localhost') ? window.location.origin : 'https://pure-whisky.com'}/admin" target="_blank" style="color: #B85D2C; text-decoration: underline; font-weight: bold;">${typeof window !== 'undefined' && window.location.origin && !window.location.origin.includes('localhost') ? window.location.origin : 'https://pure-whisky.com'}/admin</a>
+            </p>
           </div>
         </div>
 
@@ -561,5 +573,66 @@ export async function sendInvoiceEmail({ order, adminEmail = DEFAULT_ADMIN_EMAIL
     subject: `Rechnung ${invoiceNum} zu Ihrer Bestellung #${order.orderId} – PURE.WHISKY.`,
     html,
     attachments
+  });
+}
+
+/**
+ * Sends 2FA One-Time Verification Code to info@pure-whisky.com
+ */
+export async function sendAdmin2FACodeEmail({ code, recipient = DEFAULT_ADMIN_EMAIL }) {
+  const html = `
+    <!DOCTYPE html>
+    <html lang="de">
+    <head>
+      <meta charset="utf-8">
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #FAF8F5; margin: 0; padding: 30px 15px; color: #181F1C;">
+      <div style="max-width: 520px; margin: 0 auto; background: #ffffff; border: 1px solid #E2DDD5; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.04);">
+        
+        <div style="background: #181F1C; padding: 24px; text-align: center;">
+          <img src="https://pub-b33108412309406a9a941ddc51e9a5b9.r2.dev/Pure-Whisky/logo-pure-whisky.png" alt="PURE.WHISKY." style="width: 60px; height: 60px; object-fit: contain; margin-bottom: 8px;" />
+          <h2 style="color: #FAF8F5; margin: 0; font-size: 18px; font-weight: normal; letter-spacing: 1px;">PURE.WHISKY.</h2>
+          <p style="color: #B85D2C; margin: 4px 0 0 0; font-size: 11px; text-transform: uppercase; letter-spacing: 2px;">Admin-Sicherheitscode (2FA)</p>
+        </div>
+
+        <div style="padding: 30px 25px; text-align: center;">
+          <p style="font-size: 14px; margin: 0 0 16px 0; color: #3A4A40;">
+            Hallo Ines, es wurde soeben ein Anmeldeversuch für das PURE.WHISKY. Admin-Dashboard gestartet.
+          </p>
+
+          <p style="font-size: 12px; color: #55695E; margin: 0 0 20px 0;">
+            Dein 6-stelliger Bestätigungscode lautet:
+          </p>
+
+          <div style="background: #FAF8F5; border: 2px dashed #B85D2C; border-radius: 12px; padding: 18px 24px; display: inline-block; margin-bottom: 24px;">
+            <span style="font-family: monospace, Consolas, Courier, monospace; font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #181F1C;">
+              ${code}
+            </span>
+          </div>
+
+          <div style="background: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; padding: 14px; margin: 0 0 20px 0; text-align: left; font-size: 12px; color: #78350f; line-height: 1.5;">
+            ⏱️ <strong>Gültigkeit:</strong> Dieser Code ist für die nächsten <strong>15 Minuten</strong> gültig.<br/>
+            🔒 <strong>Geräte-Erkennung:</strong> Aktiviere im Anmeldefenster einfach das Häkchen <em>„Dieses Gerät dauerhaft merken“</em>, damit du diesen Code auf deinem Smartphone oder Laptop künftig nicht mehr eingeben musst.
+          </div>
+
+          <p style="font-size: 11px; color: #94a3b8; margin: 0;">
+            Falls du diesen Anmeldeversuch nicht selbst ausgelöst hast, ignoriere diese E-Mail bitte. Ohne diesen Code ist kein Zugriff möglich.
+          </p>
+        </div>
+
+        <div style="background: #f8fafc; padding: 12px; text-align: center; font-size: 10px; color: #64748b; border-top: 1px solid #e2e8f0;">
+          PURE.WHISKY. Sicherheitssystem · Automatische 2FA-Verifizierung
+        </div>
+
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendResendMail({
+    to: recipient,
+    subject: `🔐 Dein PURE.WHISKY. Admin-Sicherheitscode: ${code}`,
+    html
   });
 }
