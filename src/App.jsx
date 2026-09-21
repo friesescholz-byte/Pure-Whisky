@@ -267,7 +267,7 @@ export default function App() {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
           const cleaned = parsed.filter(o => 
-            (!['1831', '1224', '1545', '1270'].includes(o.orderId) || o.contractConcluded || o.status === 'rechnung_versendet') &&
+            (!['1831', '1224', '1545', '1270', '1274', '1276'].includes(o.orderId) || o.contractConcluded || o.status === 'rechnung_versendet') &&
             o.status !== 'zahlung_ausstehend'
           );
           if (cleaned.length > 0) return cleaned;
@@ -421,16 +421,20 @@ export default function App() {
           return;
         }
 
-        // 3. Fetch official consecutive order ID from Cloudflare KV
+        // 3. Fetch official consecutive order ID from Cloudflare KV (idempotent per paymentId)
         let orderId = null;
         let invoiceNumber = null;
+        let existingServerOrder = null;
         try {
-          const idRes = await fetch('/api/orders/next-id');
+          const idRes = await fetch(`/api/orders/next-id?paymentId=${encodeURIComponent(pendingPaymentId)}`);
           if (idRes.ok) {
             const idData = await idRes.json();
             if (idData.orderId) {
               orderId = idData.orderId.toString();
               invoiceNumber = idData.invoiceNumber || `A09401${orderId}`;
+              if (idData.isExisting && idData.order) {
+                existingServerOrder = idData.order;
+              }
             }
           }
         } catch (idErr) {
@@ -438,7 +442,7 @@ export default function App() {
         }
 
         if (!orderId) {
-          const localLast = parseInt(localStorage.getItem('pure_last_order_id') || '1269', 10);
+          const localLast = parseInt(localStorage.getItem('pure_last_order_id') || '1277', 10);
           const nextLocal = localLast + 1;
           orderId = nextLocal.toString();
           invoiceNumber = `A09401${orderId}`;
@@ -448,21 +452,23 @@ export default function App() {
         const todayStr = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
         const finalizedOrder = {
+          ...(existingServerOrder || {}),
           orderId,
           invoiceNumber,
-          date: todayStr,
-          createdAt: new Date().toISOString(),
-          customer: checkoutData.customer,
-          paymentMethod: `Online-Zahlung (${pendingPaymentId}) – ${checkoutData.customer.email}`,
+          paymentId: pendingPaymentId,
+          date: existingServerOrder?.date || todayStr,
+          createdAt: existingServerOrder?.createdAt || new Date().toISOString(),
+          customer: checkoutData.customer || existingServerOrder?.customer,
+          paymentMethod: `Online-Zahlung (${pendingPaymentId}) – ${checkoutData.customer?.email || ''}`,
           paymentStatus: `Bezahlt (${checkResult.method || 'Online-Zahlung'})`,
-          items: checkoutData.items || [],
-          shipping: checkoutData.shipping || 0,
-          total: checkoutData.total,
-          netTotal: checkoutData.total / 1.19,
-          vatTotal: checkoutData.total - (checkoutData.total / 1.19),
-          status: 'neu_eingegangen',
-          invoiceSentAt: null,
-          contractConcluded: false,
+          items: checkoutData.items || existingServerOrder?.items || [],
+          shipping: checkoutData.shipping ?? existingServerOrder?.shipping ?? 0,
+          total: checkoutData.total || existingServerOrder?.total,
+          netTotal: (checkoutData.total || existingServerOrder?.total) / 1.19,
+          vatTotal: (checkoutData.total || existingServerOrder?.total) - ((checkoutData.total || existingServerOrder?.total) / 1.19),
+          status: existingServerOrder?.status || 'neu_eingegangen',
+          invoiceSentAt: existingServerOrder?.invoiceSentAt || null,
+          contractConcluded: existingServerOrder?.contractConcluded || false,
           confirmationEmailSent: true
         };
 
@@ -500,7 +506,7 @@ export default function App() {
 
         // 7. Automatically add customer to WooCommerce CRM
         setWooCustomers(prev => {
-          const emailLower = finalizedOrder.customer.email.toLowerCase().trim();
+          const emailLower = (finalizedOrder.customer?.email || '').toLowerCase().trim();
           if (prev.some(c => c.email.toLowerCase().trim() === emailLower)) {
             return prev;
           }
@@ -528,10 +534,12 @@ export default function App() {
         await clearPendingCheckout(pendingPaymentId, sessionIdFromUrl);
 
         // 9. Send Emails (Order Confirmation to customer + Admin alert to Ines)
-        try {
-          await sendOrderConfirmationEmail({ order: finalizedOrder, adminEmail });
-        } catch (e) {
-          console.warn('Could not send confirmation email:', e);
+        if (!existingServerOrder?.confirmationEmailSent) {
+          try {
+            await sendOrderConfirmationEmail({ order: finalizedOrder, adminEmail });
+          } catch (e) {
+            console.warn('Could not send confirmation email:', e);
+          }
         }
 
         // 10. Show Paid Confirmation Modal
@@ -546,7 +554,7 @@ export default function App() {
       if (serverOrders && Array.isArray(serverOrders)) {
         // Exclude legacy test order IDs and unconfirmed/cancelled test orders
         const cleaned = serverOrders.filter(o => 
-          (!['1831', '1224', '1545', '1270'].includes(o.orderId) || o.status === 'rechnung_versendet' || o.contractConcluded) && 
+          (!['1831', '1224', '1545', '1270', '1274', '1276'].includes(o.orderId) || o.status === 'rechnung_versendet' || o.contractConcluded) && 
           o.status !== 'zahlung_ausstehend'
         );
         const finalOrders = cleaned.length > 0 ? cleaned : INITIAL_ORDERS;

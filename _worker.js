@@ -32,42 +32,54 @@ export default {
               const rawOrders = await env.PURE_KV.get('pure_orders');
               let orders = rawOrders ? JSON.parse(rawOrders) : [];
               if (Array.isArray(orders)) {
-                // 1. Check if already recorded by frontend return handler
-                const existing = orders.find(o => o.paymentMethod && o.paymentMethod.includes(paymentId));
+                // 1. Check if already recorded by frontend return handler or previous webhook
+                const existing = orders.find(o => 
+                  (o.paymentId && o.paymentId === paymentId) ||
+                  (typeof o.paymentMethod === 'string' && o.paymentMethod.includes(paymentId))
+                );
                 if (existing) {
-                  existing.status = 'neu_eingegangen';
+                  existing.paymentId = paymentId;
+                  existing.status = existing.status === 'rechnung_versendet' ? 'rechnung_versendet' : 'neu_eingegangen';
                   existing.paymentStatus = `Bezahlt (${payment.method || 'Online-Zahlung'})`;
                   await env.PURE_KV.put('pure_orders', JSON.stringify(orders));
                 } else {
-                  // 2. If frontend didn't record yet (e.g. mobile tab closed), finalize from pending KV
-                  const rawPending = await env.PURE_KV.get(`pure_pending:${paymentId}`);
-                  if (rawPending) {
-                    const pendingData = JSON.parse(rawPending);
-                    let storedLastId = parseInt(await env.PURE_KV.get('pure_last_order_id') || '1268', 10);
-                    const nextId = Math.max(1269, storedLastId + 1);
-                    await env.PURE_KV.put('pure_last_order_id', nextId.toString());
+                  // Lock to prevent race condition with frontend redirect
+                  const lockKey = `pure_order_lock:${paymentId}`;
+                  const isLocked = await env.PURE_KV.get(lockKey);
+                  if (!isLocked) {
+                    await env.PURE_KV.put(lockKey, '1', { expirationTtl: 120 });
 
-                    const autoOrder = {
-                      orderId: nextId.toString(),
-                      invoiceNumber: `A09401${nextId}`,
-                      date: new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }),
-                      createdAt: new Date().toISOString(),
-                      customer: pendingData.customer,
-                      items: pendingData.items || [],
-                      shipping: pendingData.shipping || 0,
-                      total: pendingData.total,
-                      netTotal: pendingData.total / 1.19,
-                      vatTotal: pendingData.total - (pendingData.total / 1.19),
-                      status: 'neu_eingegangen',
-                      paymentStatus: `Bezahlt (${payment.method || 'Online-Zahlung'})`,
-                      paymentMethod: `Online-Zahlung (${paymentId}) – ${pendingData.customer?.email || ''}`,
-                      invoiceSentAt: null,
-                      contractConcluded: false,
-                      confirmationEmailSent: false
-                    };
-                    orders.unshift(autoOrder);
-                    await env.PURE_KV.put('pure_orders', JSON.stringify(orders));
-                    await env.PURE_KV.delete(`pure_pending:${paymentId}`);
+                    // 2. If frontend didn't record yet (e.g. mobile tab closed), finalize from pending KV
+                    const rawPending = await env.PURE_KV.get(`pure_pending:${paymentId}`);
+                    if (rawPending) {
+                      const pendingData = JSON.parse(rawPending);
+                      let storedLastId = parseInt(await env.PURE_KV.get('pure_last_order_id') || '1277', 10);
+                      const nextId = Math.max(1277, storedLastId + 1);
+                      await env.PURE_KV.put('pure_last_order_id', nextId.toString());
+
+                      const autoOrder = {
+                        orderId: nextId.toString(),
+                        invoiceNumber: `A09401${nextId}`,
+                        paymentId: paymentId,
+                        date: new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+                        createdAt: new Date().toISOString(),
+                        customer: pendingData.customer,
+                        items: pendingData.items || [],
+                        shipping: pendingData.shipping || 0,
+                        total: pendingData.total,
+                        netTotal: pendingData.total / 1.19,
+                        vatTotal: pendingData.total - (pendingData.total / 1.19),
+                        status: 'neu_eingegangen',
+                        paymentStatus: `Bezahlt (${payment.method || 'Online-Zahlung'})`,
+                        paymentMethod: `Online-Zahlung (${paymentId}) – ${pendingData.customer?.email || ''}`,
+                        invoiceSentAt: null,
+                        contractConcluded: false,
+                        confirmationEmailSent: false
+                      };
+                      orders.unshift(autoOrder);
+                      await env.PURE_KV.put('pure_orders', JSON.stringify(orders));
+                      await env.PURE_KV.delete(`pure_pending:${paymentId}`);
+                    }
                   }
                 }
               }
@@ -137,19 +149,37 @@ export default {
 
           if (Array.isArray(body)) {
             orders = body;
-          } else if (body && body.orderId) {
-            const idx = orders.findIndex(o => o.orderId === body.orderId);
+          } else if (body && (body.orderId || body.paymentId)) {
+            const paymentId = body.paymentId || (typeof body.paymentMethod === 'string' ? body.paymentMethod.match(/tr_[a-zA-Z0-9]+/)?.[0] : null);
+            
+            const idx = orders.findIndex(o => 
+              (body.orderId && o.orderId === body.orderId) || 
+              (paymentId && (
+                (o.paymentId && o.paymentId === paymentId) || 
+                (typeof o.paymentMethod === 'string' && o.paymentMethod.includes(paymentId))
+              ))
+            );
+
             if (idx >= 0) {
-              orders[idx] = { ...orders[idx], ...body };
+              orders[idx] = { 
+                ...orders[idx], 
+                ...body, 
+                orderId: orders[idx].orderId || body.orderId,
+                invoiceNumber: orders[idx].invoiceNumber || body.invoiceNumber,
+                paymentId: paymentId || orders[idx].paymentId
+              };
             } else {
-              orders.unshift(body);
+              orders.unshift({
+                ...body,
+                paymentId: paymentId || body.paymentId
+              });
             }
 
             // Keep track of highest consecutive order id
             const numId = parseInt(body.orderId, 10);
             if (!isNaN(numId) && numId >= 1268 && env && env.PURE_KV) {
               try {
-                const currentLast = parseInt(await env.PURE_KV.get('pure_last_order_id') || '1268', 10);
+                const currentLast = parseInt(await env.PURE_KV.get('pure_last_order_id') || '1277', 10);
                 if (numId > currentLast) {
                   await env.PURE_KV.put('pure_last_order_id', numId.toString());
                 }
@@ -261,16 +291,42 @@ export default {
       }
     }
 
-    // 0d. Consecutive Order Number API (starting after 1268 -> 1269...)
+    // 0d. Consecutive Order Number API
     if (url.pathname === '/api/orders/next-id') {
-      let nextId = 1269;
+      const paymentId = url.searchParams.get('paymentId');
+
+      // If a paymentId was passed, check if an order already exists for this payment!
+      if (paymentId && env && env.PURE_KV) {
+        try {
+          const rawOrders = await env.PURE_KV.get('pure_orders');
+          if (rawOrders) {
+            const orders = JSON.parse(rawOrders);
+            const existing = orders.find(o => 
+              (o.paymentId && o.paymentId === paymentId) ||
+              (typeof o.paymentMethod === 'string' && o.paymentMethod.includes(paymentId))
+            );
+            if (existing) {
+              return new Response(JSON.stringify({ 
+                orderId: existing.orderId, 
+                invoiceNumber: existing.invoiceNumber,
+                isExisting: true,
+                order: existing
+              }), {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+              });
+            }
+          }
+        } catch (e) {}
+      }
+
+      let nextId = 1278;
       if (env && env.PURE_KV) {
         try {
           const storedLastId = await env.PURE_KV.get('pure_last_order_id');
           if (storedLastId && !isNaN(parseInt(storedLastId, 10))) {
-            nextId = Math.max(1269, parseInt(storedLastId, 10) + 1);
+            nextId = Math.max(1278, parseInt(storedLastId, 10) + 1);
           } else {
-            nextId = 1269;
+            nextId = 1278;
           }
           await env.PURE_KV.put('pure_last_order_id', nextId.toString());
         } catch (e) {
@@ -279,7 +335,8 @@ export default {
       }
       return new Response(JSON.stringify({ 
         orderId: nextId.toString(), 
-        invoiceNumber: `A09401${nextId}` 
+        invoiceNumber: `A09401${nextId}`,
+        isExisting: false
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
