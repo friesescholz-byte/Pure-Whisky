@@ -42,7 +42,7 @@ export function buildInvoicePdf(order) {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.5);
   doc.setTextColor(119, 119, 119); // #777777
-  doc.text('PURE.WHISKY. – Am Urnenfeld 1c – 29339 Wathlingen – info@pure-whisky.com', margin, 46);
+  doc.text('PURE.WHISKY. – Dürerring 1 – 31582 Nienburg – info@pure-whisky.com', margin, 46);
 
   // 3. RECIPIENT ADDRESS
   doc.setFont('helvetica', 'normal');
@@ -224,7 +224,7 @@ export function buildInvoicePdf(order) {
   doc.setFont('helvetica', 'bold');
   doc.text('PURE.WHISKY.', margin + (colWidth * 2), footerY + 5);
   doc.setFont('helvetica', 'normal');
-  doc.text('Am Urnenfeld 1c\n29339 Wathlingen', margin + (colWidth * 2), footerY + 9);
+  doc.text('Dürerring 1\n31582 Nienburg', margin + (colWidth * 2), footerY + 9);
 
   return doc;
 }

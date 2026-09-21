@@ -513,7 +513,7 @@ export async function sendOrderConfirmationEmail({ order, adminEmail = DEFAULT_A
         </div>
 
         <div style="background: #F4F0EA; padding: 18px 30px; text-align: center; font-size: 11px; color: #78887E;">
-          PURE.WHISKY. · Inhaberin Ines Zager · Am Urnenfeld 1c · 29339 Wathlingen · Deutschland<br/>
+          PURE.WHISKY. · Inhaberin Ines Zager · Dürerring 1 · 31582 Nienburg · Deutschland<br/>
           E-Mail: <a href="mailto:info@pure-whisky.com" style="color: #B85D2C; text-decoration: none;">info@pure-whisky.com</a>
         </div>
 
@@ -596,7 +596,7 @@ export async function sendInvoiceEmail({ order, adminEmail = DEFAULT_ADMIN_EMAIL
 
         <!-- Sender Line -->
         <div style="font-size: 10px; color: #777777; margin-bottom: 24px; letter-spacing: 0.01em;">
-          PURE.WHISKY. – Am Urnenfeld 1c – 29339 Wathlingen – info@pure-whisky.com
+          PURE.WHISKY. – Dürerring 1 – 31582 Nienburg – info@pure-whisky.com
         </div>
 
         <!-- Recipient Address -->
@@ -682,8 +682,8 @@ export async function sendInvoiceEmail({ order, adminEmail = DEFAULT_ADMIN_EMAIL
               </td>
               <td style="vertical-align: top; width: 34%;">
                 <strong style="color: #555555; display: block; margin-bottom: 3px;">PURE.WHISKY.</strong>
-                <div>Am Urnenfeld 1c</div>
-                <div>29339 Wathlingen</div>
+                <div>Dürerring 1</div>
+                <div>31582 Nienburg</div>
               </td>
             </tr>
           </table>

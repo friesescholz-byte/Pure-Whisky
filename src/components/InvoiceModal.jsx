@@ -207,7 +207,7 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
       <img src="https://pub-b33108412309406a9a941ddc51e9a5b9.r2.dev/Pure-Whisky/logo-pure-whisky.png" alt="PURE.WHISKY." class="logo" />
       
       <div class="sender-line">
-        PURE.WHISKY. – Am Urnenfeld 1c – 29339 Wathlingen – info@pure-whisky.com
+        PURE.WHISKY. – Dürerring 1 – 31582 Nienburg – info@pure-whisky.com
       </div>
 
       <div class="recipient">
@@ -298,8 +298,8 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
         </div>
         <div class="footer-col">
           <div class="footer-col-title">PURE.WHISKY.</div>
-          <div>Am Urnenfeld 1c</div>
-          <div>29339 Wathlingen</div>
+          <div>Dürerring 1</div>
+          <div>31582 Nienburg</div>
         </div>
       </div>
     </div>
@@ -414,7 +414,7 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
 
           {/* SENDER LINE */}
           <div className="text-[7.5pt] text-neutral-500 mb-5 tracking-normal">
-            PURE.WHISKY. – Am Urnenfeld 1c – 29339 Wathlingen – info@pure-whisky.com
+            PURE.WHISKY. – Dürerring 1 – 31582 Nienburg – info@pure-whisky.com
           </div>
 
           {/* RECIPIENT ADDRESS */}
@@ -562,8 +562,8 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
               <div className="font-bold text-neutral-700 text-[8.25pt] mb-1">
                 PURE.WHISKY.
               </div>
-              <div>Am Urnenfeld 1c</div>
-              <div>29339 Wathlingen</div>
+              <div>Dürerring 1</div>
+              <div>31582 Nienburg</div>
             </div>
           </div>
         </div>
