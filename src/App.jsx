@@ -25,7 +25,6 @@ import { PRODUCTS, BLOG_POSTS } from './data/pureWhiskyFullData';
 import initialCrmData from './data/initialCrmData.json';
 import { 
   sendOrderConfirmationEmail, 
-  sendAdminNewOrderNotification,
   sendInvoiceEmail,
   syncOrderToServer,
   fetchOrdersFromServer,
@@ -528,17 +527,11 @@ export default function App() {
         try { localStorage.removeItem('pure_whisky_cart'); } catch {}
         await clearPendingCheckout(pendingPaymentId, sessionIdFromUrl);
 
-        // 9. Send Emails (Order Confirmation to customer + Admin alert with button to Ines)
+        // 9. Send Emails (Order Confirmation to customer + Admin alert to Ines)
         try {
           await sendOrderConfirmationEmail({ order: finalizedOrder, adminEmail });
         } catch (e) {
           console.warn('Could not send confirmation email:', e);
-        }
-
-        try {
-          await sendAdminNewOrderNotification({ order: finalizedOrder, adminEmail });
-        } catch (e) {
-          console.warn('Could not send admin notification:', e);
         }
 
         // 10. Show Paid Confirmation Modal

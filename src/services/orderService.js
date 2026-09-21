@@ -299,10 +299,42 @@ export async function deleteOrderFromServer(orderId) {
   }
 }
 
+// -------------------------------------------------------------
+// Anti-Duplicate Email Locks (Session & In-Memory Guard)
+// -------------------------------------------------------------
+const sentNotificationLocks = new Set();
+
+function isNotificationLocked(key) {
+  if (sentNotificationLocks.has(key)) return true;
+  try {
+    if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem(`pure_lock_${key}`)) {
+      return true;
+    }
+  } catch {}
+  return false;
+}
+
+function lockNotification(key) {
+  sentNotificationLocks.add(key);
+  try {
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem(`pure_lock_${key}`, '1');
+    }
+  } catch {}
+}
+
 /**
  * Sends separate Admin Notification about new order to Ines Zager & admin
  */
 export async function sendAdminNewOrderNotification({ order, adminEmail = DEFAULT_ADMIN_EMAIL }) {
+  if (!order || !order.orderId) return { success: false };
+  const lockKey = `admin_notif_${order.orderId}`;
+  if (isNotificationLocked(lockKey)) {
+    console.log(`[Email Guard] Admin notification for order #${order.orderId} already sent. Skipping duplicate.`);
+    return { success: true, duplicate: true };
+  }
+  lockNotification(lockKey);
+
   const itemsList = order.items?.map(item => `
     <tr>
       <td style="padding: 8px 10px; border-bottom: 1px solid #e5e5e5; font-size: 13px;">
@@ -490,17 +522,26 @@ export async function sendOrderConfirmationEmail({ order, adminEmail = DEFAULT_A
     </html>
   `;
 
-  // 1. Send customer confirmation email (WITHOUT attachments)
-  const customerPromise = sendResendMail({
-    to: order.customer.email,
-    subject: `Bestelleingangsbestätigung #${order.orderId} – PURE.WHISKY.`,
-    html
-  });
+  if (!order || !order.orderId) return [];
 
-  // 2. Send dedicated Admin Notification to Ines Zager and adminEmail
+  // 1. Send customer confirmation email (guarded against double delivery)
+  const custLockKey = `cust_conf_${order.orderId}`;
+  let customerPromise = null;
+  if (!isNotificationLocked(custLockKey)) {
+    lockNotification(custLockKey);
+    customerPromise = sendResendMail({
+      to: order.customer.email,
+      subject: `Bestelleingangsbestätigung #${order.orderId} – PURE.WHISKY.`,
+      html
+    });
+  } else {
+    console.log(`[Email Guard] Customer confirmation for order #${order.orderId} already sent. Skipping duplicate.`);
+  }
+
+  // 2. Send dedicated Admin Notification to Ines Zager and adminEmail (guarded by its own lock)
   const adminPromise = sendAdminNewOrderNotification({ order, adminEmail });
 
-  return Promise.allSettled([customerPromise, adminPromise]);
+  return Promise.allSettled([customerPromise, adminPromise].filter(Boolean));
 }
 
 /**
@@ -508,6 +549,14 @@ export async function sendOrderConfirmationEmail({ order, adminEmail = DEFAULT_A
  * This concludes the binding sales contract.
  */
 export async function sendInvoiceEmail({ order, adminEmail = DEFAULT_ADMIN_EMAIL }) {
+  if (!order || !order.orderId) return { success: false };
+  const invoiceLockKey = `invoice_email_${order.orderId}`;
+  if (isNotificationLocked(invoiceLockKey)) {
+    console.log(`[Email Guard] Invoice email for order #${order.orderId} already sent. Skipping duplicate.`);
+    return { success: true, duplicate: true };
+  }
+  lockNotification(invoiceLockKey);
+
   const subtotal = order.items?.reduce((sum, item) => sum + (item.price * item.quantity), 0) || (order.total - (order.shipping ?? 6.90));
   const shipping = order.shipping ?? 6.90;
   const total = order.total || (subtotal + shipping);
