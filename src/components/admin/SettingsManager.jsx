@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { Mail, ShieldCheck, Check, Save, Building, CreditCard, Bell, Key, ExternalLink } from 'lucide-react';
 
 export default function SettingsManager({ 
-  adminEmail = 'friese.scholz@gmail.com', 
+  adminEmail = 'info@pure-whisky.com', 
   onSaveAdminEmail 
 }) {
   const [emailInput, setEmailInput] = useState(adminEmail);
   const [mollieKey, setMollieKey] = useState(
-    () => localStorage.getItem('pure_mollie_key') || 'test_757rbjSksxgtDCCAps98ThDSgpxCaz'
+    () => localStorage.getItem('pure_mollie_key') || 'live_U9khRJeSJzhqTfNJmBAWprDreve6fv'
   );
   const [resendKey, setResendKey] = useState(
     () => localStorage.getItem('pure_resend_key') || (import.meta.env?.VITE_RESEND_API_KEY || '')

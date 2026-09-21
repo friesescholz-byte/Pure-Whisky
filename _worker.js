@@ -23,7 +23,7 @@ export default {
           const paymentId = params.get('id');
 
           if (paymentId && env && env.PURE_KV) {
-            let serverKey = await env.PURE_KV.get('mollie_api_key') || env?.MOLLIE_API_KEY || 'test_757rbjSksxgtDCCAps98ThDSgpxCaz';
+            let serverKey = await env.PURE_KV.get('mollie_api_key') || env?.MOLLIE_API_KEY || 'live_U9khRJeSJzhqTfNJmBAWprDreve6fv';
             const mollieRes = await fetch(`https://api.mollie.com/v2/payments/${paymentId}`, {
               headers: { 'Authorization': `Bearer ${serverKey}` }
             });
@@ -113,6 +113,17 @@ export default {
             } else {
               orders.unshift(body);
             }
+
+            // Keep track of highest consecutive order id
+            const numId = parseInt(body.orderId, 10);
+            if (!isNaN(numId) && numId >= 1268 && env && env.PURE_KV) {
+              try {
+                const currentLast = parseInt(await env.PURE_KV.get('pure_last_order_id') || '1268', 10);
+                if (numId > currentLast) {
+                  await env.PURE_KV.put('pure_last_order_id', numId.toString());
+                }
+              } catch {}
+            }
           }
 
           if (env && env.PURE_KV) {
@@ -128,6 +139,45 @@ export default {
       }
     }
 
+    // 0d. Consecutive Order Number API (starting after 1268 -> 1269...)
+    if (url.pathname === '/api/orders/next-id') {
+      let nextId = 1269;
+      if (env && env.PURE_KV) {
+        try {
+          const storedLastId = await env.PURE_KV.get('pure_last_order_id');
+          if (storedLastId && !isNaN(parseInt(storedLastId, 10))) {
+            nextId = Math.max(1269, parseInt(storedLastId, 10) + 1);
+          } else {
+            nextId = 1269;
+          }
+          await env.PURE_KV.put('pure_last_order_id', nextId.toString());
+        } catch (e) {
+          console.warn('Could not increment next order id:', e);
+        }
+      }
+      return new Response(JSON.stringify({ 
+        orderId: nextId.toString(), 
+        invoiceNumber: `A09401${nextId}` 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    if (request.method === 'POST' && url.pathname === '/api/settings/last-order-id') {
+      try {
+        const body = await request.json();
+        const lastId = parseInt(body.lastOrderId, 10);
+        if (env && env.PURE_KV && !isNaN(lastId)) {
+          await env.PURE_KV.put('pure_last_order_id', lastId.toString());
+        }
+        return new Response(JSON.stringify({ success: true, lastOrderId: lastId }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      } catch (e) {
+        return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: corsHeaders });
+      }
+    }
+
     if (url.pathname.startsWith('/api/mollie')) {
       const molliePath = url.pathname.replace(/^\/api\/mollie/, '') + url.search;
       const targetUrl = 'https://api.mollie.com' + molliePath;
@@ -139,7 +189,7 @@ export default {
         if (env && env.PURE_KV) {
           try { fallbackKey = await env.PURE_KV.get('mollie_api_key'); } catch {}
         }
-        fallbackKey = fallbackKey || env?.MOLLIE_API_KEY || 'test_757rbjSksxgtDCCAps98ThDSgpxCaz';
+        fallbackKey = fallbackKey || env?.MOLLIE_API_KEY || 'live_U9khRJeSJzhqTfNJmBAWprDreve6fv';
         authHeader = `Bearer ${fallbackKey}`;
       }
       headers.set('Authorization', authHeader);

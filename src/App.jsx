@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import CaskSelectionTrust from './components/CaskSelectionTrust';
@@ -34,7 +34,8 @@ import { CheckCircle2 } from 'lucide-react';
 function getTabFromUrl() {
   if (typeof window === 'undefined') return 'home';
   const path = window.location.pathname.toLowerCase().trim();
-  if (path === '/admin' || path.startsWith('/admin')) return 'admin';
+  const search = window.location.search.toLowerCase();
+  if (path === '/admin' || path.startsWith('/admin') || search.includes('admin=true') || search.includes('tab=admin')) return 'admin';
   if (path === '/abmelden' || path.startsWith('/abmelden') || path === '/unsubscribe' || path.startsWith('/unsubscribe')) return 'unsubscribe';
   if (path === '/shop' || path.startsWith('/shop') || path.startsWith('/faesser')) return 'shop';
   if (path === '/about' || path.startsWith('/about') || path.startsWith('/ueber-uns') || path.startsWith('/ines-zager')) return 'about';
@@ -269,12 +270,14 @@ export default function App() {
     }
   }, [newsletterSubs]);
 
-  // Admin Notification Email Setting (default: friese.scholz@gmail.com)
+  // Admin Notification Email Setting (default: info@pure-whisky.com)
   const [adminEmail, setAdminEmail] = useState(() => {
-    return localStorage.getItem('pure_whisky_admin_email') || 'friese.scholz@gmail.com';
+    return localStorage.getItem('pure_whisky_admin_email') || 'info@pure-whisky.com';
   });
 
   const [paidConfirmationOrder, setPaidConfirmationOrder] = useState(null);
+
+  const processingMollieOrdersRef = useRef(new Set());
 
   // Check URL query parameters for return from Mollie payment gateway
   useEffect(() => {
@@ -288,9 +291,22 @@ export default function App() {
       setCartItems([]);
       try { localStorage.removeItem('pure_whisky_cart'); } catch {}
 
-      // Clean query string from URL without reload
+      // Clean query string from URL immediately to prevent re-triggering on refresh
       const cleanUrl = window.location.pathname;
       window.history.replaceState({}, document.title, cleanUrl);
+
+      // Guard against duplicate execution in the same session
+      if (processingMollieOrdersRef.current.has(orderIdParam)) {
+        return;
+      }
+      processingMollieOrdersRef.current.add(orderIdParam);
+
+      // Check persistent storage of already dispatched confirmations
+      let alreadyConfirmedList = [];
+      try {
+        alreadyConfirmedList = JSON.parse(localStorage.getItem('pure_whisky_confirmed_orders') || '[]');
+      } catch {}
+      const isAlreadyDispatched = alreadyConfirmedList.includes(orderIdParam);
 
       (async () => {
         // Retrieve pending order if stored
@@ -305,19 +321,14 @@ export default function App() {
           console.warn('Could not parse pending order:', err);
         }
 
-        // If not in localStorage, look up in current state or fetch from server KV
+        // If not in localStorage, fetch from server KV
         if (!target || !target.customer?.email) {
-          const existingInState = orders.find(o => o.orderId === orderIdParam);
-          if (existingInState) {
-            target = existingInState;
-          } else {
-            try {
-              const serverOrders = await fetchOrdersFromServer();
-              const foundInServer = serverOrders?.find(o => o.orderId === orderIdParam);
-              if (foundInServer) target = foundInServer;
-            } catch (e) {
-              console.warn('Could not fetch server orders on return:', e);
-            }
+          try {
+            const serverOrders = await fetchOrdersFromServer();
+            const foundInServer = serverOrders?.find(o => o.orderId === orderIdParam);
+            if (foundInServer) target = foundInServer;
+          } catch (e) {
+            console.warn('Could not fetch server orders on return:', e);
           }
         }
 
@@ -355,7 +366,13 @@ export default function App() {
         await syncOrderToServer(updatedOrder);
 
         // Send order confirmation to customer (no attachments) and admin alert to info@pure-whisky.com
-        if (target.customer && target.customer.email && !target.confirmationEmailSent) {
+        // STRICT CHECK: Only send once per order ID!
+        if (target.customer && target.customer.email && !isAlreadyDispatched && !target.confirmationEmailSent) {
+          try {
+            alreadyConfirmedList.push(orderIdParam);
+            localStorage.setItem('pure_whisky_confirmed_orders', JSON.stringify(alreadyConfirmedList));
+          } catch {}
+
           updatedOrder.confirmationEmailSent = true;
           try {
             await sendOrderConfirmationEmail({ order: updatedOrder, adminEmail });
@@ -366,7 +383,7 @@ export default function App() {
         }
       })();
     }
-  }, [adminEmail, orders]);
+  }, [adminEmail]);
 
   const handleRefreshOrders = async () => {
     try {
@@ -675,33 +692,46 @@ export default function App() {
     }));
   };
 
+  const invoiceSendingLockRef = useRef(new Set());
+
   // Orders & Invoice Handlers
   const handleSendInvoice = async (orderId) => {
-    const targetOrder = orders.find(o => o.orderId === orderId);
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    const timeStr = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-
-    const updatedOrder = {
-      ...(targetOrder || {}),
-      orderId,
-      status: 'rechnung_versendet',
-      contractConcluded: true,
-      invoiceSentAt: `${dateStr}, ${timeStr} Uhr`
-    };
-
-    setOrders(prev => prev.map(o => o.orderId === orderId ? updatedOrder : o));
-    syncOrderToServer(updatedOrder);
-
-    if (targetOrder) {
-      try {
-        await sendInvoiceEmail({ order: { ...updatedOrder, date: dateStr }, adminEmail });
-      } catch (mailErr) {
-        console.warn('Resend invoice dispatch notice:', mailErr);
-      }
+    if (!orderId) return;
+    if (invoiceSendingLockRef.current.has(orderId)) {
+      console.warn('Invoice send already in progress for order:', orderId);
+      return;
     }
+    invoiceSendingLockRef.current.add(orderId);
 
-    alert(`Rechnung zu Bestellung #${orderId} wurde erfolgreich per Resend übermittelt!\n\n• Absender: noreply@scholz-friese-webdesign.de\n• Antwort-Adresse: info@pure-whisky.com\n• Empfänger: ${targetOrder?.customer?.email}\n• Bcc an Admin: ${adminEmail}\n\nDer Kaufvertrag ist damit rechtswirksam geschlossen.`);
+    try {
+      const targetOrder = orders.find(o => o.orderId === orderId);
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const timeStr = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+
+      const updatedOrder = {
+        ...(targetOrder || {}),
+        orderId,
+        status: 'rechnung_versendet',
+        contractConcluded: true,
+        invoiceSentAt: `${dateStr}, ${timeStr} Uhr`
+      };
+
+      setOrders(prev => prev.map(o => o.orderId === orderId ? updatedOrder : o));
+      syncOrderToServer(updatedOrder);
+
+      if (targetOrder) {
+        try {
+          await sendInvoiceEmail({ order: { ...updatedOrder, date: dateStr }, adminEmail });
+        } catch (mailErr) {
+          console.warn('Resend invoice dispatch notice:', mailErr);
+        }
+      }
+
+      alert(`Rechnung zu Bestellung #${orderId} wurde erfolgreich per E-Mail an ${targetOrder?.customer?.email || 'den Kunden'} übermittelt!\n\n• Bcc-Kopie an: info@pure-whisky.com\n\nDer Kaufvertrag ist damit rechtswirksam geschlossen.`);
+    } finally {
+      invoiceSendingLockRef.current.delete(orderId);
+    }
   };
 
   const handleOpenInvoice = (order) => {

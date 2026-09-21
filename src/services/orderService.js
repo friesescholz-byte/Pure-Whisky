@@ -5,18 +5,18 @@
 
 import { generateInvoicePdfBase64 } from './invoicePdfGenerator.js';
 
-export const DEFAULT_ADMIN_EMAIL = 'friese.scholz@gmail.com';
+export const DEFAULT_ADMIN_EMAIL = 'info@pure-whisky.com';
 export const SENDER_EMAIL = 'PURE.WHISKY. <noreply@scholz-friese-webdesign.de>';
 export const REPLY_TO_EMAIL = 'info@pure-whisky.com';
 
-export const DEFAULT_MOLLIE_KEY = 'test_757rbjSksxgtDCCAps98ThDSgpxCaz';
+export const DEFAULT_MOLLIE_KEY = '';
 
 export function getMollieKey() {
   const customKey = typeof window !== 'undefined' ? localStorage.getItem('pure_mollie_key') : null;
   if (customKey && customKey.trim()) {
     return customKey.trim();
   }
-  return import.meta.env?.VITE_MOLLIE_API_KEY || DEFAULT_MOLLIE_KEY;
+  return import.meta.env?.VITE_MOLLIE_API_KEY || '';
 }
 
 export function getResendKey() {
@@ -245,11 +245,14 @@ export async function sendAdminNewOrderNotification({ order, adminEmail = DEFAUL
             Gesamtbetrag: <span style="color: #B85D2C; font-size: 17px;">${formatEur(order.total)}</span> (inkl. Versand & 19% MwSt.)
           </div>
 
-          <div style="background: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; padding: 15px; text-align: center;">
-            <p style="margin: 0 0 8px 0; color: #92400e; font-weight: bold;">Aktion im Admin-Dashboard erforderlich:</p>
-            <p style="margin: 0; font-size: 12px; color: #78350f; line-height: 1.5;">
+          <div style="background: #fffbeb; border: 1px solid #fef3c7; border-radius: 10px; padding: 20px; text-align: center; margin: 20px 0;">
+            <p style="margin: 0 0 8px 0; color: #92400e; font-weight: bold; font-size: 14px;">Aktion im Admin-Dashboard erforderlich:</p>
+            <p style="margin: 0 0 16px 0; font-size: 12px; color: #78350f; line-height: 1.5;">
               Die Bestellung ist im Admin-Dashboard unter <strong>Bestellungen</strong> hinterlegt. Sobald Sie die Bestellung geprüft haben, versenden Sie dort mit einem Klick die offizielle Rechnung als PDF an den Kunden, um den Kaufvertrag rechtswirksam zu schließen.
             </p>
+            <a href="https://pure-whisky.com/admin" target="_blank" style="display: inline-block; background-color: #B85D2C; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 13px; letter-spacing: 0.5px;">
+              👉 Direkt zum Admin-Dashboard & Rechnung versenden
+            </a>
           </div>
         </div>
 
@@ -529,14 +532,17 @@ export async function sendInvoiceEmail({ order, adminEmail = DEFAULT_ADMIN_EMAIL
     console.warn('Could not generate PDF attachment for invoice email:', pdfErr);
   }
 
+  const customerEmail = (order.customer?.email || '').toLowerCase().trim();
   const bccRecipients = ['info@pure-whisky.com'];
   if (adminEmail && !bccRecipients.includes(adminEmail)) {
     bccRecipients.push(adminEmail);
   }
+  // Filter out customer email from BCC to prevent duplicate delivery when testing with info@pure-whisky.com
+  const filteredBcc = bccRecipients.filter(email => email.toLowerCase().trim() !== customerEmail);
 
   return sendResendMail({
     to: order.customer.email,
-    bcc: bccRecipients,
+    bcc: filteredBcc,
     subject: `Rechnung ${invoiceNum} zu Ihrer Bestellung #${order.orderId} – PURE.WHISKY.`,
     html,
     attachments

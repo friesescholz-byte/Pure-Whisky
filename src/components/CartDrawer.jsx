@@ -62,8 +62,31 @@ export default function CartDrawer({
     }
 
     setIsProcessing(true);
-    const orderId = (Math.floor(1200 + Math.random() * 800)).toString();
-    const invoiceNumber = `A09401${orderId}`;
+
+    let orderId = null;
+    let invoiceNumber = null;
+    try {
+      const idRes = await fetch('/api/orders/next-id');
+      if (idRes.ok) {
+        const idData = await idRes.json();
+        if (idData && idData.orderId) {
+          orderId = idData.orderId.toString();
+          invoiceNumber = idData.invoiceNumber || `A09401${orderId}`;
+        }
+      }
+    } catch (idErr) {
+      console.warn('Could not fetch consecutive order ID from server:', idErr);
+    }
+
+    if (!orderId) {
+      // Fallback: consecutive counter starting after 1268
+      const localLast = parseInt(localStorage.getItem('pure_last_order_id') || '1268', 10);
+      const nextLocal = localLast + 1;
+      orderId = nextLocal.toString();
+      invoiceNumber = `A09401${orderId}`;
+      try { localStorage.setItem('pure_last_order_id', orderId); } catch {}
+    }
+
     const todayStr = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
     // Step 1: Call Payments API Gateway

@@ -16,6 +16,7 @@ export default function OrdersManager({
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'neu_eingegangen' | 'rechnung_versendet'
   const [confirmModalOrder, setConfirmModalOrder] = useState(null);
+  const [isSendingInvoice, setIsSendingInvoice] = useState(false);
   
   // Accordion state: set of expanded order IDs. Default: first order expanded if available
   const [expandedOrderIds, setExpandedOrderIds] = useState(() => {
@@ -56,10 +57,15 @@ export default function OrdersManager({
   const pendingCount = orders.filter(o => o.status === 'neu_eingegangen').length;
   const concludedCount = orders.filter(o => o.status === 'rechnung_versendet').length;
 
-  const handleConfirmSend = () => {
-    if (confirmModalOrder) {
-      onSendInvoice(confirmModalOrder.orderId);
-      setConfirmModalOrder(null);
+  const handleConfirmSend = async () => {
+    if (confirmModalOrder && !isSendingInvoice) {
+      setIsSendingInvoice(true);
+      try {
+        await onSendInvoice(confirmModalOrder.orderId);
+      } finally {
+        setIsSendingInvoice(false);
+        setConfirmModalOrder(null);
+      }
     }
   };
 
@@ -566,17 +572,19 @@ export default function OrdersManager({
             <div className="flex items-center justify-end space-x-3 pt-3 border-t border-[#E2DDD5]">
               <button
                 onClick={() => setConfirmModalOrder(null)}
-                className="px-4 py-2 bg-[#FAF8F5] hover:bg-[#E2DDD5] border border-[#D4C8B8] text-xs font-semibold text-[#181F1C] rounded-lg transition-colors"
+                disabled={isSendingInvoice}
+                className="px-4 py-2 bg-[#FAF8F5] hover:bg-[#E2DDD5] border border-[#D4C8B8] text-xs font-semibold text-[#181F1C] rounded-lg transition-colors disabled:opacity-50"
               >
                 Abbrechen
               </button>
               
               <button
                 onClick={handleConfirmSend}
-                className="px-5 py-2 bg-[#B85D2C] hover:bg-[#A04E24] text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-all shadow-md flex items-center space-x-2"
+                disabled={isSendingInvoice}
+                className="px-5 py-2 bg-[#B85D2C] hover:bg-[#A04E24] disabled:opacity-50 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-all shadow-md flex items-center space-x-2"
               >
                 <CheckCircle2 className="w-4 h-4" />
-                <span>Kaufvertrag schließen & senden</span>
+                <span>{isSendingInvoice ? 'Wird versendet...' : 'Kaufvertrag schließen & senden'}</span>
               </button>
             </div>
           </div>

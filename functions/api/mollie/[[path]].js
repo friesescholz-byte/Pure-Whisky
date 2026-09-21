@@ -22,7 +22,7 @@ export async function onRequest(context) {
         const paymentId = params.get('id');
 
         if (paymentId && context.env && context.env.PURE_KV) {
-          let serverKey = await context.env.PURE_KV.get('mollie_api_key') || context.env?.MOLLIE_API_KEY || 'test_757rbjSksxgtDCCAps98ThDSgpxCaz';
+          let serverKey = await context.env.PURE_KV.get('mollie_api_key') || context.env?.MOLLIE_API_KEY || 'live_U9khRJeSJzhqTfNJmBAWprDreve6fv';
           const mollieRes = await fetch(`https://api.mollie.com/v2/payments/${paymentId}`, {
             headers: { 'Authorization': `Bearer ${serverKey}` }
           });
@@ -58,7 +58,7 @@ export async function onRequest(context) {
     if (context.env && context.env.PURE_KV) {
       try { fallbackKey = await context.env.PURE_KV.get('mollie_api_key'); } catch {}
     }
-    fallbackKey = fallbackKey || context.env?.MOLLIE_API_KEY || 'test_757rbjSksxgtDCCAps98ThDSgpxCaz';
+    fallbackKey = fallbackKey || context.env?.MOLLIE_API_KEY || 'live_U9khRJeSJzhqTfNJmBAWprDreve6fv';
     authHeader = `Bearer ${fallbackKey}`;
   }
   headers.set('Authorization', authHeader);
