@@ -54,7 +54,7 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
                 </span>
               )}
               <span className="text-xs text-[#A0AEC0]">
-                ({product.pricePerLiter} · inkl. MwSt. zzgl. Versand)
+                ({product.pricePerLiter} · inkl. MwSt. {product.freeShipping ? '· Kostenloser Versand' : 'zzgl. Versand'})
               </span>
             </div>
 

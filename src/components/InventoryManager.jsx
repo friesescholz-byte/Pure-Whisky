@@ -39,7 +39,8 @@ const initialNewProductState = {
   tastingFinish: '',
   image: '',
   cardBg: IMAGES.card_bg_speyside,
-  galleryImages: []
+  galleryImages: [],
+  freeShipping: false
 };
 
 export default function InventoryManager({ 
@@ -83,7 +84,8 @@ export default function InventoryManager({
     tastingFinish: '',
     image: '',
     cardBg: IMAGES.card_bg_speyside,
-    galleryImages: []
+    galleryImages: [],
+    freeShipping: false
   });
 
   // Create form state
@@ -285,7 +287,8 @@ export default function InventoryManager({
       tastingFinish: p.tastingNotes?.finish || '',
       image: pPrimaryImage,
       cardBg: pCardBg,
-      galleryImages: pGallery
+      galleryImages: pGallery,
+      freeShipping: !!p.freeShipping
     });
   };
 
@@ -330,6 +333,7 @@ export default function InventoryManager({
       soldOut: isSoldOut,
       releaseDate: releaseDateVal,
       badge: formState.badge.trim() || (isUpcoming ? `Release am ${releaseDateVal} · Vorabzugriff` : (isSoldOut ? 'Ausverkauft' : 'Sofort lieferbar')),
+      freeShipping: !!formState.freeShipping,
       image: primaryImg,
       cutoutImage: primaryImg,
       galleryImages: finalGallery,
@@ -395,6 +399,7 @@ export default function InventoryManager({
       soldOut: isSoldOut,
       releaseDate: releaseDateVal,
       badge: newFormState.badge.trim() || (isUpcoming ? `Release am ${releaseDateVal} · Vorabzugriff` : (isSoldOut ? 'Ausverkauft' : 'Neu erhältlich · Sofort lieferbar')),
+      freeShipping: !!newFormState.freeShipping,
       bottlesTotal: totalBottles,
       bottlesRemaining: isSoldOut ? 0 : numericStock,
       bottleCount: `${totalBottles} Flaschen`,
@@ -624,6 +629,11 @@ export default function InventoryManager({
                       <span className="text-[10px] sm:text-[11px] text-[#55695E] block font-craft-mono">
                         {p.pricePerLiter || `${(p.price / 0.7).toFixed(2).replace('.', ',')} € / l`}
                       </span>
+                      {p.freeShipping && (
+                        <span className="inline-block mt-1 text-[9px] px-1.5 py-0.5 rounded bg-emerald-100 text-[#2D6A4F] font-craft-mono font-bold">
+                          Versandfrei
+                        </span>
+                      )}
                     </td>
 
                     {/* Status & Release Date Selector */}
@@ -729,7 +739,7 @@ export default function InventoryManager({
                       {p.price.toFixed(2)} €
                     </span>
                     <span className="text-[10px] text-[#55695E] block font-craft-mono">
-                      inkl. MwSt.
+                      {p.freeShipping ? 'Versandfrei' : 'inkl. MwSt.'}
                     </span>
                   </div>
                 </div>
@@ -816,7 +826,7 @@ export default function InventoryManager({
             <div className="flex items-center space-x-2 border-b border-[#E2DDD5] pb-2 overflow-x-auto">
               {[
                 { id: 'general', label: '1. Stammdaten & Fass' },
-                { id: 'pricing', label: '2. Preis & Lager' },
+                { id: 'pricing', label: '2. Preis, Lager & Versand' },
                 { id: 'sensory', label: '3. Tasting Notes' },
                 { id: 'media', label: `4. Flaschenbilder & Kachel-Hintergrund (${formState.galleryImages?.length || 1})` }
               ].map(tab => (
@@ -1095,6 +1105,64 @@ export default function InventoryManager({
                       placeholder="z.B. 17. September 2026"
                       className="w-full px-4 py-2.5 bg-white border border-[#D4C8B8] rounded-xl text-sm font-bold text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
                     />
+                  </div>
+
+                  {/* VERSANDKOSTEN FÜR DIESES PRODUKT ABWÄHLEN / AKTIVIEREN */}
+                  <div className={`p-4 rounded-2xl border transition-all ${
+                    formState.freeShipping 
+                      ? 'bg-emerald-50/60 border-emerald-300' 
+                      : 'bg-[#FAF8F5] border-[#D4C8B8]'
+                  }`}>
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2">
+                          <label className="text-xs font-craft-mono uppercase text-[#181F1C] font-bold">
+                            Versandkosten für dieses Produkt
+                          </label>
+                          {formState.freeShipping && (
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-[#2D6A4F] font-bold">
+                              Versand abgewählt (0,00 €)
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-[#55695E]">
+                          {formState.freeShipping 
+                            ? 'Versand abgewählt: Dieses Produkt ist versandkostenfrei (0,00 €).'
+                            : 'Standardversand aktiv: 6,90 € DHL GoGreen mit 18+ Alterssichtprüfung.'}
+                        </p>
+                      </div>
+
+                      {/* Toggle Switch */}
+                      <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                        <input
+                          type="checkbox"
+                          checked={!formState.freeShipping}
+                          onChange={(e) => setFormState({ ...formState, freeShipping: !e.target.checked })}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-[#D4C8B8] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-[#D4C8B8] after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#2D6A4F]"></div>
+                      </label>
+                    </div>
+
+                    <div className="text-[11px] text-[#55695E] border-t border-[#E2DDD5]/70 pt-2.5 mt-2.5 flex items-center justify-between">
+                      <span>
+                        {formState.freeShipping ? (
+                          <span className="text-[#2D6A4F] font-medium flex items-center space-x-1">
+                            <CheckCircle className="w-3.5 h-3.5 shrink-0" />
+                            <span>Versand abgewählt. Enthält der Warenkorb nur versandkostenfreie Produkte, entfallen die 6,90 € an der Kasse.</span>
+                          </span>
+                        ) : (
+                          <span>Schalter umlegen oder Klick rechts, um den Versand für diesen Artikel abzuwählen.</span>
+                        )}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setFormState(prev => ({ ...prev, freeShipping: !prev.freeShipping }))}
+                        className="text-xs text-[#B85D2C] hover:text-[#A04E24] underline font-medium cursor-pointer shrink-0 ml-2"
+                      >
+                        {formState.freeShipping ? 'Versand berechnen' : 'Versand abwählen'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -1408,7 +1476,7 @@ export default function InventoryManager({
             <div className="flex items-center space-x-2 border-b border-[#E2DDD5] pb-2 overflow-x-auto">
               {[
                 { id: 'general', label: '1. Stammdaten & Fass' },
-                { id: 'pricing', label: '2. Preis & Lager' },
+                { id: 'pricing', label: '2. Preis, Lager & Versand' },
                 { id: 'sensory', label: '3. Tasting Notes' },
                 { id: 'media', label: `4. Flaschenbilder & Kachel-Hintergrund (${newFormState.galleryImages?.length || 0})` }
               ].map(tab => (
@@ -1688,6 +1756,64 @@ export default function InventoryManager({
                       placeholder="z.B. 17. September 2026"
                       className="w-full px-4 py-2.5 bg-white border border-[#D4C8B8] rounded-xl text-sm font-bold text-[#181F1C] focus:outline-none focus:border-[#B85D2C]"
                     />
+                  </div>
+
+                  {/* VERSANDKOSTEN FÜR NEUES PRODUKT ABWÄHLEN / AKTIVIEREN */}
+                  <div className={`p-4 rounded-2xl border transition-all ${
+                    newFormState.freeShipping 
+                      ? 'bg-emerald-50/60 border-emerald-300' 
+                      : 'bg-[#FAF8F5] border-[#D4C8B8]'
+                  }`}>
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2">
+                          <label className="text-xs font-craft-mono uppercase text-[#181F1C] font-bold">
+                            Versandkosten für dieses Produkt
+                          </label>
+                          {newFormState.freeShipping && (
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-[#2D6A4F] font-bold">
+                              Versand abgewählt (0,00 €)
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-[#55695E]">
+                          {newFormState.freeShipping 
+                            ? 'Versand abgewählt: Dieses Produkt ist versandkostenfrei (0,00 €).'
+                            : 'Standardversand aktiv: 6,90 € DHL GoGreen mit 18+ Alterssichtprüfung.'}
+                        </p>
+                      </div>
+
+                      {/* Toggle Switch */}
+                      <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                        <input
+                          type="checkbox"
+                          checked={!newFormState.freeShipping}
+                          onChange={(e) => setNewFormState({ ...newFormState, freeShipping: !e.target.checked })}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-[#D4C8B8] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-[#D4C8B8] after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#2D6A4F]"></div>
+                      </label>
+                    </div>
+
+                    <div className="text-[11px] text-[#55695E] border-t border-[#E2DDD5]/70 pt-2.5 mt-2.5 flex items-center justify-between">
+                      <span>
+                        {newFormState.freeShipping ? (
+                          <span className="text-[#2D6A4F] font-medium flex items-center space-x-1">
+                            <CheckCircle className="w-3.5 h-3.5 shrink-0" />
+                            <span>Versand abgewählt. Enthält der Warenkorb nur versandkostenfreie Produkte, entfallen die 6,90 € an der Kasse.</span>
+                          </span>
+                        ) : (
+                          <span>Schalter umlegen oder Klick rechts, um den Versand für diesen Artikel abzuwählen.</span>
+                        )}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setNewFormState(prev => ({ ...prev, freeShipping: !prev.freeShipping }))}
+                        className="text-xs text-[#B85D2C] hover:text-[#A04E24] underline font-medium cursor-pointer shrink-0 ml-2"
+                      >
+                        {newFormState.freeShipping ? 'Versand berechnen' : 'Versand abwählen'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}

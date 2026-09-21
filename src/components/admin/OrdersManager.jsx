@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   FileText, Send, CheckCircle2, Clock, Search, Filter, Printer, 
   AlertCircle, ChevronDown, ChevronUp, Eye, ShieldCheck, Plus, RefreshCw, 
-  Mail, Package, User, MapPin, CreditCard, Truck, Calendar, ArrowUpRight
+  Mail, Package, User, MapPin, CreditCard, Truck, Calendar, ArrowUpRight, Trash2
 } from 'lucide-react';
 
 export default function OrdersManager({ 
@@ -11,7 +11,8 @@ export default function OrdersManager({
   onViewInvoice, 
   onAddTestOrder,
   onRefreshOrders,
-  adminEmail = 'friese.scholz@gmail.com'
+  onDeleteOrder,
+  adminEmail = 'info@pure-whisky.com'
 }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'neu_eingegangen' | 'rechnung_versendet'
@@ -339,6 +340,21 @@ export default function OrdersManager({
                         <span>{isConcluded ? 'Erneut senden' : 'Rechnung senden'}</span>
                       </button>
 
+                      {/* Delete Button */}
+                      {onDeleteOrder && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteOrder(order.orderId);
+                          }}
+                          className="p-2 rounded-xl bg-white hover:bg-rose-50 border border-[#D4C8B8] hover:border-rose-300 text-stone-400 hover:text-rose-600 transition-colors shadow-2xs cursor-pointer"
+                          title="Bestellung dauerhaft löschen"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+
                     </div>
 
                   </div>
@@ -488,8 +504,19 @@ export default function OrdersManager({
 
                     {/* Action Bar inside expanded card */}
                     <div className="pt-4 border-t border-[#E2DDD5] flex flex-col sm:flex-row items-center justify-between gap-3">
-                      <div className="text-xs text-[#55695E] font-craft-mono">
-                        Bestell-ID: <span className="font-mono text-[#181F1C] font-bold">#{order.orderId}</span> · Erstellt: {order.date}
+                      <div className="flex items-center space-x-3 text-xs text-[#55695E] font-craft-mono">
+                        <div>Bestell-ID: <span className="font-mono text-[#181F1C] font-bold">#{order.orderId}</span> · Erstellt: {order.date}</div>
+                        {onDeleteOrder && (
+                          <button
+                            type="button"
+                            onClick={() => onDeleteOrder(order.orderId)}
+                            className="text-xs text-rose-600 hover:text-rose-700 hover:underline flex items-center space-x-1 cursor-pointer font-craft-mono ml-2 transition-colors"
+                            title="Bestellung dauerhaft löschen"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Löschen</span>
+                          </button>
+                        )}
                       </div>
 
                       <div className="flex items-center space-x-3 w-full sm:w-auto justify-end">

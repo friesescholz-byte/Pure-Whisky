@@ -109,7 +109,7 @@ export default function ProductDossierModal({ product, onClose, onAddToCart }) {
         <div className="p-6 border-t border-[#E2DDD5] bg-[#FAF8F5] flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-left w-full sm:w-auto">
             <div className="font-serif text-2xl sm:text-3xl text-[#181F1C] font-bold">{product.price.toFixed(2)} €</div>
-            <div className="text-xs text-[#55695E]">{product.pricePerLiter} · inkl. MwSt. zzgl. Versand</div>
+            <div className="text-xs text-[#55695E]">{product.pricePerLiter} · inkl. MwSt. {product.freeShipping ? '· Kostenloser Versand' : 'zzgl. Versand'}</div>
           </div>
 
           <div className="flex items-center space-x-3 w-full sm:w-auto">

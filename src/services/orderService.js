@@ -187,6 +187,21 @@ export async function fetchOrdersFromServer() {
 }
 
 /**
+ * Delete single order from Cloudflare KV
+ */
+export async function deleteOrderFromServer(orderId) {
+  try {
+    const res = await fetch(`/api/orders?id=${encodeURIComponent(orderId)}`, {
+      method: 'DELETE'
+    });
+    return await res.json();
+  } catch (err) {
+    console.warn('Could not delete order from server KV:', err);
+    return null;
+  }
+}
+
+/**
  * Sends separate Admin Notification about new order to Ines Zager & admin
  */
 export async function sendAdminNewOrderNotification({ order, adminEmail = DEFAULT_ADMIN_EMAIL }) {

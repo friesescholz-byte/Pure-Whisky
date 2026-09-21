@@ -137,6 +137,32 @@ export default {
           return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
         }
       }
+
+      if (request.method === 'DELETE') {
+        try {
+          const deleteId = url.searchParams.get('id');
+          let orders = [];
+          if (env && env.PURE_KV) {
+            try {
+              const raw = await env.PURE_KV.get('pure_orders');
+              if (raw) orders = JSON.parse(raw);
+            } catch (e) {}
+          }
+          if (!Array.isArray(orders)) orders = [];
+
+          if (deleteId) {
+            orders = orders.filter(o => o.orderId !== deleteId);
+          }
+          if (env && env.PURE_KV) {
+            await env.PURE_KV.put('pure_orders', JSON.stringify(orders));
+          }
+          return new Response(JSON.stringify({ success: true, orders }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        } catch (err) {
+          return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
+        }
+      }
     }
 
     // 0d. Consecutive Order Number API (starting after 1268 -> 1269...)

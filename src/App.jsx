@@ -27,7 +27,8 @@ import {
   sendOrderConfirmationEmail, 
   sendInvoiceEmail,
   syncOrderToServer,
-  fetchOrdersFromServer
+  fetchOrdersFromServer,
+  deleteOrderFromServer
 } from './services/orderService';
 import { CheckCircle2 } from 'lucide-react';
 
@@ -207,12 +208,16 @@ export default function App() {
 
 
 
-  // Persistent Orders (with Jürgen Eisner real order as seed)
+  // Persistent Orders (with Jürgen Eisner real order #1268 as baseline)
   const [orders, setOrders] = useState(() => {
     const saved = localStorage.getItem('pure_whisky_orders');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          const cleaned = parsed.filter(o => !['1831', '1224', '1545'].includes(o.orderId));
+          if (cleaned.length > 0) return cleaned;
+        }
       } catch (e) {
         console.error('Failed to parse orders:', e);
       }
@@ -388,21 +393,39 @@ export default function App() {
   const handleRefreshOrders = async () => {
     try {
       const serverOrders = await fetchOrdersFromServer();
-      if (serverOrders && Array.isArray(serverOrders) && serverOrders.length > 0) {
-        setOrders(prev => {
-          const map = new Map();
-          serverOrders.forEach(o => map.set(o.orderId, o));
-          prev.forEach(o => {
-            if (!map.has(o.orderId)) map.set(o.orderId, o);
-          });
-          const merged = Array.from(map.values());
-          try { localStorage.setItem('pure_whisky_orders', JSON.stringify(merged)); } catch {}
-          return merged;
-        });
+      if (serverOrders && Array.isArray(serverOrders)) {
+        // Exclude legacy test order IDs
+        const cleaned = serverOrders.filter(o => !['1831', '1224', '1545'].includes(o.orderId));
+        const finalOrders = cleaned.length > 0 ? cleaned : INITIAL_ORDERS;
+        setOrders(finalOrders);
+        try { localStorage.setItem('pure_whisky_orders', JSON.stringify(finalOrders)); } catch {}
       }
     } catch (e) {
       console.warn('Could not refresh orders from KV:', e);
     }
+  };
+
+  const handleDeleteOrder = async (orderId) => {
+    const orderToDelete = orders.find(o => o.orderId === orderId);
+    const orderLabel = orderToDelete 
+      ? `#${orderId} (${orderToDelete.customer?.firstName || ''} ${orderToDelete.customer?.lastName || ''})` 
+      : `#${orderId}`;
+      
+    if (orderId === '1268') {
+      if (!window.confirm(`Achtung: Dies ist die Referenz-Bestellung #1268 (Jürgen Eisner). Möchten Sie diese wirklich dauerhaft löschen?`)) {
+        return;
+      }
+    } else {
+      if (!window.confirm(`Möchten Sie die Bestellung ${orderLabel} wirklich dauerhaft löschen?`)) {
+        return;
+      }
+    }
+
+    const updated = orders.filter(o => o.orderId !== orderId);
+    const finalOrders = updated.length > 0 ? updated : INITIAL_ORDERS;
+    setOrders(finalOrders);
+    try { localStorage.setItem('pure_whisky_orders', JSON.stringify(finalOrders)); } catch {}
+    await deleteOrderFromServer(orderId);
   };
 
   // Automatically sync orders from Cloudflare KV on mount and whenever navigating to admin
@@ -976,6 +999,7 @@ export default function App() {
             onViewInvoice={handleOpenInvoice}
             onAddTestOrder={handleAddTestOrder}
             onRefreshOrders={handleRefreshOrders}
+            onDeleteOrder={handleDeleteOrder}
             // WooCommerce Customers CRM Props
             wooCustomers={wooCustomers}
             onAddWooCustomer={handleAddWooCustomer}

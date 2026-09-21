@@ -35,7 +35,8 @@ export default function CartDrawer({
   if (!isOpen) return null;
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-  const shipping = 6.90;
+  const requiresShipping = cartItems.some(item => !item.product.freeShipping && item.product.hasShipping !== false);
+  const shipping = requiresShipping ? 6.90 : 0.00;
   const total = subtotal + shipping;
 
   const handleInputChange = (e) => {
@@ -255,15 +256,27 @@ export default function CartDrawer({
                 )}
 
                 {cartItems.length > 0 && (
-                  <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#E2DDD5] text-xs text-[#3A4A40] space-y-1">
-                    <div className="flex items-center space-x-2 font-bold text-[#181F1C]">
-                      <ShieldCheck className="w-4 h-4 text-[#2D6A4F]" />
-                      <span>Versicherter DHL GoGreen Versand</span>
+                  shipping === 0 ? (
+                    <div className="p-4 rounded-xl bg-[#E8EFEA] border border-[#C2D8C9] text-xs text-[#1B4332] space-y-1">
+                      <div className="flex items-center space-x-2 font-bold text-[#1B4332]">
+                        <CheckCircle2 className="w-4 h-4 text-[#2D6A4F]" />
+                        <span>Kostenloser Versand (0,00 €)</span>
+                      </div>
+                      <p className="text-[11px] text-[#2D6A4F]">
+                        Für die Artikel in Ihrem Warenkorb fallen keine Versandkosten an.
+                      </p>
                     </div>
-                    <p className="text-[11px] text-[#55695E]">
-                      Versand innerhalb von 2–4 Werktagen · Pauschal 6,90 € inkl. Alterssichtprüfung (ab 18 Jahren).
-                    </p>
-                  </div>
+                  ) : (
+                    <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#E2DDD5] text-xs text-[#3A4A40] space-y-1">
+                      <div className="flex items-center space-x-2 font-bold text-[#181F1C]">
+                        <ShieldCheck className="w-4 h-4 text-[#2D6A4F]" />
+                        <span>Versicherter DHL GoGreen Versand</span>
+                      </div>
+                      <p className="text-[11px] text-[#55695E]">
+                        Versand innerhalb von 2–4 Werktagen · Pauschal 6,90 € inkl. Alterssichtprüfung (ab 18 Jahren).
+                      </p>
+                    </div>
+                  )
                 )}
               </div>
 
@@ -287,7 +300,9 @@ export default function CartDrawer({
                     </div>
                     <div className="flex justify-between">
                       <span>{t.cart.shipping}</span>
-                      <span className="font-semibold text-[#181F1C]">{shipping.toFixed(2)} €</span>
+                      <span className={`font-semibold ${shipping === 0 ? 'text-[#2D6A4F]' : 'text-[#181F1C]'}`}>
+                        {shipping === 0 ? 'Kostenlos (0,00 €)' : `${shipping.toFixed(2)} €`}
+                      </span>
                     </div>
                     <div className="flex justify-between font-serif text-lg text-[#181F1C] font-bold pt-2 border-t border-[#E2DDD5]">
                       <span>{t.cart.total}</span>

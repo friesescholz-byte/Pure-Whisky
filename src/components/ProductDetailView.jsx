@@ -318,7 +318,11 @@ export default function ProductDetailView({
               <div className="pt-2 border-t border-[#E2DDD5] space-y-2 text-xs font-craft-mono text-[#55695E] font-bold">
                 <div className="flex items-center space-x-2">
                   <ShieldCheck className="w-4 h-4 text-[#2D6A4F]" />
-                  <span>{lang === 'de' ? 'Klimaneutraler DHL GoGreen Versand (2–4 Werktage)' : 'Climate-neutral DHL GoGreen shipping (2–4 days)'}</span>
+                  <span>
+                    {product.freeShipping
+                      ? (lang === 'de' ? 'Kostenloser DHL GoGreen Versand (2–4 Werktage)' : 'Free DHL GoGreen shipping (2–4 days)')
+                      : (lang === 'de' ? 'Klimaneutraler DHL GoGreen Versand (2–4 Werktage)' : 'Climate-neutral DHL GoGreen shipping (2–4 days)')}
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Droplets className="w-4 h-4 text-[#B85D2C]" />
