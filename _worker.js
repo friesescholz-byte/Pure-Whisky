@@ -302,12 +302,18 @@ export default {
 
     // 0e. Products & Pricing API (Cross-device Cloudflare KV Sync)
     if (url.pathname === '/api/products') {
+      const EXCLUDED_LEGACY_IDS = new Set(['glenturret-14', 'benrinnes-12', 'ledaig-10', 'craigellachie-13']);
       if (request.method === 'GET') {
         let products = null;
         if (env && env.PURE_KV) {
           try {
             const raw = await env.PURE_KV.get('pure_products');
-            if (raw) products = JSON.parse(raw);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed)) {
+                products = parsed.filter(p => !EXCLUDED_LEGACY_IDS.has(p.id));
+              }
+            }
           } catch (e) {
             console.warn('Could not read pure_products from KV:', e);
           }
@@ -320,7 +326,10 @@ export default {
       if (request.method === 'POST') {
         try {
           const body = await request.json();
-          const products = Array.isArray(body) ? body : (body?.products || []);
+          let products = Array.isArray(body) ? body : (body?.products || []);
+          if (Array.isArray(products)) {
+            products = products.filter(p => !EXCLUDED_LEGACY_IDS.has(p.id));
+          }
           if (env && env.PURE_KV && Array.isArray(products)) {
             await env.PURE_KV.put('pure_products', JSON.stringify(products));
           }
