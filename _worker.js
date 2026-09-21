@@ -280,6 +280,163 @@ export default {
       }
     }
 
+    // 0e. Products & Pricing API (Cross-device Cloudflare KV Sync)
+    if (url.pathname === '/api/products') {
+      if (request.method === 'GET') {
+        let products = null;
+        if (env && env.PURE_KV) {
+          try {
+            const raw = await env.PURE_KV.get('pure_products');
+            if (raw) products = JSON.parse(raw);
+          } catch (e) {
+            console.warn('Could not read pure_products from KV:', e);
+          }
+        }
+        return new Response(JSON.stringify({ products: Array.isArray(products) ? products : null }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      if (request.method === 'POST') {
+        try {
+          const body = await request.json();
+          const products = Array.isArray(body) ? body : (body?.products || []);
+          if (env && env.PURE_KV && Array.isArray(products)) {
+            await env.PURE_KV.put('pure_products', JSON.stringify(products));
+          }
+          return new Response(JSON.stringify({ success: true, count: products.length }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        } catch (err) {
+          return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
+        }
+      }
+    }
+
+    // 0f. Blog Posts API (Cross-device Cloudflare KV Sync)
+    if (url.pathname === '/api/blog') {
+      if (request.method === 'GET') {
+        let posts = null;
+        if (env && env.PURE_KV) {
+          try {
+            const raw = await env.PURE_KV.get('pure_blog_posts');
+            if (raw) posts = JSON.parse(raw);
+          } catch (e) {}
+        }
+        return new Response(JSON.stringify({ posts: Array.isArray(posts) ? posts : null }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      if (request.method === 'POST') {
+        try {
+          const body = await request.json();
+          const posts = Array.isArray(body) ? body : (body?.posts || []);
+          if (env && env.PURE_KV && Array.isArray(posts)) {
+            await env.PURE_KV.put('pure_blog_posts', JSON.stringify(posts));
+          }
+          return new Response(JSON.stringify({ success: true, count: posts.length }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        } catch (err) {
+          return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
+        }
+      }
+    }
+
+    // 0g. CRM Customers API (Cross-device Cloudflare KV Sync)
+    if (url.pathname === '/api/crm/customers') {
+      if (request.method === 'GET') {
+        let customers = null;
+        if (env && env.PURE_KV) {
+          try {
+            const raw = await env.PURE_KV.get('pure_crm_customers');
+            if (raw) customers = JSON.parse(raw);
+          } catch (e) {}
+        }
+        return new Response(JSON.stringify({ customers: Array.isArray(customers) ? customers : null }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      if (request.method === 'POST') {
+        try {
+          const body = await request.json();
+          const customers = Array.isArray(body) ? body : (body?.customers || []);
+          if (env && env.PURE_KV && Array.isArray(customers)) {
+            await env.PURE_KV.put('pure_crm_customers', JSON.stringify(customers));
+          }
+          return new Response(JSON.stringify({ success: true, count: customers.length }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        } catch (err) {
+          return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
+        }
+      }
+    }
+
+    // 0h. Newsletter Subscribers API (Cross-device Cloudflare KV Sync)
+    if (url.pathname === '/api/crm/newsletter') {
+      if (request.method === 'GET') {
+        let subs = null;
+        if (env && env.PURE_KV) {
+          try {
+            const raw = await env.PURE_KV.get('pure_crm_newsletter');
+            if (raw) subs = JSON.parse(raw);
+          } catch (e) {}
+        }
+        return new Response(JSON.stringify({ subscribers: Array.isArray(subs) ? subs : null }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      if (request.method === 'POST') {
+        try {
+          const body = await request.json();
+          const subs = Array.isArray(body) ? body : (body?.subscribers || []);
+          if (env && env.PURE_KV && Array.isArray(subs)) {
+            await env.PURE_KV.put('pure_crm_newsletter', JSON.stringify(subs));
+          }
+          return new Response(JSON.stringify({ success: true, count: subs.length }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        } catch (err) {
+          return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
+        }
+      }
+    }
+
+    // 0i. Sent Campaigns History API (Cross-device Cloudflare KV Sync)
+    if (url.pathname === '/api/campaigns') {
+      if (request.method === 'GET') {
+        let campaigns = null;
+        if (env && env.PURE_KV) {
+          try {
+            const raw = await env.PURE_KV.get('pure_campaigns');
+            if (raw) campaigns = JSON.parse(raw);
+          } catch (e) {}
+        }
+        return new Response(JSON.stringify({ campaigns: Array.isArray(campaigns) ? campaigns : null }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      if (request.method === 'POST') {
+        try {
+          const body = await request.json();
+          const campaigns = Array.isArray(body) ? body : (body?.campaigns || []);
+          if (env && env.PURE_KV && Array.isArray(campaigns)) {
+            await env.PURE_KV.put('pure_campaigns', JSON.stringify(campaigns));
+          }
+          return new Response(JSON.stringify({ success: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        } catch (err) {
+          return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
+        }
+      }
+    }
+
     if (url.pathname.startsWith('/api/mollie')) {
       const molliePath = url.pathname.replace(/^\/api\/mollie/, '') + url.search;
       const targetUrl = 'https://api.mollie.com' + molliePath;

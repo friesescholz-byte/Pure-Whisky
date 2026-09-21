@@ -732,3 +732,142 @@ export async function sendAdmin2FACodeEmail({ code, recipient = DEFAULT_ADMIN_EM
     html
   });
 }
+
+// -------------------------------------------------------------
+// Cloudflare KV Multi-Device Synchronization APIs
+// -------------------------------------------------------------
+
+export async function fetchProductsFromServer() {
+  try {
+    const res = await fetch('/api/products');
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.products)) return data.products;
+    }
+  } catch (e) {
+    console.warn('Could not fetch products from server:', e);
+  }
+  return null;
+}
+
+export async function syncProductsToServer(products) {
+  try {
+    const res = await fetch('/api/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(products)
+    });
+    return res.ok;
+  } catch (e) {
+    console.warn('Could not sync products to server:', e);
+    return false;
+  }
+}
+
+export async function fetchBlogPostsFromServer() {
+  try {
+    const res = await fetch('/api/blog');
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.posts)) return data.posts;
+    }
+  } catch (e) {
+    console.warn('Could not fetch blog posts from server:', e);
+  }
+  return null;
+}
+
+export async function syncBlogPostsToServer(posts) {
+  try {
+    const res = await fetch('/api/blog', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(posts)
+    });
+    return res.ok;
+  } catch (e) {
+    console.warn('Could not sync blog posts to server:', e);
+    return false;
+  }
+}
+
+export async function fetchCrmCustomersFromServer() {
+  try {
+    const res = await fetch('/api/crm/customers');
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.customers)) return data.customers;
+    }
+  } catch (e) {
+    console.warn('Could not fetch CRM customers from server:', e);
+  }
+  return null;
+}
+
+export async function syncCrmCustomersToServer(customers) {
+  try {
+    const res = await fetch('/api/crm/customers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(customers)
+    });
+    return res.ok;
+  } catch (e) {
+    console.warn('Could not sync CRM customers to server:', e);
+    return false;
+  }
+}
+
+export async function fetchNewsletterSubsFromServer() {
+  try {
+    const res = await fetch('/api/crm/newsletter');
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.subscribers)) return data.subscribers;
+    }
+  } catch (e) {
+    console.warn('Could not fetch newsletter subs from server:', e);
+  }
+  return null;
+}
+
+export async function syncNewsletterSubsToServer(subscribers) {
+  try {
+    const res = await fetch('/api/crm/newsletter', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(subscribers)
+    });
+    return res.ok;
+  } catch (e) {
+    console.warn('Could not sync newsletter subs to server:', e);
+    return false;
+  }
+}
+
+export async function fetchCampaignsFromServer() {
+  try {
+    const res = await fetch('/api/campaigns');
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.campaigns)) return data.campaigns;
+    }
+  } catch (e) {
+    console.warn('Could not fetch campaigns from server:', e);
+  }
+  return null;
+}
+
+export async function syncCampaignsToServer(campaigns) {
+  try {
+    const res = await fetch('/api/campaigns', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(campaigns)
+    });
+    return res.ok;
+  } catch (e) {
+    console.warn('Could not sync campaigns to server:', e);
+    return false;
+  }
+}

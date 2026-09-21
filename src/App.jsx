@@ -32,7 +32,15 @@ import {
   deleteOrderFromServer,
   checkMolliePaymentStatus,
   getPendingCheckout,
-  clearPendingCheckout
+  clearPendingCheckout,
+  fetchProductsFromServer,
+  syncProductsToServer,
+  fetchBlogPostsFromServer,
+  syncBlogPostsToServer,
+  fetchCrmCustomersFromServer,
+  syncCrmCustomersToServer,
+  fetchNewsletterSubsFromServer,
+  syncNewsletterSubsToServer
 } from './services/orderService';
 import { CheckCircle2 } from 'lucide-react';
 
@@ -112,12 +120,13 @@ export default function App() {
     return () => window.removeEventListener('popstate', handleUrlSync);
   }, []);
 
-  // Persistent Products & Pricing
+  // Persistent Products & Pricing with Cloudflare KV Sync
   const [products, setProducts] = useState(() => {
     const saved = localStorage.getItem('pure_whisky_products_v5');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       } catch (e) {
         console.error('Failed to parse saved products:', e);
       }
@@ -133,19 +142,53 @@ export default function App() {
     }
   }, [products]);
 
+  const refreshProductsFromKV = async () => {
+    try {
+      const serverProducts = await fetchProductsFromServer();
+      if (serverProducts && Array.isArray(serverProducts) && serverProducts.length > 0) {
+        // Merge: If this browser has custom products (e.g. created on mobile) that aren't on server yet, preserve and upload!
+        setProducts(prev => {
+          const customLocal = prev.filter(p => !serverProducts.some(sp => sp.id === p.id));
+          if (customLocal.length > 0) {
+            const merged = [...customLocal, ...serverProducts];
+            syncProductsToServer(merged);
+            return merged;
+          }
+          return serverProducts;
+        });
+      } else {
+        syncProductsToServer(products.length > 0 ? products : PRODUCTS);
+      }
+    } catch (e) {
+      console.warn('Could not sync products from KV:', e);
+    }
+  };
+
   const handleUpdateProduct = (updatedProduct) => {
-    setProducts(prev => prev.map(p => p.id === updatedProduct.id ? updatedProduct : p));
+    setProducts(prev => {
+      const next = prev.map(p => p.id === updatedProduct.id ? updatedProduct : p);
+      syncProductsToServer(next);
+      return next;
+    });
     if (selectedProduct && selectedProduct.id === updatedProduct.id) {
       setSelectedProduct(updatedProduct);
     }
   };
 
   const handleCreateProduct = (newProduct) => {
-    setProducts(prev => [newProduct, ...prev]);
+    setProducts(prev => {
+      const next = [newProduct, ...prev];
+      syncProductsToServer(next);
+      return next;
+    });
   };
 
   const handleDeleteProduct = (productId) => {
-    setProducts(prev => prev.filter(p => p.id !== productId));
+    setProducts(prev => {
+      const next = prev.filter(p => p.id !== productId);
+      syncProductsToServer(next);
+      return next;
+    });
     if (selectedProduct && selectedProduct.id === productId) {
       setSelectedProduct(products.find(p => p.id !== productId) || PRODUCTS[0]);
     }
@@ -154,6 +197,7 @@ export default function App() {
   const handleResetProducts = () => {
     if (window.confirm('Möchten Sie alle Fässer, Preise und Verfügbarkeiten auf die Standardwerte zurücksetzen?')) {
       setProducts(PRODUCTS);
+      syncProductsToServer(PRODUCTS);
       try {
         localStorage.removeItem('pure_whisky_products_v5');
       } catch (e) {
@@ -162,7 +206,7 @@ export default function App() {
     }
   };
 
-  // Persistent Blog Posts
+  // Persistent Blog Posts with Cloudflare KV Sync
   const [blogPosts, setBlogPosts] = useState(() => {
     try {
       const saved = localStorage.getItem('pure_whisky_posts_v4');
@@ -180,6 +224,27 @@ export default function App() {
       console.warn('LocalStorage limit exceeded when saving blog posts:', e);
     }
   }, [blogPosts]);
+
+  const refreshBlogPostsFromKV = async () => {
+    try {
+      const serverPosts = await fetchBlogPostsFromServer();
+      if (serverPosts && Array.isArray(serverPosts) && serverPosts.length > 0) {
+        setBlogPosts(prev => {
+          const customLocal = prev.filter(p => !serverPosts.some(sp => sp.id === p.id));
+          if (customLocal.length > 0) {
+            const merged = [...customLocal, ...serverPosts];
+            syncBlogPostsToServer(merged);
+            return merged;
+          }
+          return serverPosts;
+        });
+      } else {
+        syncBlogPostsToServer(blogPosts.length > 0 ? blogPosts : BLOG_POSTS);
+      }
+    } catch (e) {
+      console.warn('Could not sync blog posts from KV:', e);
+    }
+  };
 
   // Cross-tab synchronization for blog posts & CRM
   useEffect(() => {
@@ -515,9 +580,67 @@ export default function App() {
     await deleteOrderFromServer(orderId);
   };
 
-  // Automatically sync orders from Cloudflare KV on mount and whenever navigating to admin
+  // Refresh CRM from Cloudflare KV
+  const refreshCrmCustomersFromKV = async () => {
+    try {
+      const serverCust = await fetchCrmCustomersFromServer();
+      if (serverCust && Array.isArray(serverCust) && serverCust.length > 0) {
+        setWooCustomers(prev => {
+          const customLocal = prev.filter(c => !serverCust.some(sc => sc.email === c.email));
+          if (customLocal.length > 0) {
+            const merged = [...customLocal, ...serverCust];
+            syncCrmCustomersToServer(merged);
+            return merged;
+          }
+          return serverCust;
+        });
+      } else {
+        if (wooCustomers && wooCustomers.length > 0) syncCrmCustomersToServer(wooCustomers);
+      }
+    } catch (e) {
+      console.warn('Could not sync CRM customers from KV:', e);
+    }
+  };
+
+  const refreshNewsletterSubsFromKV = async () => {
+    try {
+      const serverSubs = await fetchNewsletterSubsFromServer();
+      if (serverSubs && Array.isArray(serverSubs) && serverSubs.length > 0) {
+        setNewsletterSubs(prev => {
+          const customLocal = prev.filter(s => !serverSubs.some(ss => ss.email === s.email));
+          if (customLocal.length > 0) {
+            const merged = [...customLocal, ...serverSubs];
+            syncNewsletterSubsToServer(merged);
+            return merged;
+          }
+          return serverSubs;
+        });
+      } else {
+        if (newsletterSubs && newsletterSubs.length > 0) syncNewsletterSubsToServer(newsletterSubs);
+      }
+    } catch (e) {
+      console.warn('Could not sync newsletter subs from KV:', e);
+    }
+  };
+
+  // Automatically sync ALL data from Cloudflare KV on mount, tab change, or window focus
   useEffect(() => {
+    refreshProductsFromKV();
+    refreshBlogPostsFromKV();
+    refreshCrmCustomersFromKV();
+    refreshNewsletterSubsFromKV();
     handleRefreshOrders();
+
+    const handleFocus = () => {
+      refreshProductsFromKV();
+      refreshBlogPostsFromKV();
+      refreshCrmCustomersFromKV();
+      refreshNewsletterSubsFromKV();
+      handleRefreshOrders();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
   }, [activeTab]);
 
   const handleSaveAdminEmail = (newEmail) => {
@@ -548,7 +671,9 @@ export default function App() {
         globalStatus: 'subscribed',
         listName: 'Newsletter Mailing List'
       };
-      return [newEntry, ...prev];
+      const updated = [newEntry, ...prev];
+      syncNewsletterSubsToServer(updated);
+      return updated;
     });
   };
 
@@ -566,27 +691,35 @@ export default function App() {
 
   const handleToggleNewsletterStatus = (identifier) => {
     const term = (identifier || '').toLowerCase().trim();
-    setNewsletterSubs(prev => prev.map(s => {
-      const sEmail = (s.email || '').toLowerCase().trim();
-      const sId = (s.id || '').toLowerCase().trim();
-      if (sEmail === term || sId === term) {
-        const nextStatus = s.listStatus === 'subscribed' ? 'unsubscribed' : 'subscribed';
-        return { ...s, listStatus: nextStatus, globalStatus: nextStatus };
-      }
-      return s;
-    }));
+    setNewsletterSubs(prev => {
+      const updated = prev.map(s => {
+        const sEmail = (s.email || '').toLowerCase().trim();
+        const sId = (s.id || '').toLowerCase().trim();
+        if (sEmail === term || sId === term) {
+          const nextStatus = s.listStatus === 'subscribed' ? 'unsubscribed' : 'subscribed';
+          return { ...s, listStatus: nextStatus, globalStatus: nextStatus };
+        }
+        return s;
+      });
+      syncNewsletterSubsToServer(updated);
+      return updated;
+    });
   };
 
   const handleDeleteNewsletterSubscriber = (identifier, secondaryId) => {
     const term = (identifier || '').toLowerCase().trim();
     const sec = (secondaryId || '').toLowerCase().trim();
-    setNewsletterSubs(prev => prev.filter(s => {
-      const sEmail = (s.email || '').toLowerCase().trim();
-      const sId = (s.id || '').toLowerCase().trim();
-      if (term && (sEmail === term || sId === term)) return false;
-      if (sec && (sEmail === sec || sId === sec)) return false;
-      return true;
-    }));
+    setNewsletterSubs(prev => {
+      const updated = prev.filter(s => {
+        const sEmail = (s.email || '').toLowerCase().trim();
+        const sId = (s.id || '').toLowerCase().trim();
+        if (term && (sEmail === term || sId === term)) return false;
+        if (sec && (sEmail === sec || sId === sec)) return false;
+        return true;
+      });
+      syncNewsletterSubsToServer(updated);
+      return updated;
+    });
   };
 
   // Synchronize unsubscribers globally from Cloudflare KV with real-time tab & focus sync
@@ -786,20 +919,26 @@ export default function App() {
       if (prev.some(c => c.email.toLowerCase().trim() === emailLower)) {
         return prev;
       }
-      return [cust, ...prev];
+      const updated = [cust, ...prev];
+      syncCrmCustomersToServer(updated);
+      return updated;
     });
   };
 
   const handleDeleteWooCustomer = (identifier, secondaryId) => {
     const term = (identifier || '').toLowerCase().trim();
     const sec = (secondaryId || '').toLowerCase().trim();
-    setWooCustomers(prev => prev.filter(c => {
-      const cEmail = (c.email || '').toLowerCase().trim();
-      const cId = (c.id || '').toLowerCase().trim();
-      if (term && (cEmail === term || cId === term)) return false;
-      if (sec && (cEmail === sec || cId === sec)) return false;
-      return true;
-    }));
+    setWooCustomers(prev => {
+      const updated = prev.filter(c => {
+        const cEmail = (c.email || '').toLowerCase().trim();
+        const cId = (c.id || '').toLowerCase().trim();
+        if (term && (cEmail === term || cId === term)) return false;
+        if (sec && (cEmail === sec || cId === sec)) return false;
+        return true;
+      });
+      syncCrmCustomersToServer(updated);
+      return updated;
+    });
   };
 
   const invoiceSendingLockRef = useRef(new Set());
@@ -939,8 +1078,9 @@ export default function App() {
       updated = [newPost, ...blogPosts];
     }
     setBlogPosts(updated);
+    syncBlogPostsToServer(updated);
     try {
-      localStorage.setItem('pure_whisky_posts_v3', JSON.stringify(updated));
+      localStorage.setItem('pure_whisky_posts_v4', JSON.stringify(updated));
     } catch (e) {
       console.warn('LocalStorage limit exceeded when saving blog posts:', e);
     }
@@ -949,8 +1089,9 @@ export default function App() {
   const handleDeleteBlogPost = (postId) => {
     const updated = blogPosts.filter(p => p.id !== postId);
     setBlogPosts(updated);
+    syncBlogPostsToServer(updated);
     try {
-      localStorage.setItem('pure_whisky_posts_v3', JSON.stringify(updated));
+      localStorage.setItem('pure_whisky_posts_v4', JSON.stringify(updated));
     } catch (e) {
       console.warn('LocalStorage error deleting post:', e);
     }

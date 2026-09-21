@@ -11,7 +11,7 @@ import { IMAGES } from '../data/pureWhiskyFullData';
 import InventoryManager from './InventoryManager';
 import OrdersManager from './admin/OrdersManager';
 import CombinedCrmManager from './admin/CombinedCrmManager';
-import { sendAdmin2FACodeEmail } from '../services/orderService';
+import { sendAdmin2FACodeEmail, fetchCampaignsFromServer, syncCampaignsToServer } from '../services/orderService';
 
 export default function AdminView({ 
   blogPosts, 
@@ -93,6 +93,14 @@ export default function AdminView({
   useEffect(() => {
     localStorage.setItem('pure_whisky_sent_campaigns', JSON.stringify(sentCampaigns));
   }, [sentCampaigns]);
+
+  useEffect(() => {
+    fetchCampaignsFromServer().then(serverCamp => {
+      if (serverCamp && Array.isArray(serverCamp) && serverCamp.length > 0) {
+        setSentCampaigns(serverCamp);
+      }
+    });
+  }, []);
 
   const [selectedHistoryCampaign, setSelectedHistoryCampaign] = useState(null);
   const [logPage, setLogPage] = useState(1);
@@ -710,7 +718,11 @@ Ines Zager · PURE.WHISKY.`);
         attachments: attachments.map(a => ({ filename: a.filename, size: a.size })),
         status: `Erfolgreich an ${successfulRecipients.length} Empfänger zugestellt`
       };
-      setSentCampaigns(prev => [newCampaign, ...prev]);
+      setSentCampaigns(prev => {
+        const next = [newCampaign, ...prev];
+        syncCampaignsToServer(next);
+        return next;
+      });
     }
 
     setIsSending(false);
