@@ -431,17 +431,9 @@ export default function CartDrawer({
 
                     <p className="text-xs text-[#55695E] leading-relaxed">
                       {lang === 'de'
-                        ? 'Sie werden nach Klick auf Bestellen direkt zur gesicherten Zahlungsseite weitergeleitet. Dort wählen Sie einfach Ihre bevorzugte Methode:'
-                        : 'After placing your order, you will be redirected to the secure checkout page to choose your preferred method:'}
+                        ? 'Sie werden nach Klick auf Bestellen direkt zur gesicherten Zahlungsseite weitergeleitet.'
+                        : 'After placing your order, you will be redirected to the secure checkout page.'}
                     </p>
-
-                    <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                      {['Kreditkarte', 'PayPal', 'Apple Pay', 'Klarna Sofortüberweisung', 'SEPA / iDEAL'].map((m) => (
-                        <span key={m} className="px-2 py-0.5 bg-white border border-[#D4C8B8] text-[10px] font-craft-mono font-medium text-[#181F1C] rounded-md shadow-2xs">
-                          {m}
-                        </span>
-                      ))}
-                    </div>
                   </div>
                 </div>
               </div>
