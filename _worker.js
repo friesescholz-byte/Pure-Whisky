@@ -28,16 +28,47 @@ export default {
               headers: { 'Authorization': `Bearer ${serverKey}` }
             });
             const payment = await mollieRes.json();
-            if (payment && payment.status === 'paid' && payment.metadata && payment.metadata.orderId) {
-              const orderId = payment.metadata.orderId;
+            if (payment && payment.status === 'paid') {
               const rawOrders = await env.PURE_KV.get('pure_orders');
               let orders = rawOrders ? JSON.parse(rawOrders) : [];
               if (Array.isArray(orders)) {
-                const idx = orders.findIndex(o => o.orderId === orderId);
-                if (idx >= 0) {
-                  orders[idx].status = 'neu_eingegangen';
-                  orders[idx].paymentStatus = `Bezahlt (${payment.method || 'Online-Zahlung'})`;
+                // 1. Check if already recorded by frontend return handler
+                const existing = orders.find(o => o.paymentMethod && o.paymentMethod.includes(paymentId));
+                if (existing) {
+                  existing.status = 'neu_eingegangen';
+                  existing.paymentStatus = `Bezahlt (${payment.method || 'Online-Zahlung'})`;
                   await env.PURE_KV.put('pure_orders', JSON.stringify(orders));
+                } else {
+                  // 2. If frontend didn't record yet (e.g. mobile tab closed), finalize from pending KV
+                  const rawPending = await env.PURE_KV.get(`pure_pending:${paymentId}`);
+                  if (rawPending) {
+                    const pendingData = JSON.parse(rawPending);
+                    let storedLastId = parseInt(await env.PURE_KV.get('pure_last_order_id') || '1268', 10);
+                    const nextId = Math.max(1269, storedLastId + 1);
+                    await env.PURE_KV.put('pure_last_order_id', nextId.toString());
+
+                    const autoOrder = {
+                      orderId: nextId.toString(),
+                      invoiceNumber: `A09401${nextId}`,
+                      date: new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+                      createdAt: new Date().toISOString(),
+                      customer: pendingData.customer,
+                      items: pendingData.items || [],
+                      shipping: pendingData.shipping || 0,
+                      total: pendingData.total,
+                      netTotal: pendingData.total / 1.19,
+                      vatTotal: pendingData.total - (pendingData.total / 1.19),
+                      status: 'neu_eingegangen',
+                      paymentStatus: `Bezahlt (${payment.method || 'Online-Zahlung'})`,
+                      paymentMethod: `Online-Zahlung (${paymentId}) – ${pendingData.customer?.email || ''}`,
+                      invoiceSentAt: null,
+                      contractConcluded: false,
+                      confirmationEmailSent: false
+                    };
+                    orders.unshift(autoOrder);
+                    await env.PURE_KV.put('pure_orders', JSON.stringify(orders));
+                    await env.PURE_KV.delete(`pure_pending:${paymentId}`);
+                  }
                 }
               }
             }
@@ -162,6 +193,51 @@ export default {
         } catch (err) {
           return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
         }
+      }
+    }
+
+    // 0c-2. Pending Checkouts API (Temporary session storage before Mollie payment confirmation - never shown in Admin!)
+    if (url.pathname === '/api/orders/pending') {
+      if (request.method === 'POST') {
+        try {
+          const body = await request.json();
+          if (body && body.paymentId && env && env.PURE_KV) {
+            await env.PURE_KV.put(`pure_pending:${body.paymentId}`, JSON.stringify(body.checkoutData), {
+              expirationTtl: 86400 // 24h TTL
+            });
+          }
+          return new Response(JSON.stringify({ success: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        } catch (e) {
+          return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: corsHeaders });
+        }
+      }
+
+      if (request.method === 'GET') {
+        const paymentId = url.searchParams.get('paymentId');
+        let data = null;
+        if (paymentId && env && env.PURE_KV) {
+          try {
+            const raw = await env.PURE_KV.get(`pure_pending:${paymentId}`);
+            if (raw) data = JSON.parse(raw);
+          } catch (e) {}
+        }
+        return new Response(JSON.stringify({ checkoutData: data }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      if (request.method === 'DELETE') {
+        const paymentId = url.searchParams.get('paymentId');
+        if (paymentId && env && env.PURE_KV) {
+          try {
+            await env.PURE_KV.delete(`pure_pending:${paymentId}`);
+          } catch (e) {}
+        }
+        return new Response(JSON.stringify({ success: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
       }
     }
 

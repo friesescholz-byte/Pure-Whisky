@@ -35,11 +35,11 @@ export async function createMolliePayment({ orderId, amount, description, redire
       currency: 'EUR',
       value: formattedAmount
     },
-    description: description || `PURE.WHISKY. Bestellung #${orderId}`,
-    redirectUrl: redirectUrl || `${window.location.origin}/?order_status=paid&order_id=${orderId}`,
+    description: description || `PURE.WHISKY. Einzelfass-Bestellung`,
+    redirectUrl: redirectUrl || `${window.location.origin}/?order_return=1`,
     metadata: {
-      orderId,
-      customerEmail
+      customerEmail,
+      orderRef: orderId || undefined
     }
   };
 
@@ -86,6 +86,102 @@ export async function createMolliePayment({ orderId, amount, description, redire
       error: err.message
     };
   }
+}
+
+/**
+ * Verifies payment status with Mollie API
+ * Returns { success, status, paid, raw }
+ */
+export async function checkMolliePaymentStatus(paymentId) {
+  if (!paymentId) return { success: false, status: 'unknown', paid: false };
+  try {
+    const headers = { 'Content-Type': 'application/json' };
+    const customKey = typeof window !== 'undefined' ? localStorage.getItem('pure_mollie_key') : null;
+    if (customKey && customKey.trim()) {
+      headers['Authorization'] = `Bearer ${customKey.trim()}`;
+    }
+
+    const response = await fetch(`/api/mollie/v2/payments/${paymentId}`, {
+      method: 'GET',
+      headers
+    });
+
+    const data = await response.json();
+    if (response.ok && data.id) {
+      return {
+        success: true,
+        status: data.status, // 'paid', 'canceled', 'expired', 'failed', 'open'
+        paid: data.status === 'paid',
+        paymentId: data.id,
+        method: data.method,
+        amount: data.amount,
+        raw: data
+      };
+    } else {
+      console.warn('Mollie status check failed:', data);
+      return { success: false, status: data.status || 'error', paid: false, raw: data };
+    }
+  } catch (err) {
+    console.error('Error checking Mollie payment status:', err);
+    return { success: false, status: 'network_error', paid: false, error: err.message };
+  }
+}
+
+/**
+ * Saves pending checkout session (temporary until paid)
+ */
+export async function savePendingCheckout(paymentId, checkoutData) {
+  try {
+    localStorage.setItem('pure_whisky_pending_checkout', JSON.stringify({ paymentId, checkoutData }));
+    await fetch('/api/orders/pending', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paymentId, checkoutData })
+    });
+  } catch (e) {
+    console.warn('Could not sync pending checkout:', e);
+  }
+}
+
+/**
+ * Retrieves pending checkout session
+ */
+export async function getPendingCheckout(paymentId) {
+  try {
+    const saved = localStorage.getItem('pure_whisky_pending_checkout');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (!paymentId || parsed.paymentId === paymentId) {
+        return parsed.checkoutData;
+      }
+    }
+  } catch {}
+
+  if (paymentId) {
+    try {
+      const res = await fetch(`/api/orders/pending?paymentId=${encodeURIComponent(paymentId)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.checkoutData) return data.checkoutData;
+      }
+    } catch {}
+  }
+  return null;
+}
+
+/**
+ * Clears pending checkout session
+ */
+export async function clearPendingCheckout(paymentId) {
+  try {
+    localStorage.removeItem('pure_whisky_pending_checkout');
+    localStorage.removeItem('pure_whisky_pending_order');
+    if (paymentId) {
+      await fetch(`/api/orders/pending?paymentId=${encodeURIComponent(paymentId)}`, {
+        method: 'DELETE'
+      });
+    }
+  } catch {}
 }
 
 /**

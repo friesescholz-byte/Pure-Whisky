@@ -25,10 +25,14 @@ import { PRODUCTS, BLOG_POSTS } from './data/pureWhiskyFullData';
 import initialCrmData from './data/initialCrmData.json';
 import { 
   sendOrderConfirmationEmail, 
+  sendAdminNewOrderNotification,
   sendInvoiceEmail,
   syncOrderToServer,
   fetchOrdersFromServer,
-  deleteOrderFromServer
+  deleteOrderFromServer,
+  checkMolliePaymentStatus,
+  getPendingCheckout,
+  clearPendingCheckout
 } from './services/orderService';
 import { CheckCircle2 } from 'lucide-react';
 
@@ -215,7 +219,10 @@ export default function App() {
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
-          const cleaned = parsed.filter(o => !['1831', '1224', '1545'].includes(o.orderId));
+          const cleaned = parsed.filter(o => 
+            (!['1831', '1224', '1545', '1270'].includes(o.orderId) || o.contractConcluded || o.status === 'rechnung_versendet') &&
+            o.status !== 'zahlung_ausstehend'
+          );
           if (cleaned.length > 0) return cleaned;
         }
       } catch (e) {
@@ -288,104 +295,181 @@ export default function App() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const urlParams = new URLSearchParams(window.location.search);
-    const orderStatus = urlParams.get('order_status');
-    const orderIdParam = urlParams.get('order_id');
+    const hasOrderReturn = urlParams.has('order_return') || urlParams.get('order_status') === 'paid';
+    const paymentIdFromUrl = urlParams.get('payment_id');
 
-    if (orderStatus === 'paid' && orderIdParam) {
-      // Clear cart
-      setCartItems([]);
-      try { localStorage.removeItem('pure_whisky_cart'); } catch {}
+    // Retrieve pending payment ID either from URL or localStorage
+    let pendingPaymentId = paymentIdFromUrl;
+    let localPendingData = null;
+    try {
+      const raw = localStorage.getItem('pure_whisky_pending_checkout');
+      if (raw) {
+        localPendingData = JSON.parse(raw);
+        if (!pendingPaymentId && localPendingData.paymentId) {
+          pendingPaymentId = localPendingData.paymentId;
+        }
+      }
+    } catch (e) {
+      console.warn('Could not read pending checkout:', e);
+    }
 
+    if (hasOrderReturn && pendingPaymentId) {
       // Clean query string from URL immediately to prevent re-triggering on refresh
       const cleanUrl = window.location.pathname;
       window.history.replaceState({}, document.title, cleanUrl);
 
       // Guard against duplicate execution in the same session
-      if (processingMollieOrdersRef.current.has(orderIdParam)) {
+      if (processingMollieOrdersRef.current.has(pendingPaymentId)) {
         return;
       }
-      processingMollieOrdersRef.current.add(orderIdParam);
+      processingMollieOrdersRef.current.add(pendingPaymentId);
 
-      // Check persistent storage of already dispatched confirmations
-      let alreadyConfirmedList = [];
+      // Check persistent storage of already confirmed payments
+      let confirmedPayments = [];
       try {
-        alreadyConfirmedList = JSON.parse(localStorage.getItem('pure_whisky_confirmed_orders') || '[]');
+        confirmedPayments = JSON.parse(localStorage.getItem('pure_whisky_confirmed_payments') || '[]');
       } catch {}
-      const isAlreadyDispatched = alreadyConfirmedList.includes(orderIdParam);
+      if (confirmedPayments.includes(pendingPaymentId)) {
+        return;
+      }
 
       (async () => {
-        // Retrieve pending order if stored
-        let target = null;
+        // 1. STRICT VERIFICATION WITH MOLLIE API DIRECTLY
+        const checkResult = await checkMolliePaymentStatus(pendingPaymentId);
+        
+        if (!checkResult.paid) {
+          // The customer aborted, cancelled, or the payment is not completed!
+          console.log('Mollie payment status is not paid:', checkResult.status);
+          await clearPendingCheckout(pendingPaymentId);
+          if (checkResult.status === 'canceled') {
+            alert('Der Bezahlvorgang bei Mollie wurde abgebrochen. Es wurde kein Betrag eingezogen und keine Bestellung ausgelöst. Ihr Warenkorb ist weiterhin unverändert vorhanden.');
+          } else if (checkResult.status === 'failed') {
+            alert('Die Zahlung konnte leider nicht durchgeführt werden. Es wurde kein Betrag abgebucht. Bitte versuchen Sie es mit einer anderen Zahlungsmethode erneut.');
+          }
+          return;
+        }
+
+        // 2. PAYMENT IS 100% CONFIRMED AS PAID BY MOLLIE!
+        confirmedPayments.push(pendingPaymentId);
         try {
-          const saved = localStorage.getItem('pure_whisky_pending_order');
-          if (saved) {
-            target = JSON.parse(saved);
-            localStorage.removeItem('pure_whisky_pending_order');
-          }
-        } catch (err) {
-          console.warn('Could not parse pending order:', err);
-        }
+          localStorage.setItem('pure_whisky_confirmed_payments', JSON.stringify(confirmedPayments));
+        } catch {}
 
-        // If not in localStorage, fetch from server KV
-        if (!target || !target.customer?.email) {
+        // Fetch checkout data
+        let checkoutData = localPendingData?.checkoutData || await getPendingCheckout(pendingPaymentId);
+        if (!checkoutData) {
           try {
-            const serverOrders = await fetchOrdersFromServer();
-            const foundInServer = serverOrders?.find(o => o.orderId === orderIdParam);
-            if (foundInServer) target = foundInServer;
-          } catch (e) {
-            console.warn('Could not fetch server orders on return:', e);
+            const legacyPending = localStorage.getItem('pure_whisky_pending_order');
+            if (legacyPending) checkoutData = JSON.parse(legacyPending);
+          } catch {}
+        }
+
+        if (!checkoutData || !checkoutData.customer) {
+          console.warn('Paid order missing checkout details:', pendingPaymentId);
+          return;
+        }
+
+        // 3. Fetch official consecutive order ID from Cloudflare KV
+        let orderId = null;
+        let invoiceNumber = null;
+        try {
+          const idRes = await fetch('/api/orders/next-id');
+          if (idRes.ok) {
+            const idData = await idRes.json();
+            if (idData.orderId) {
+              orderId = idData.orderId.toString();
+              invoiceNumber = idData.invoiceNumber || `A09401${orderId}`;
+            }
           }
+        } catch (idErr) {
+          console.warn('Could not fetch next-id from KV:', idErr);
         }
 
-        if (!target) {
-          target = {
-            orderId: orderIdParam,
-            invoiceNumber: `A09401${orderIdParam}`,
-            date: new Date().toLocaleDateString('de-DE'),
-            customer: { firstName: 'Kunde', lastName: '', email: '' },
-            items: [],
-            total: 0
-          };
+        if (!orderId) {
+          const localLast = parseInt(localStorage.getItem('pure_last_order_id') || '1269', 10);
+          const nextLocal = localLast + 1;
+          orderId = nextLocal.toString();
+          invoiceNumber = `A09401${orderId}`;
+          try { localStorage.setItem('pure_last_order_id', orderId); } catch {}
         }
 
-        const updatedOrder = {
-          ...target,
-          orderId: orderIdParam,
-          paymentStatus: 'Bezahlt (Online-Zahlung)',
-          status: 'neu_eingegangen'
+        const todayStr = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+        const finalizedOrder = {
+          orderId,
+          invoiceNumber,
+          date: todayStr,
+          createdAt: new Date().toISOString(),
+          customer: checkoutData.customer,
+          paymentMethod: `Online-Zahlung (${pendingPaymentId}) – ${checkoutData.customer.email}`,
+          paymentStatus: `Bezahlt (${checkResult.method || 'Online-Zahlung'})`,
+          items: checkoutData.items || [],
+          shipping: checkoutData.shipping || 0,
+          total: checkoutData.total,
+          netTotal: checkoutData.total / 1.19,
+          vatTotal: checkoutData.total - (checkoutData.total / 1.19),
+          status: 'neu_eingegangen',
+          invoiceSentAt: null,
+          contractConcluded: false,
+          confirmationEmailSent: true
         };
 
-        // Update local React state and localStorage
+        // 4. Update React state & localStorage
         setOrders(prev => {
-          const exists = prev.some(o => o.orderId === orderIdParam);
+          const exists = prev.some(o => o.orderId === orderId);
           const next = exists 
-            ? prev.map(o => o.orderId === orderIdParam ? updatedOrder : o)
-            : [updatedOrder, ...prev];
+            ? prev.map(o => o.orderId === orderId ? finalizedOrder : o)
+            : [finalizedOrder, ...prev];
           try { localStorage.setItem('pure_whisky_orders', JSON.stringify(next)); } catch {}
           return next;
         });
 
-        setPaidConfirmationOrder(updatedOrder);
+        // 5. Sync to server KV so ALL devices see the paid order immediately
+        await syncOrderToServer(finalizedOrder);
 
-        // Sync to server KV so ALL devices see the paid order immediately
-        await syncOrderToServer(updatedOrder);
-
-        // Send order confirmation to customer (no attachments) and admin alert to info@pure-whisky.com
-        // STRICT CHECK: Only send once per order ID!
-        if (target.customer && target.customer.email && !isAlreadyDispatched && !target.confirmationEmailSent) {
-          try {
-            alreadyConfirmedList.push(orderIdParam);
-            localStorage.setItem('pure_whisky_confirmed_orders', JSON.stringify(alreadyConfirmedList));
-          } catch {}
-
-          updatedOrder.confirmationEmailSent = true;
-          try {
-            await sendOrderConfirmationEmail({ order: updatedOrder, adminEmail });
-            await syncOrderToServer(updatedOrder);
-          } catch (e) {
-            console.warn('Could not send confirmation email:', e);
+        // 6. Automatically add customer to WooCommerce CRM
+        setWooCustomers(prev => {
+          const emailLower = finalizedOrder.customer.email.toLowerCase().trim();
+          if (prev.some(c => c.email.toLowerCase().trim() === emailLower)) {
+            return prev;
           }
+          const newCust = {
+            id: `crm_woo_${Date.now()}`,
+            firstName: finalizedOrder.customer.firstName,
+            lastName: finalizedOrder.customer.lastName,
+            fullName: `${finalizedOrder.customer.firstName} ${finalizedOrder.customer.lastName}`.trim(),
+            email: finalizedOrder.customer.email,
+            subscribedAt: new Date().toISOString().replace('T', ' ').slice(0, 19),
+            confirmedAt: new Date().toISOString().replace('T', ' ').slice(0, 19),
+            listStatus: 'subscribed',
+            globalStatus: 'subscribed',
+            listName: 'WooCommerce Customers'
+          };
+          const updatedCust = [newCust, ...prev];
+          try { localStorage.setItem('pure_whisky_woo_customers', JSON.stringify(updatedCust)); } catch {}
+          return updatedCust;
+        });
+
+        // 7. Clear cart & pending checkout
+        setCartItems([]);
+        try { localStorage.removeItem('pure_whisky_cart'); } catch {}
+        await clearPendingCheckout(pendingPaymentId);
+
+        // 8. Send Emails (Order Confirmation to customer + Admin alert with button to Ines)
+        try {
+          await sendOrderConfirmationEmail({ order: finalizedOrder, adminEmail });
+        } catch (e) {
+          console.warn('Could not send confirmation email:', e);
         }
+
+        try {
+          await sendAdminNewOrderNotification({ order: finalizedOrder, adminEmail });
+        } catch (e) {
+          console.warn('Could not send admin notification:', e);
+        }
+
+        // 9. Show Paid Confirmation Modal
+        setPaidConfirmationOrder(finalizedOrder);
       })();
     }
   }, [adminEmail]);
@@ -394,8 +478,11 @@ export default function App() {
     try {
       const serverOrders = await fetchOrdersFromServer();
       if (serverOrders && Array.isArray(serverOrders)) {
-        // Exclude legacy test order IDs
-        const cleaned = serverOrders.filter(o => !['1831', '1224', '1545'].includes(o.orderId));
+        // Exclude legacy test order IDs and unconfirmed/cancelled test orders
+        const cleaned = serverOrders.filter(o => 
+          (!['1831', '1224', '1545', '1270'].includes(o.orderId) || o.status === 'rechnung_versendet' || o.contractConcluded) && 
+          o.status !== 'zahlung_ausstehend'
+        );
         const finalOrders = cleaned.length > 0 ? cleaned : INITIAL_ORDERS;
         setOrders(finalOrders);
         try { localStorage.setItem('pure_whisky_orders', JSON.stringify(finalOrders)); } catch {}

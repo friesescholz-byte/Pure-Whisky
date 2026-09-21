@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, ShoppingBag, Plus, Minus, Trash2, ArrowRight, ShieldCheck, CheckCircle2, ChevronLeft, CreditCard, Send, ExternalLink, Loader2, AlertCircle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
-import { createMolliePayment, syncOrderToServer } from '../services/orderService';
+import { createMolliePayment, savePendingCheckout } from '../services/orderService';
 
 export default function CartDrawer({ 
   isOpen, 
@@ -63,41 +63,15 @@ export default function CartDrawer({
     }
 
     setIsProcessing(true);
+    setPaymentError(null);
 
-    let orderId = null;
-    let invoiceNumber = null;
-    try {
-      const idRes = await fetch('/api/orders/next-id');
-      if (idRes.ok) {
-        const idData = await idRes.json();
-        if (idData && idData.orderId) {
-          orderId = idData.orderId.toString();
-          invoiceNumber = idData.invoiceNumber || `A09401${orderId}`;
-        }
-      }
-    } catch (idErr) {
-      console.warn('Could not fetch consecutive order ID from server:', idErr);
-    }
-
-    if (!orderId) {
-      // Fallback: consecutive counter starting after 1268
-      const localLast = parseInt(localStorage.getItem('pure_last_order_id') || '1268', 10);
-      const nextLocal = localLast + 1;
-      orderId = nextLocal.toString();
-      invoiceNumber = `A09401${orderId}`;
-      try { localStorage.setItem('pure_last_order_id', orderId); } catch {}
-    }
-
-    const todayStr = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
-
-    // Step 1: Call Payments API Gateway
+    // Step 1: Call Payments API Gateway (Mollie)
     let mollieResult = null;
     try {
       mollieResult = await createMolliePayment({
-        orderId,
         amount: total,
         customerEmail: formData.email.trim(),
-        description: `PURE.WHISKY. Bestellung #${orderId}`
+        description: `PURE.WHISKY. Einzelfass-Bestellung`
       });
     } catch (mollieErr) {
       console.error('Payment checkout initiation error:', mollieErr);
@@ -112,11 +86,7 @@ export default function CartDrawer({
       return;
     }
 
-    const newOrder = {
-      orderId,
-      invoiceNumber,
-      date: todayStr,
-      createdAt: new Date().toISOString(),
+    const checkoutData = {
       customer: {
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
@@ -125,7 +95,6 @@ export default function CartDrawer({
         city: formData.city.trim(),
         email: formData.email.trim()
       },
-      paymentMethod: `Online-Zahlung (${mollieResult.paymentId}) – ${formData.email.trim()}`,
       items: cartItems.map(item => ({
         id: item.product.id,
         name: item.product.name,
@@ -135,31 +104,11 @@ export default function CartDrawer({
       })),
       shipping,
       total,
-      netTotal: total / 1.19,
-      vatTotal: total - (total / 1.19),
-      status: 'zahlung_ausstehend',
-      invoiceSentAt: null,
-      contractConcluded: false
+      createdAt: new Date().toISOString()
     };
 
-    // Store pending order in localStorage for completion upon return from Mollie
-    try {
-      localStorage.setItem('pure_whisky_pending_order', JSON.stringify(newOrder));
-    } catch (err) {
-      console.warn('Could not save pending order to localStorage:', err);
-    }
-
-    // Register pending order in state without sending confirmation email yet
-    if (onCompleteOrder) {
-      await onCompleteOrder(newOrder, { skipEmail: true });
-    }
-
-    // Await sync pending order to Cloudflare KV server database so it is saved before redirect
-    try {
-      await syncOrderToServer(newOrder);
-    } catch (syncErr) {
-      console.warn('Order KV sync notice:', syncErr);
-    }
+    // Store pending checkout session (temporary until paid - NEVER saved as order or shown in Admin!)
+    await savePendingCheckout(mollieResult.paymentId, checkoutData);
 
     // IMMEDIATELY REDIRECT TO MOLLIE
     window.location.href = mollieResult.checkoutUrl;
