@@ -146,16 +146,7 @@ export default function App() {
     try {
       const serverProducts = await fetchProductsFromServer();
       if (serverProducts && Array.isArray(serverProducts) && serverProducts.length > 0) {
-        // Merge: If this browser has custom products (e.g. created on mobile) that aren't on server yet, preserve and upload!
-        setProducts(prev => {
-          const customLocal = prev.filter(p => !serverProducts.some(sp => sp.id === p.id));
-          if (customLocal.length > 0) {
-            const merged = [...customLocal, ...serverProducts];
-            syncProductsToServer(merged);
-            return merged;
-          }
-          return serverProducts;
-        });
+        setProducts(serverProducts);
       } else {
         syncProductsToServer(products.length > 0 ? products : PRODUCTS);
       }
@@ -229,15 +220,7 @@ export default function App() {
     try {
       const serverPosts = await fetchBlogPostsFromServer();
       if (serverPosts && Array.isArray(serverPosts) && serverPosts.length > 0) {
-        setBlogPosts(prev => {
-          const customLocal = prev.filter(p => !serverPosts.some(sp => sp.id === p.id));
-          if (customLocal.length > 0) {
-            const merged = [...customLocal, ...serverPosts];
-            syncBlogPostsToServer(merged);
-            return merged;
-          }
-          return serverPosts;
-        });
+        setBlogPosts(serverPosts);
       } else {
         syncBlogPostsToServer(blogPosts.length > 0 ? blogPosts : BLOG_POSTS);
       }
@@ -610,15 +593,7 @@ export default function App() {
     try {
       const serverCust = await fetchCrmCustomersFromServer();
       if (serverCust && Array.isArray(serverCust) && serverCust.length > 0) {
-        setWooCustomers(prev => {
-          const customLocal = prev.filter(c => !serverCust.some(sc => sc.email === c.email));
-          if (customLocal.length > 0) {
-            const merged = [...customLocal, ...serverCust];
-            syncCrmCustomersToServer(merged);
-            return merged;
-          }
-          return serverCust;
-        });
+        setWooCustomers(serverCust);
       } else {
         if (wooCustomers && wooCustomers.length > 0) syncCrmCustomersToServer(wooCustomers);
       }
@@ -631,15 +606,7 @@ export default function App() {
     try {
       const serverSubs = await fetchNewsletterSubsFromServer();
       if (serverSubs && Array.isArray(serverSubs) && serverSubs.length > 0) {
-        setNewsletterSubs(prev => {
-          const customLocal = prev.filter(s => !serverSubs.some(ss => ss.email === s.email));
-          if (customLocal.length > 0) {
-            const merged = [...customLocal, ...serverSubs];
-            syncNewsletterSubsToServer(merged);
-            return merged;
-          }
-          return serverSubs;
-        });
+        setNewsletterSubs(serverSubs);
       } else {
         if (newsletterSubs && newsletterSubs.length > 0) syncNewsletterSubsToServer(newsletterSubs);
       }
