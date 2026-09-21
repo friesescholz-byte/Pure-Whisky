@@ -66,12 +66,14 @@ export default function CartDrawer({
     setPaymentError(null);
 
     // Step 1: Call Payments API Gateway (Mollie)
+    const sessionId = 'chk_' + Math.random().toString(36).substring(2, 9) + Date.now();
     let mollieResult = null;
     try {
       mollieResult = await createMolliePayment({
         amount: total,
         customerEmail: formData.email.trim(),
-        description: `PURE.WHISKY. Einzelfass-Bestellung`
+        description: `PURE.WHISKY. Einzelfass-Bestellung`,
+        redirectUrl: `${window.location.origin}/?order_return=1&session_id=${sessionId}`
       });
     } catch (mollieErr) {
       console.error('Payment checkout initiation error:', mollieErr);
@@ -108,7 +110,7 @@ export default function CartDrawer({
     };
 
     // Store pending checkout session (temporary until paid - NEVER saved as order or shown in Admin!)
-    await savePendingCheckout(mollieResult.paymentId, checkoutData);
+    await savePendingCheckout(mollieResult.paymentId, checkoutData, sessionId);
 
     // IMMEDIATELY REDIRECT TO MOLLIE
     window.location.href = mollieResult.checkoutUrl;

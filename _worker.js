@@ -201,10 +201,17 @@ export default {
       if (request.method === 'POST') {
         try {
           const body = await request.json();
-          if (body && body.paymentId && env && env.PURE_KV) {
-            await env.PURE_KV.put(`pure_pending:${body.paymentId}`, JSON.stringify(body.checkoutData), {
-              expirationTtl: 86400 // 24h TTL
-            });
+          if (body && env && env.PURE_KV) {
+            if (body.paymentId) {
+              await env.PURE_KV.put(`pure_pending:${body.paymentId}`, JSON.stringify(body.checkoutData || body), {
+                expirationTtl: 86400
+              });
+            }
+            if (body.sessionId) {
+              await env.PURE_KV.put(`pure_pending_sess:${body.sessionId}`, JSON.stringify({ paymentId: body.paymentId, checkoutData: body.checkoutData || body }), {
+                expirationTtl: 86400
+              });
+            }
           }
           return new Response(JSON.stringify({ success: true }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -216,23 +223,36 @@ export default {
 
       if (request.method === 'GET') {
         const paymentId = url.searchParams.get('paymentId');
+        const sessionId = url.searchParams.get('sessionId');
         let data = null;
-        if (paymentId && env && env.PURE_KV) {
+        let resolvedPaymentId = paymentId;
+        if (env && env.PURE_KV) {
           try {
-            const raw = await env.PURE_KV.get(`pure_pending:${paymentId}`);
-            if (raw) data = JSON.parse(raw);
+            if (paymentId) {
+              const raw = await env.PURE_KV.get(`pure_pending:${paymentId}`);
+              if (raw) data = JSON.parse(raw);
+            } else if (sessionId) {
+              const raw = await env.PURE_KV.get(`pure_pending_sess:${sessionId}`);
+              if (raw) {
+                const parsed = JSON.parse(raw);
+                data = parsed.checkoutData;
+                resolvedPaymentId = parsed.paymentId;
+              }
+            }
           } catch (e) {}
         }
-        return new Response(JSON.stringify({ checkoutData: data }), {
+        return new Response(JSON.stringify({ checkoutData: data, paymentId: resolvedPaymentId }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
       }
 
       if (request.method === 'DELETE') {
         const paymentId = url.searchParams.get('paymentId');
-        if (paymentId && env && env.PURE_KV) {
+        const sessionId = url.searchParams.get('sessionId');
+        if (env && env.PURE_KV) {
           try {
-            await env.PURE_KV.delete(`pure_pending:${paymentId}`);
+            if (paymentId) await env.PURE_KV.delete(`pure_pending:${paymentId}`);
+            if (sessionId) await env.PURE_KV.delete(`pure_pending_sess:${sessionId}`);
           } catch (e) {}
         }
         return new Response(JSON.stringify({ success: true }), {

@@ -130,13 +130,13 @@ export async function checkMolliePaymentStatus(paymentId) {
 /**
  * Saves pending checkout session (temporary until paid)
  */
-export async function savePendingCheckout(paymentId, checkoutData) {
+export async function savePendingCheckout(paymentId, checkoutData, sessionId) {
   try {
-    localStorage.setItem('pure_whisky_pending_checkout', JSON.stringify({ paymentId, checkoutData }));
+    localStorage.setItem('pure_whisky_pending_checkout', JSON.stringify({ paymentId, checkoutData, sessionId }));
     await fetch('/api/orders/pending', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ paymentId, checkoutData })
+      body: JSON.stringify({ paymentId, checkoutData, sessionId })
     });
   } catch (e) {
     console.warn('Could not sync pending checkout:', e);
@@ -144,25 +144,26 @@ export async function savePendingCheckout(paymentId, checkoutData) {
 }
 
 /**
- * Retrieves pending checkout session
+ * Retrieves pending checkout session (by paymentId or sessionId)
  */
-export async function getPendingCheckout(paymentId) {
+export async function getPendingCheckout(paymentId, sessionId) {
   try {
     const saved = localStorage.getItem('pure_whisky_pending_checkout');
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (!paymentId || parsed.paymentId === paymentId) {
-        return parsed.checkoutData;
+      if ((paymentId && parsed.paymentId === paymentId) || (sessionId && parsed.sessionId === sessionId)) {
+        return { checkoutData: parsed.checkoutData, paymentId: parsed.paymentId };
       }
     }
   } catch {}
 
-  if (paymentId) {
+  const query = paymentId ? `paymentId=${encodeURIComponent(paymentId)}` : (sessionId ? `sessionId=${encodeURIComponent(sessionId)}` : '');
+  if (query) {
     try {
-      const res = await fetch(`/api/orders/pending?paymentId=${encodeURIComponent(paymentId)}`);
+      const res = await fetch(`/api/orders/pending?${query}`);
       if (res.ok) {
         const data = await res.json();
-        if (data.checkoutData) return data.checkoutData;
+        if (data.checkoutData) return { checkoutData: data.checkoutData, paymentId: data.paymentId };
       }
     } catch {}
   }
@@ -172,12 +173,13 @@ export async function getPendingCheckout(paymentId) {
 /**
  * Clears pending checkout session
  */
-export async function clearPendingCheckout(paymentId) {
+export async function clearPendingCheckout(paymentId, sessionId) {
   try {
     localStorage.removeItem('pure_whisky_pending_checkout');
     localStorage.removeItem('pure_whisky_pending_order');
-    if (paymentId) {
-      await fetch(`/api/orders/pending?paymentId=${encodeURIComponent(paymentId)}`, {
+    const query = paymentId ? `paymentId=${encodeURIComponent(paymentId)}` : (sessionId ? `sessionId=${encodeURIComponent(sessionId)}` : '');
+    if (query) {
+      await fetch(`/api/orders/pending?${query}`, {
         method: 'DELETE'
       });
     }

@@ -362,50 +362,57 @@ export default function App() {
     const urlParams = new URLSearchParams(window.location.search);
     const hasOrderReturn = urlParams.has('order_return') || urlParams.get('order_status') === 'paid';
     const paymentIdFromUrl = urlParams.get('payment_id');
+    const sessionIdFromUrl = urlParams.get('session_id');
 
-    // Retrieve pending payment ID either from URL or localStorage
-    let pendingPaymentId = paymentIdFromUrl;
-    let localPendingData = null;
-    try {
-      const raw = localStorage.getItem('pure_whisky_pending_checkout');
-      if (raw) {
-        localPendingData = JSON.parse(raw);
-        if (!pendingPaymentId && localPendingData.paymentId) {
-          pendingPaymentId = localPendingData.paymentId;
-        }
-      }
-    } catch (e) {
-      console.warn('Could not read pending checkout:', e);
-    }
-
-    if (hasOrderReturn && pendingPaymentId) {
+    if (hasOrderReturn) {
       // Clean query string from URL immediately to prevent re-triggering on refresh
       const cleanUrl = window.location.pathname;
       window.history.replaceState({}, document.title, cleanUrl);
 
-      // Guard against duplicate execution in the same session
-      if (processingMollieOrdersRef.current.has(pendingPaymentId)) {
-        return;
-      }
-      processingMollieOrdersRef.current.add(pendingPaymentId);
-
-      // Check persistent storage of already confirmed payments
-      let confirmedPayments = [];
-      try {
-        confirmedPayments = JSON.parse(localStorage.getItem('pure_whisky_confirmed_payments') || '[]');
-      } catch {}
-      if (confirmedPayments.includes(pendingPaymentId)) {
-        return;
-      }
-
       (async () => {
+        // Retrieve pending checkout (by paymentId or sessionId)
+        let resolved = await getPendingCheckout(paymentIdFromUrl, sessionIdFromUrl);
+        let pendingPaymentId = paymentIdFromUrl || resolved?.paymentId;
+        let checkoutData = resolved?.checkoutData;
+
+        if (!pendingPaymentId) {
+          try {
+            const raw = localStorage.getItem('pure_whisky_pending_checkout');
+            if (raw) {
+              const localData = JSON.parse(raw);
+              pendingPaymentId = localData.paymentId;
+              checkoutData = checkoutData || localData.checkoutData;
+            }
+          } catch (e) {}
+        }
+
+        if (!pendingPaymentId) {
+          console.warn('No payment ID found for order return');
+          return;
+        }
+
+        // Guard against duplicate execution in the same session
+        if (processingMollieOrdersRef.current.has(pendingPaymentId)) {
+          return;
+        }
+        processingMollieOrdersRef.current.add(pendingPaymentId);
+
+        // Check persistent storage of already confirmed payments
+        let confirmedPayments = [];
+        try {
+          confirmedPayments = JSON.parse(localStorage.getItem('pure_whisky_confirmed_payments') || '[]');
+        } catch {}
+        if (confirmedPayments.includes(pendingPaymentId)) {
+          return;
+        }
+
         // 1. STRICT VERIFICATION WITH MOLLIE API DIRECTLY
         const checkResult = await checkMolliePaymentStatus(pendingPaymentId);
         
         if (!checkResult.paid) {
           // The customer aborted, cancelled, or the payment is not completed!
           console.log('Mollie payment status is not paid:', checkResult.status);
-          await clearPendingCheckout(pendingPaymentId);
+          await clearPendingCheckout(pendingPaymentId, sessionIdFromUrl);
           if (checkResult.status === 'canceled') {
             alert('Der Bezahlvorgang bei Mollie wurde abgebrochen. Es wurde kein Betrag eingezogen und keine Bestellung ausgelöst. Ihr Warenkorb ist weiterhin unverändert vorhanden.');
           } else if (checkResult.status === 'failed') {
@@ -420,9 +427,7 @@ export default function App() {
           localStorage.setItem('pure_whisky_confirmed_payments', JSON.stringify(confirmedPayments));
         } catch {}
 
-        // Fetch checkout data
-        let checkoutData = localPendingData?.checkoutData || await getPendingCheckout(pendingPaymentId);
-        if (!checkoutData) {
+        if (!checkoutData || !checkoutData.customer) {
           try {
             const legacyPending = localStorage.getItem('pure_whisky_pending_order');
             if (legacyPending) checkoutData = JSON.parse(legacyPending);
@@ -492,7 +497,26 @@ export default function App() {
         // 5. Sync to server KV so ALL devices see the paid order immediately
         await syncOrderToServer(finalizedOrder);
 
-        // 6. Automatically add customer to WooCommerce CRM
+        // 6. Automatically deduct stock for ordered items and sync
+        setProducts(prevProducts => {
+          const updatedProducts = prevProducts.map(prod => {
+            const orderedItem = checkoutData.items?.find(item => item.id === prod.id);
+            if (orderedItem) {
+              const currentStock = prod.stock !== undefined ? prod.stock : 48;
+              const newStock = Math.max(0, currentStock - (orderedItem.quantity || 1));
+              return {
+                ...prod,
+                stock: newStock,
+                isSoldOut: newStock === 0 ? true : prod.isSoldOut
+              };
+            }
+            return prod;
+          });
+          syncProductsToServer(updatedProducts);
+          return updatedProducts;
+        });
+
+        // 7. Automatically add customer to WooCommerce CRM
         setWooCustomers(prev => {
           const emailLower = finalizedOrder.customer.email.toLowerCase().trim();
           if (prev.some(c => c.email.toLowerCase().trim() === emailLower)) {
@@ -512,15 +536,16 @@ export default function App() {
           };
           const updatedCust = [newCust, ...prev];
           try { localStorage.setItem('pure_whisky_woo_customers', JSON.stringify(updatedCust)); } catch {}
+          syncCrmCustomersToServer(updatedCust);
           return updatedCust;
         });
 
-        // 7. Clear cart & pending checkout
+        // 8. Clear cart & pending checkout
         setCartItems([]);
         try { localStorage.removeItem('pure_whisky_cart'); } catch {}
-        await clearPendingCheckout(pendingPaymentId);
+        await clearPendingCheckout(pendingPaymentId, sessionIdFromUrl);
 
-        // 8. Send Emails (Order Confirmation to customer + Admin alert with button to Ines)
+        // 9. Send Emails (Order Confirmation to customer + Admin alert with button to Ines)
         try {
           await sendOrderConfirmationEmail({ order: finalizedOrder, adminEmail });
         } catch (e) {
@@ -533,7 +558,7 @@ export default function App() {
           console.warn('Could not send admin notification:', e);
         }
 
-        // 9. Show Paid Confirmation Modal
+        // 10. Show Paid Confirmation Modal
         setPaidConfirmationOrder(finalizedOrder);
       })();
     }
