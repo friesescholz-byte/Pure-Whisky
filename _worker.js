@@ -1,3 +1,63 @@
+async function uploadBase64ToR2(dataUrl, filename = 'image', env) {
+  if (!env || !env.MEDIA_BUCKET || !dataUrl || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) {
+    return dataUrl;
+  }
+  try {
+    const match = dataUrl.match(/^data:([^;]+);base64,/);
+    const mimeType = match ? match[1] : 'image/webp';
+    const commaIdx = dataUrl.indexOf(',');
+    const rawBase64 = commaIdx >= 0 ? dataUrl.slice(commaIdx + 1) : dataUrl;
+    const binaryStr = atob(rawBase64);
+    const bytes = new Uint8Array(binaryStr.length);
+    for (let i = 0; i < binaryStr.length; i++) {
+      bytes[i] = binaryStr.charCodeAt(i);
+    }
+    const ext = mimeType.includes('webp') ? 'webp' : (mimeType.includes('png') ? 'png' : (mimeType.includes('svg') ? 'svg' : 'jpg'));
+    const safeBase = (filename || 'media').toLowerCase().replace(/[^a-z0-9_-]/g, '-').slice(0, 30) || 'media';
+    const key = `Pure-Whisky/dashboard/${Date.now()}_${Math.random().toString(36).slice(2, 7)}_${safeBase}.${ext}`;
+
+    await env.MEDIA_BUCKET.put(key, bytes, {
+      httpMetadata: {
+        contentType: mimeType,
+        cacheControl: 'public, max-age=31536000, immutable'
+      }
+    });
+    return `https://pub-b33108412309406a9a941ddc51e9a5b9.r2.dev/${key}`;
+  } catch (err) {
+    console.error('Auto upload base64 to R2 failed:', err);
+    return dataUrl;
+  }
+}
+
+async function sanitizeMediaDeep(obj, env) {
+  if (!obj || typeof obj !== 'object') {
+    if (typeof obj === 'string' && obj.startsWith('data:image/')) {
+      return await uploadBase64ToR2(obj, 'upload', env);
+    }
+    return obj;
+  }
+
+  if (Array.isArray(obj)) {
+    const result = [];
+    for (const item of obj) {
+      result.push(await sanitizeMediaDeep(item, env));
+    }
+    return result;
+  }
+
+  const out = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (typeof v === 'string' && v.startsWith('data:image/')) {
+      out[k] = await uploadBase64ToR2(v, k, env);
+    } else if (v && typeof v === 'object') {
+      out[k] = await sanitizeMediaDeep(v, env);
+    } else {
+      out[k] = v;
+    }
+  }
+  return out;
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -12,6 +72,86 @@ export default {
 
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders, status: 204 });
+    }
+
+    // 00. Canonical Domain Redirect (Redirect *.workers.dev to official pure-whisky.com)
+    if (url.hostname.includes('pure-whisky.friese-scholz.workers.dev') && request.method === 'GET' && !url.pathname.startsWith('/api/')) {
+      const targetUrl = `https://pure-whisky.com${url.pathname}${url.search}`;
+      return Response.redirect(targetUrl, 301);
+    }
+
+    // 00b. Direct Media Upload API (Cloudflare R2 Bucket: website-datein -> Pure-Whisky/dashboard/)
+    if (url.pathname === '/api/upload' && request.method === 'POST') {
+      try {
+        if (!env || !env.MEDIA_BUCKET) {
+          return new Response(JSON.stringify({ error: 'R2 bucket binding MEDIA_BUCKET nicht konfiguriert' }), {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+
+        const contentType = request.headers.get('content-type') || '';
+        let fileBuffer = null;
+        let mimeType = 'image/webp';
+        let originalName = 'upload';
+
+        if (contentType.includes('multipart/form-data')) {
+          const formData = await request.formData();
+          const file = formData.get('file');
+          if (!file) {
+            return new Response(JSON.stringify({ error: 'Keine Datei im FormData Feld file gefunden' }), {
+              status: 400,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            });
+          }
+          fileBuffer = await file.arrayBuffer();
+          mimeType = file.type || 'image/webp';
+          originalName = (file.name || 'image').replace(/\.[^/.]+$/, '');
+        } else {
+          // JSON payload: { image: "data:image/...", filename: "..." }
+          const body = await request.json();
+          const dataUrl = body?.image || body?.dataUrl;
+          if (!dataUrl || typeof dataUrl !== 'string') {
+            return new Response(JSON.stringify({ error: 'Kein gültiger Bild-String übergeben' }), {
+              status: 400,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            });
+          }
+          const match = dataUrl.match(/^data:([^;]+);base64,/);
+          mimeType = match ? match[1] : 'image/webp';
+          const commaIdx = dataUrl.indexOf(',');
+          const rawBase64 = commaIdx >= 0 ? dataUrl.slice(commaIdx + 1) : dataUrl;
+          const binaryStr = atob(rawBase64);
+          const bytes = new Uint8Array(binaryStr.length);
+          for (let i = 0; i < binaryStr.length; i++) {
+            bytes[i] = binaryStr.charCodeAt(i);
+          }
+          fileBuffer = bytes;
+          originalName = (body?.filename || 'image').replace(/\.[^/.]+$/, '');
+        }
+
+        const ext = mimeType.includes('webp') ? 'webp' : (mimeType.includes('png') ? 'png' : (mimeType.includes('svg') ? 'svg' : 'jpg'));
+        const safeBase = originalName.toLowerCase().replace(/[^a-z0-9_-]/g, '-').slice(0, 30) || 'media';
+        const key = `Pure-Whisky/dashboard/${Date.now()}_${safeBase}.${ext}`;
+
+        await env.MEDIA_BUCKET.put(key, fileBuffer, {
+          httpMetadata: {
+            contentType: mimeType,
+            cacheControl: 'public, max-age=31536000, immutable'
+          }
+        });
+
+        const publicUrl = `https://pub-b33108412309406a9a941ddc51e9a5b9.r2.dev/${key}`;
+        return new Response(JSON.stringify({ success: true, url: publicUrl, key }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      } catch (uploadErr) {
+        console.error('Upload to R2 error:', uploadErr);
+        return new Response(JSON.stringify({ error: uploadErr.message }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
     }
 
     // 0. Mollie API Proxy & Webhook
@@ -369,6 +509,11 @@ export default {
               const parsed = JSON.parse(raw);
               if (Array.isArray(parsed)) {
                 products = parsed.filter(p => !EXCLUDED_LEGACY_IDS.has(p.id));
+                // Auto sanitize if any base64 remains
+                if (raw.includes('data:image/')) {
+                  products = await sanitizeMediaDeep(products, env);
+                  await env.PURE_KV.put('pure_products', JSON.stringify(products));
+                }
               }
             }
           } catch (e) {
@@ -386,16 +531,66 @@ export default {
           let products = Array.isArray(body) ? body : (body?.products || []);
           if (Array.isArray(products)) {
             products = products.filter(p => !EXCLUDED_LEGACY_IDS.has(p.id));
+            products = await sanitizeMediaDeep(products, env);
           }
           if (env && env.PURE_KV && Array.isArray(products)) {
             await env.PURE_KV.put('pure_products', JSON.stringify(products));
           }
-          return new Response(JSON.stringify({ success: true, count: products.length }), {
+          return new Response(JSON.stringify({ success: true, count: products.length, products }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           });
         } catch (err) {
           return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
         }
+      }
+    }
+
+    // 0e-2. Safe Stock Deduction API (Decrements bottles without risking product catalog or tasting notes)
+    if (url.pathname === '/api/products/deduct-stock' && request.method === 'POST') {
+      try {
+        const body = await request.json();
+        const items = body?.items || (Array.isArray(body) ? body : []);
+        if (!Array.isArray(items) || items.length === 0) {
+          return new Response(JSON.stringify({ error: 'Keine Artikel übergeben' }), {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+
+        if (env && env.PURE_KV) {
+          const raw = await env.PURE_KV.get('pure_products');
+          if (raw) {
+            let products = JSON.parse(raw);
+            if (Array.isArray(products)) {
+              let changed = false;
+              for (const item of items) {
+                const prodId = item.id || item.productId || item.product?.id;
+                const qty = item.quantity || 1;
+                const prod = products.find(p => p.id === prodId);
+                if (prod && typeof prod.bottlesRemaining === 'number') {
+                  prod.bottlesRemaining = Math.max(0, prod.bottlesRemaining - qty);
+                  if (prod.bottlesRemaining === 0) {
+                    prod.isAvailable = false;
+                    prod.soldOut = true;
+                    prod.badge = 'Ausverkauft';
+                  }
+                  changed = true;
+                }
+              }
+              if (changed) {
+                await env.PURE_KV.put('pure_products', JSON.stringify(products));
+              }
+              return new Response(JSON.stringify({ success: true, products }), {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+              });
+            }
+          }
+        }
+        return new Response(JSON.stringify({ success: true, message: 'Keine KV-Produkte aktualisiert' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
       }
     }
 
@@ -406,7 +601,13 @@ export default {
         if (env && env.PURE_KV) {
           try {
             const raw = await env.PURE_KV.get('pure_blog_posts');
-            if (raw) posts = JSON.parse(raw);
+            if (raw) {
+              posts = JSON.parse(raw);
+              if (Array.isArray(posts) && raw.includes('data:image/')) {
+                posts = await sanitizeMediaDeep(posts, env);
+                await env.PURE_KV.put('pure_blog_posts', JSON.stringify(posts));
+              }
+            }
           } catch (e) {}
         }
         return new Response(JSON.stringify({ posts: Array.isArray(posts) ? posts : null }), {
@@ -417,11 +618,14 @@ export default {
       if (request.method === 'POST') {
         try {
           const body = await request.json();
-          const posts = Array.isArray(body) ? body : (body?.posts || []);
+          let posts = Array.isArray(body) ? body : (body?.posts || []);
+          if (Array.isArray(posts)) {
+            posts = await sanitizeMediaDeep(posts, env);
+          }
           if (env && env.PURE_KV && Array.isArray(posts)) {
             await env.PURE_KV.put('pure_blog_posts', JSON.stringify(posts));
           }
-          return new Response(JSON.stringify({ success: true, count: posts.length }), {
+          return new Response(JSON.stringify({ success: true, count: posts.length, posts }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           });
         } catch (err) {

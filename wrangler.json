@@ -17,5 +17,11 @@
       "binding": "PURE_KV",
       "id": "54eeb5664c6341e280e43f71c3e04379"
     }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "MEDIA_BUCKET",
+      "bucket_name": "website-datein"
+    }
   ]
 }

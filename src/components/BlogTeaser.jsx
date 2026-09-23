@@ -3,9 +3,10 @@ import { ArrowRight, Calendar } from 'lucide-react';
 import { BLOG_POSTS } from '../data/pureWhiskyFullData';
 import { useLanguage } from '../context/LanguageContext';
 
-export default function BlogTeaser({ onOpenBlog, onOpenPost, onOpenShop }) {
+export default function BlogTeaser({ posts, onOpenBlog, onOpenPost, onOpenShop }) {
   const { lang, t } = useLanguage();
-  const top2 = BLOG_POSTS.slice(0, 2);
+  const source = posts && posts.length > 0 ? posts : BLOG_POSTS;
+  const top2 = source.slice(0, 2);
 
   return (
     <section className="py-24 lg:py-32 bg-[#FAF8F5] border-b border-[#E2DDD5]">

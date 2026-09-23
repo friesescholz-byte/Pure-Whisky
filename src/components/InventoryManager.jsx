@@ -6,6 +6,7 @@ import {
   Upload, Image as ImageIcon, Plus, Trash2, FileText, Wine, Star, CheckCircle, ArrowRight
 } from 'lucide-react';
 import { IMAGES } from '../data/pureWhiskyFullData';
+import { uploadMediaFile } from '../services/orderService';
 
 const COMMON_REGIONS = [
   'Speyside',
@@ -142,51 +143,59 @@ export default function InventoryManager({
     });
   };
 
-  // Add bottle image to gallery
+  // Add bottle image to gallery (Direct R2 Upload)
   const handleProductImageUpload = async (file, isCreate = false) => {
     if (!file) return;
     setIsCompressingImage(true);
     try {
-      const dataUrl = await compressImageFile(file);
+      let finalUrl = await uploadMediaFile(file, file.name);
+      if (!finalUrl) {
+        finalUrl = await compressImageFile(file);
+      }
       if (isCreate) {
         setNewFormState(prev => {
-          const updated = [...prev.galleryImages, dataUrl];
+          const updated = [...prev.galleryImages, finalUrl];
           return {
             ...prev,
             galleryImages: updated,
-            image: prev.image || dataUrl
+            image: prev.image || finalUrl,
+            cutoutImage: prev.cutoutImage || finalUrl
           };
         });
       } else {
         setFormState(prev => {
-          const updated = [...prev.galleryImages, dataUrl];
+          const updated = [...prev.galleryImages, finalUrl];
           return {
             ...prev,
             galleryImages: updated,
-            image: prev.image || dataUrl
+            image: prev.image || finalUrl,
+            cutoutImage: prev.cutoutImage || finalUrl
           };
         });
       }
     } catch (err) {
-      console.error('Error compressing image:', err);
+      console.error('Error uploading product image:', err);
     } finally {
       setIsCompressingImage(false);
     }
   };
 
-  // Upload custom tile background
+  // Upload custom tile background (Direct R2 Upload)
   const handleCardBgUpload = async (file, isCreate = false) => {
     if (!file) return;
     setIsCompressingImage(true);
     try {
-      const dataUrl = await compressImageFile(file);
+      let finalUrl = await uploadMediaFile(file, `cardbg_${file.name}`);
+      if (!finalUrl) {
+        finalUrl = await compressImageFile(file);
+      }
       if (isCreate) {
-        setNewFormState(prev => ({ ...prev, cardBg: dataUrl }));
+        setNewFormState(prev => ({ ...prev, cardBg: finalUrl }));
       } else {
-        setFormState(prev => ({ ...prev, cardBg: dataUrl }));
+        setFormState(prev => ({ ...prev, cardBg: finalUrl }));
       }
     } catch (err) {
-      console.error('Error compressing card background image:', err);
+      console.error('Error uploading card background image:', err);
     } finally {
       setIsCompressingImage(false);
     }

@@ -924,3 +924,77 @@ export async function syncCampaignsToServer(campaigns) {
     return false;
   }
 }
+
+/**
+ * Uploads an image (File object, Blob or Base64 data URL) to Cloudflare R2
+ * Returns the public CDN URL or fallback
+ */
+export async function uploadMediaFile(fileOrDataUrl, filename = 'upload') {
+  try {
+    if (!fileOrDataUrl) return null;
+
+    // If it's already an external HTTP / R2 URL, return as-is
+    if (typeof fileOrDataUrl === 'string' && fileOrDataUrl.startsWith('http')) {
+      return fileOrDataUrl;
+    }
+
+    // Handle File / Blob via FormData
+    if (typeof File !== 'undefined' && fileOrDataUrl instanceof File) {
+      const formData = new FormData();
+      formData.append('file', fileOrDataUrl);
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.url) return data.url;
+      }
+    } else if (typeof Blob !== 'undefined' && fileOrDataUrl instanceof Blob) {
+      const formData = new FormData();
+      formData.append('file', fileOrDataUrl, `${filename}.webp`);
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.url) return data.url;
+      }
+    } else if (typeof fileOrDataUrl === 'string' && fileOrDataUrl.startsWith('data:image/')) {
+      // Base64 JSON upload
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: fileOrDataUrl, filename })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.url) return data.url;
+      }
+    }
+  } catch (err) {
+    console.error('Failed to upload media to R2:', err);
+  }
+  return null;
+}
+
+/**
+ * Deduct stock safely on server without risk of overwriting product metadata or tasting notes
+ */
+export async function deductStockOnServer(items) {
+  try {
+    const res = await fetch('/api/products/deduct-stock', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return data.products || null;
+    }
+  } catch (e) {
+    console.warn('Could not deduct stock on server:', e);
+  }
+  return null;
+}

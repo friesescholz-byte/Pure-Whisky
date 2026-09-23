@@ -34,6 +34,7 @@ import {
   clearPendingCheckout,
   fetchProductsFromServer,
   syncProductsToServer,
+  deductStockOnServer,
   fetchBlogPostsFromServer,
   syncBlogPostsToServer,
   fetchCrmCustomersFromServer,
@@ -107,6 +108,13 @@ export default function App() {
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
 
 
+  // 0. Canonical Redirect to pure-whisky.com
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hostname.includes('pure-whisky.friese-scholz.workers.dev')) {
+      window.location.replace(`https://pure-whisky.com${window.location.pathname}${window.location.search}${window.location.hash}`);
+    }
+  }, []);
+
   // Sync state on browser URL navigation
   useEffect(() => {
     const handleUrlSync = () => {
@@ -146,8 +154,6 @@ export default function App() {
       const serverProducts = await fetchProductsFromServer();
       if (serverProducts && Array.isArray(serverProducts) && serverProducts.length > 0) {
         setProducts(serverProducts);
-      } else {
-        syncProductsToServer(products.length > 0 ? products : PRODUCTS);
       }
     } catch (e) {
       console.warn('Could not sync products from KV:', e);
@@ -220,8 +226,6 @@ export default function App() {
       const serverPosts = await fetchBlogPostsFromServer();
       if (serverPosts && Array.isArray(serverPosts) && serverPosts.length > 0) {
         setBlogPosts(serverPosts);
-      } else {
-        syncBlogPostsToServer(blogPosts.length > 0 ? blogPosts : BLOG_POSTS);
       }
     } catch (e) {
       console.warn('Could not sync blog posts from KV:', e);
@@ -485,23 +489,31 @@ export default function App() {
         // 5. Sync to server KV so ALL devices see the paid order immediately
         await syncOrderToServer(finalizedOrder);
 
-        // 6. Automatically deduct stock for ordered items and sync
+        // 6. Automatically deduct stock safely on server without overwriting product metadata or tasting notes
+        if (checkoutData.items && checkoutData.items.length > 0) {
+          deductStockOnServer(checkoutData.items).then(serverProds => {
+            if (serverProds && Array.isArray(serverProds) && serverProds.length > 0) {
+              setProducts(serverProds);
+            }
+          });
+        }
         setProducts(prevProducts => {
-          const updatedProducts = prevProducts.map(prod => {
+          return prevProducts.map(prod => {
             const orderedItem = checkoutData.items?.find(item => item.id === prod.id);
             if (orderedItem) {
-              const currentStock = prod.stock !== undefined ? prod.stock : 48;
-              const newStock = Math.max(0, currentStock - (orderedItem.quantity || 1));
+              const currentRemaining = typeof prod.bottlesRemaining === 'number' ? prod.bottlesRemaining : (prod.stock || 48);
+              const newRemaining = Math.max(0, currentRemaining - (orderedItem.quantity || 1));
               return {
                 ...prod,
-                stock: newStock,
-                isSoldOut: newStock === 0 ? true : prod.isSoldOut
+                bottlesRemaining: newRemaining,
+                stock: newRemaining,
+                isAvailable: newRemaining > 0,
+                soldOut: newRemaining === 0,
+                badge: newRemaining === 0 ? 'Ausverkauft' : prod.badge
               };
             }
             return prod;
           });
-          syncProductsToServer(updatedProducts);
-          return updatedProducts;
         });
 
         // 7. Automatically add customer to WooCommerce CRM

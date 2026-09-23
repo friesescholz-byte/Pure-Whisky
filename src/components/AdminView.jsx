@@ -11,7 +11,7 @@ import { IMAGES } from '../data/pureWhiskyFullData';
 import InventoryManager from './InventoryManager';
 import OrdersManager from './admin/OrdersManager';
 import CombinedCrmManager from './admin/CombinedCrmManager';
-import { sendAdmin2FACodeEmail, fetchCampaignsFromServer, syncCampaignsToServer } from '../services/orderService';
+import { sendAdmin2FACodeEmail, fetchCampaignsFromServer, syncCampaignsToServer, uploadMediaFile } from '../services/orderService';
 
 export default function AdminView({ 
   blogPosts, 
@@ -439,14 +439,23 @@ Ines Zager · PURE.WHISKY.`);
     });
   };
 
-  // Blog Multiple Images Upload from PC (with auto-compression)
+  // Blog Multiple Images Upload from PC (Direct Cloudflare R2 Upload)
   const handleMultipleBlogImagesUpload = async (e) => {
     const files = Array.from(e.target.files);
     if (files.length > 0) {
       setIsCompressingImages(true);
       try {
-        const compressedList = await Promise.all(files.map(compressImageFile));
-        const valid = compressedList.filter(Boolean);
+        const uploadedUrls = [];
+        for (const file of files) {
+          const r2Url = await uploadMediaFile(file, file.name);
+          if (r2Url) {
+            uploadedUrls.push(r2Url);
+          } else {
+            const fallback = await compressImageFile(file);
+            if (fallback) uploadedUrls.push(fallback);
+          }
+        }
+        const valid = uploadedUrls.filter(Boolean);
         setCurrentPostForm((prev) => {
           const currentImages = prev.images || (prev.image ? [prev.image] : []);
           return {
