@@ -701,14 +701,14 @@ Datum:
           {/* TAB 7: GEWÄHRLEISTUNG (HARMONISIERTE EU-MITTEILUNG) */}
           {type === 'gewaehrleistung' && (
             <div className="space-y-6">
-              {/* Official Harmonised Notice Badge */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-[#FAF8F5] border border-[#D4C8B8] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              {/* Official Harmonised Header Card (Clean & Premium) */}
+              <div className="p-5 rounded-2xl bg-[#FAF8F5] border border-[#D4C8B8] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center space-x-3.5">
-                  <div className="w-12 h-12 rounded-xl bg-[#181F1C] text-[#FAF8F5] flex items-center justify-center font-woodblock text-xl shrink-0 shadow-xs border border-[#2D6A4F]">
-                    🇪🇺
+                  <div className="w-11 h-11 rounded-xl bg-[#2D6A4F]/10 border border-[#2D6A4F]/30 text-[#2D6A4F] flex items-center justify-center shrink-0">
+                    <ShieldCheck className="w-6 h-6" />
                   </div>
                   <div>
-                    <span className="font-craft-mono text-xs uppercase tracking-widest text-[#2D6A4F] font-bold block">
+                    <span className="font-craft-mono text-[11px] uppercase tracking-wider text-[#2D6A4F] font-bold block">
                       Harmonisierte EU-Mitteilung · Richtlinie (EU) 2019/771 & (EU) 2024/825
                     </span>
                     <h4 className="font-woodblock text-xl text-[#181F1C] uppercase tracking-wide">
@@ -716,8 +716,38 @@ Datum:
                     </h4>
                   </div>
                 </div>
-                <div className="px-3 py-1.5 rounded-lg bg-[#2D6A4F]/10 border border-[#2D6A4F]/20 text-[#2D6A4F] font-craft-mono text-xs font-bold whitespace-nowrap">
+                <div className="px-3.5 py-1.5 rounded-lg bg-white border border-[#D4C8B8] text-[#181F1C] font-craft-mono text-xs font-bold whitespace-nowrap shadow-2xs">
                   Mind. 2 Jahre Schutz
+                </div>
+              </div>
+
+              {/* Official Label Visual Card */}
+              <div className="p-5 sm:p-6 rounded-2xl bg-[#FAF8F5] border border-[#E2DDD5] text-center space-y-3">
+                <div className="flex items-center justify-between text-xs font-craft-mono text-[#55695E] pb-1 border-b border-[#E2DDD5]">
+                  <span className="font-bold text-[#181F1C]">Offizielle EU-Kennzeichnung (Aushang)</span>
+                  <span>Verbraucherrechte der Europäischen Union</span>
+                </div>
+                
+                <div className="max-w-xs sm:max-w-sm mx-auto my-3 rounded-xl overflow-hidden shadow-sm border border-[#D4C8B8] bg-white p-1">
+                  <img 
+                    src="https://pub-b33108412309406a9a941ddc51e9a5b9.r2.dev/Pure-Whisky/dashboard/1790431898932_eu_gesetzliche_gewaehrleistung.jpg" 
+                    alt="Offizielles harmonisiertes EU-Gewährleistungslabel"
+                    className="w-full h-auto object-contain block rounded-lg"
+                    loading="lazy"
+                  />
+                </div>
+
+                <div className="flex items-center justify-center space-x-2 text-xs text-[#55695E]">
+                  <span>Harmonisierte Mitteilung der Europäischen Kommission</span>
+                  <span>·</span>
+                  <a 
+                    href="https://europa.eu/youreurope/citizens/consumers/shopping/guarantees/index_de.htm" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-[#B85D2C] underline font-bold hover:text-[#A04E24]"
+                  >
+                    Im EU-Portal öffnen ↗
+                  </a>
                 </div>
               </div>
 
@@ -776,17 +806,17 @@ Datum:
 
               <div>
                 <h4 className="font-woodblock text-lg text-[#181F1C] uppercase tracking-wide mb-2">
-                  4. Hinweis zu gewerblichen Haltbarkeitsgarantien (EU-GARAN-Label)
+                  4. Abgrenzung zum EU-GARAN-Label
                 </h4>
                 <p className="text-xs text-[#55695E] leading-relaxed">
-                  Bei unseren Produkten handelt es sich um Spirituosen / Einzelfass-Whiskys (Lebens- und Genussmittel). Für diese Waren gewähren wir keine zusätzliche freiwillige gewerbliche Haltbarkeitsgarantie des Herstellers im Sinne des EU-GARAN-Labels. Ihre gesetzlichen Gewährleistungsansprüche (mindestens 2 Jahre) bleiben hiervon in vollem Umfang unberührt und uneingeschränkt bestehen.
+                  Die Europäische Union unterscheidet zwischen dem <strong>gesetzlichen Gewährleistungslabel</strong> (oben dargestellt, gilt für alle Verbrauchsgüter) und dem <strong>EU-GARAN-Label</strong>. Das GARAN-Label kennzeichnet freiwillige, mehrjährige gewerbliche Haltbarkeitsgarantien der Hersteller (z.&nbsp;B. für technische Geräte oder Maschinen). Bei Genussmitteln und Spirituosen wird keine industrielle Haltbarkeitsgarantie gewährt, sodass das GARAN-Label für Spirituosen nicht zur Anwendung kommt. Ihre gesetzlichen Gewährleistungsansprüche (mindestens 2 Jahre) gelten selbstverständlich uneingeschränkt.
                 </p>
               </div>
 
               <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#E2DDD5] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="space-y-0.5 text-xs text-[#55695E]">
                   <span className="font-bold text-[#181F1C] block">Offizielles Verbraucherportal der Europäischen Kommission:</span>
-                  <span>Umfassende Informationen zu Ihren europäischen Verbraucher- und Garantierechten.</span>
+                  <span>Umfassende Informationen zu Ihren europäischen Verbraucher- und Garantierechten in allen Amtssprachen.</span>
                 </div>
                 <a
                   href="https://europa.eu/youreurope/citizens/consumers/shopping/guarantees/index_de.htm"
