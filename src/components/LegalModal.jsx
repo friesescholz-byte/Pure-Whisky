@@ -41,7 +41,8 @@ Datum:
     widerruf: 'Widerrufsbelehrung',
     versand: 'Versand & Zahlung',
     datenschutz: 'Datenschutzerklärung',
-    barrierefreiheit: 'Erklärung zur Barrierefreiheit'
+    barrierefreiheit: 'Erklärung zur Barrierefreiheit',
+    gewaehrleistung: 'Gesetzliche Gewährleistung (EU-Hinweis)'
   };
 
   return (
@@ -693,6 +694,108 @@ Datum:
                 <p className="text-xs text-[#55695E] mt-2">
                   Stand dieser Erklärung: September 2026.
                 </p>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 7: GEWÄHRLEISTUNG (HARMONISIERTE EU-MITTEILUNG) */}
+          {type === 'gewaehrleistung' && (
+            <div className="space-y-6">
+              {/* Official Harmonised Notice Badge */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-[#FAF8F5] border border-[#D4C8B8] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center space-x-3.5">
+                  <div className="w-12 h-12 rounded-xl bg-[#181F1C] text-[#FAF8F5] flex items-center justify-center font-woodblock text-xl shrink-0 shadow-xs border border-[#2D6A4F]">
+                    🇪🇺
+                  </div>
+                  <div>
+                    <span className="font-craft-mono text-xs uppercase tracking-widest text-[#2D6A4F] font-bold block">
+                      Harmonisierte EU-Mitteilung · Richtlinie (EU) 2019/771 & (EU) 2024/825
+                    </span>
+                    <h4 className="font-woodblock text-xl text-[#181F1C] uppercase tracking-wide">
+                      Gesetzliches Gewährleistungsrecht
+                    </h4>
+                  </div>
+                </div>
+                <div className="px-3 py-1.5 rounded-lg bg-[#2D6A4F]/10 border border-[#2D6A4F]/20 text-[#2D6A4F] font-craft-mono text-xs font-bold whitespace-nowrap">
+                  Mind. 2 Jahre Schutz
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-woodblock text-lg text-[#181F1C] uppercase tracking-wide mb-2">
+                  1. Gesetzlicher Anspruch auf Gewährleistung
+                </h4>
+                <p>
+                  Als Verbraucherin oder Verbraucher in der Europäischen Union haben Sie beim Kauf von Waren in unserem Online-Shop einen <strong>gesetzlichen Anspruch auf Mängelgewährleistung</strong> (gesetzliche Mängelhaftung nach §§ 437 ff. BGB sowie der Richtlinie (EU) 2019/771).
+                </p>
+                <p className="mt-2">
+                  Die gesetzliche Gewährleistungsfrist beträgt für alle von uns gelieferten Waren <strong>mindestens zwei Jahre</strong> ab dem Zeitpunkt der Ablieferung der Ware.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-woodblock text-lg text-[#181F1C] uppercase tracking-wide mb-2">
+                  2. Ihre Rechte im Falle von Mängeln
+                </h4>
+                <p>
+                  Sollte eine gelieferte Ware zum Zeitpunkt der Übergabe mangelhaft sein (z.&nbsp;B. Transportschäden, Korkfehler oder sonstige Abweichungen von der vereinbarten Beschaffenheit), stehen Ihnen die gesetzlichen Mängelrechte kostenlos zu:
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-3">
+                  <div className="p-3.5 rounded-xl bg-white border border-[#E2DDD5] space-y-1">
+                    <strong className="text-[#181F1C] text-sm block">1. Kostenlose Nacherfüllung</strong>
+                    <span className="text-xs text-[#55695E]">
+                      Sie können primär die kostenfreie Nachlieferung einer mangelfreien Flasche (Ersatzlieferung) oder – soweit bei Einzelabfüllungen noch möglich – Nachbesserung verlangen.
+                    </span>
+                  </div>
+                  <div className="p-3.5 rounded-xl bg-white border border-[#E2DDD5] space-y-1">
+                    <strong className="text-[#181F1C] text-sm block">2. Minderung oder Rücktritt</strong>
+                    <span className="text-xs text-[#55695E]">
+                      Ist die Nacherfüllung unmöglich (z.&nbsp;B. streng limitierte Einzelfass-Rarität vergriffen) oder fehlgeschlagen, haben Sie das Recht auf Minderung des Kaufpreises oder Rücktritt vom Kaufvertrag mit vollständiger Erstattung.
+                    </span>
+                  </div>
+                </div>
+                <p className="text-xs text-[#55695E]">
+                  Die Nacherfüllung erfolgt stets ohne Kosten für Sie (einschließlich aller Rücksende- und Versandkosten).
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-woodblock text-lg text-[#181F1C] uppercase tracking-wide mb-2">
+                  3. Ihr Ansprechpartner für Gewährleistungsansprüche
+                </h4>
+                <p>
+                  Für alle Fragen, Mängelanzeigen oder Reklamationen ist PURE.WHISKY. Ihr direkter, persönlicher Ansprechpartner:
+                </p>
+                <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#E2DDD5] my-2 text-xs sm:text-sm font-normal">
+                  <p className="font-bold text-[#181F1C]">PURE.WHISKY. · Inhaberin Ines Zager</p>
+                  <p>Dürerring 1, 31582 Nienburg, Deutschland</p>
+                  <p>E-Mail: <a href="mailto:info@pure-whisky.com" className="text-[#B85D2C] underline font-bold">info@pure-whisky.com</a></p>
+                  <p>Telefon: <a href="tel:+491638738824" className="text-[#181F1C] font-bold">+49 163 8738824</a></p>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-woodblock text-lg text-[#181F1C] uppercase tracking-wide mb-2">
+                  4. Hinweis zu gewerblichen Haltbarkeitsgarantien (EU-GARAN-Label)
+                </h4>
+                <p className="text-xs text-[#55695E] leading-relaxed">
+                  Bei unseren Produkten handelt es sich um Spirituosen / Einzelfass-Whiskys (Lebens- und Genussmittel). Für diese Waren gewähren wir keine zusätzliche freiwillige gewerbliche Haltbarkeitsgarantie des Herstellers im Sinne des EU-GARAN-Labels. Ihre gesetzlichen Gewährleistungsansprüche (mindestens 2 Jahre) bleiben hiervon in vollem Umfang unberührt und uneingeschränkt bestehen.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#E2DDD5] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="space-y-0.5 text-xs text-[#55695E]">
+                  <span className="font-bold text-[#181F1C] block">Offizielles Verbraucherportal der Europäischen Kommission:</span>
+                  <span>Umfassende Informationen zu Ihren europäischen Verbraucher- und Garantierechten.</span>
+                </div>
+                <a
+                  href="https://europa.eu/youreurope/citizens/consumers/shopping/guarantees/index_de.htm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3.5 py-2 rounded-lg bg-white border border-[#D4C8B8] hover:border-[#B85D2C] text-xs font-craft-mono font-bold text-[#181F1C] hover:text-[#B85D2C] transition-colors shrink-0"
+                >
+                  europa.eu besuchen →
+                </a>
               </div>
             </div>
           )}

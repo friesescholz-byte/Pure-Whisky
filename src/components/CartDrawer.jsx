@@ -524,6 +524,34 @@ export default function CartDrawer({
                         : 'Age verification (18+) upon DHL delivery.'}
                     </span>
                   </div>
+
+                  <div className="text-[11px] text-[#55695E] leading-normal pt-0.5">
+                    {lang === 'de' ? (
+                      <>
+                        Für alle Waren gilt die{' '}
+                        <button
+                          type="button"
+                          onClick={() => onOpenLegal?.('gewaehrleistung')}
+                          className="text-[#181F1C] font-semibold underline underline-offset-2 hover:text-[#B85D2C] cursor-pointer"
+                        >
+                          gesetzliche Mängelgewährleistung (EU)
+                        </button>
+                        .
+                      </>
+                    ) : (
+                      <>
+                        All goods are covered by the{' '}
+                        <button
+                          type="button"
+                          onClick={() => onOpenLegal?.('gewaehrleistung')}
+                          className="text-[#181F1C] font-semibold underline underline-offset-2 hover:text-[#B85D2C] cursor-pointer"
+                        >
+                          statutory legal guarantee (EU)
+                        </button>
+                        .
+                      </>
+                    )}
+                  </div>
                 </div>
 
                 {paymentError && (

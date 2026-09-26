@@ -512,7 +512,10 @@ export async function sendOrderConfirmationEmail({ order, adminEmail = DEFAULT_A
           </div>
         </div>
 
-        <div style="background: #F4F0EA; padding: 18px 30px; text-align: center; font-size: 11px; color: #78887E;">
+        <div style="background: #F4F0EA; padding: 18px 30px; text-align: center; font-size: 11px; color: #78887E; line-height: 1.5;">
+          <p style="margin: 0 0 8px 0; color: #55695E;">
+            <strong>Gesetzliche Gewährleistung:</strong> Für alle Waren gilt das gesetzliche Mängelhaftungsrecht (mindestens 2 Jahre ab Erhalt der Ware). Weitere Informationen zu Ihren Rechten finden Sie auf <a href="https://europa.eu/youreurope/citizens/consumers/shopping/guarantees/index_de.htm" target="_blank" style="color: #B85D2C; text-decoration: underline;">europa.eu</a>.
+          </p>
           PURE.WHISKY. · Inhaberin Ines Zager · Dürerring 1 · 31582 Nienburg · Deutschland<br/>
           E-Mail: <a href="mailto:info@pure-whisky.com" style="color: #B85D2C; text-decoration: none;">info@pure-whisky.com</a>
         </div>
@@ -687,6 +690,9 @@ export async function sendInvoiceEmail({ order, adminEmail = DEFAULT_ADMIN_EMAIL
               </td>
             </tr>
           </table>
+          <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid #EEEEEE; font-size: 10px; color: #888888; text-align: center; line-height: 1.5;">
+            Gesetzliche Gewährleistung: Für alle gelieferten Waren gilt das gesetzliche Mängelhaftungsrecht (mindestens 2 Jahre ab Erhalt der Ware). Weitere Informationen: <a href="https://europa.eu/youreurope/citizens/consumers/shopping/guarantees/index_de.htm" target="_blank" style="color: #888888; text-decoration: underline;">europa.eu</a>.
+          </div>
         </div>
 
       </div>

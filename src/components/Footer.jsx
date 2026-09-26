@@ -73,6 +73,15 @@ export default function Footer({ onOpenLegal, setActiveTab }) {
               <li><button onClick={() => onOpenLegal('widerruf')} className="hover:text-[#B85D2C] transition-colors">{t.footer.cancellation}</button></li>
               <li><button onClick={() => onOpenLegal('versand')} className="hover:text-[#B85D2C] transition-colors whitespace-nowrap">{t.footer.shipping}</button></li>
               <li><button onClick={() => onOpenLegal('barrierefreiheit')} className="hover:text-[#B85D2C] transition-colors">{t.footer.accessibility}</button></li>
+              <li>
+                <button 
+                  onClick={() => onOpenLegal('gewaehrleistung')} 
+                  className="hover:text-[#B85D2C] transition-colors flex items-center space-x-1.5 cursor-pointer text-left"
+                >
+                  <span className="text-[10px] px-1 py-0.2 rounded bg-[#FAF8F5] border border-[#D4C8B8] font-craft-mono font-bold text-[#2D6A4F] leading-tight">EU</span>
+                  <span>{lang === 'de' ? 'Gesetzl. Gewährleistung' : 'Legal Guarantee'}</span>
+                </button>
+              </li>
             </ul>
           </div>
 
