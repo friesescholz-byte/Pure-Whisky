@@ -42,7 +42,7 @@ Datum:
     versand: 'Versand & Zahlung',
     datenschutz: 'Datenschutzerklärung',
     barrierefreiheit: 'Erklärung zur Barrierefreiheit',
-    gewaehrleistung: 'Gesetzliche Gewährleistung (EU-Hinweis)'
+    gewaehrleistung: 'Gesetzliche Gewährleistung'
   };
 
   return (
@@ -698,134 +698,139 @@ Datum:
             </div>
           )}
 
-          {/* TAB 7: GEWÄHRLEISTUNG (HARMONISIERTE EU-MITTEILUNG) */}
+          {/* TAB 7: GESETZLICHE GEWÄHRLEISTUNG */}
           {type === 'gewaehrleistung' && (
             <div className="space-y-6">
-              {/* Official Harmonised Header Card (Clean & Premium) */}
-              <div className="p-5 rounded-2xl bg-[#FAF8F5] border border-[#D4C8B8] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex items-center space-x-3.5">
-                  <div className="w-11 h-11 rounded-xl bg-[#2D6A4F]/10 border border-[#2D6A4F]/30 text-[#2D6A4F] flex items-center justify-center shrink-0">
-                    <ShieldCheck className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <span className="font-craft-mono text-[11px] uppercase tracking-wider text-[#2D6A4F] font-bold block">
-                      Harmonisierte EU-Mitteilung · Richtlinie (EU) 2019/771 & (EU) 2024/825
-                    </span>
-                    <h4 className="font-woodblock text-xl text-[#181F1C] uppercase tracking-wide">
-                      Gesetzliches Gewährleistungsrecht
-                    </h4>
-                  </div>
-                </div>
-                <div className="px-3.5 py-1.5 rounded-lg bg-white border border-[#D4C8B8] text-[#181F1C] font-craft-mono text-xs font-bold whitespace-nowrap shadow-2xs">
-                  Mind. 2 Jahre Schutz
-                </div>
-              </div>
-
-              {/* Official Label Visual Card */}
-              <div className="p-5 sm:p-6 rounded-2xl bg-[#FAF8F5] border border-[#E2DDD5] text-center space-y-3">
-                <div className="flex items-center justify-between text-xs font-craft-mono text-[#55695E] pb-1 border-b border-[#E2DDD5]">
-                  <span className="font-bold text-[#181F1C]">Offizielle EU-Kennzeichnung (Aushang)</span>
-                  <span>Verbraucherrechte der Europäischen Union</span>
-                </div>
-                
-                <div className="max-w-xs sm:max-w-sm mx-auto my-3 rounded-xl overflow-hidden shadow-sm border border-[#D4C8B8] bg-white p-1">
-                  <img 
-                    src="https://pub-b33108412309406a9a941ddc51e9a5b9.r2.dev/Pure-Whisky/dashboard/1790431898932_eu_gesetzliche_gewaehrleistung.jpg" 
-                    alt="Offizielles harmonisiertes EU-Gewährleistungslabel"
-                    className="w-full h-auto object-contain block rounded-lg"
-                    loading="lazy"
-                  />
-                </div>
-
-                <div className="flex items-center justify-center space-x-2 text-xs text-[#55695E]">
-                  <span>Harmonisierte Mitteilung der Europäischen Kommission</span>
-                  <span>·</span>
-                  <a 
-                    href="https://europa.eu/youreurope/citizens/consumers/shopping/guarantees/index_de.htm" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="text-[#B85D2C] underline font-bold hover:text-[#A04E24]"
-                  >
-                    Im EU-Portal öffnen ↗
-                  </a>
-                </div>
+              {/* Amtliche Präambel / Gesetzlicher Hinweisrahmen */}
+              <div className="p-4 sm:p-5 rounded-xl bg-[#FAF8F5] border border-[#E2DDD5] space-y-1">
+                <span className="font-craft-mono text-[11px] uppercase tracking-wider text-[#55695E] font-semibold block">
+                  Verbraucherinformation gemäß Art. 246a § 1 Abs. 1 Nr. 11 EGBGB sowie Richtlinie (EU) 2019/771 &amp; Richtlinie (EU) 2024/825
+                </span>
+                <p className="text-xs sm:text-sm text-[#181F1C] font-medium leading-relaxed">
+                  Mitteilung über das Bestehen eines gesetzlichen Mängelhaftungsrechts für Waren sowie harmonisierter Hinweis der Europäischen Union.
+                </p>
               </div>
 
               <div>
                 <h4 className="font-woodblock text-lg text-[#181F1C] uppercase tracking-wide mb-2">
-                  1. Gesetzlicher Anspruch auf Gewährleistung
+                  § 1 Gesetzliches Mängelhaftungsrecht &amp; Geltungsbereich
                 </h4>
                 <p>
-                  Als Verbraucherin oder Verbraucher in der Europäischen Union haben Sie beim Kauf von Waren in unserem Online-Shop einen <strong>gesetzlichen Anspruch auf Mängelgewährleistung</strong> (gesetzliche Mängelhaftung nach §§ 437 ff. BGB sowie der Richtlinie (EU) 2019/771).
+                  (1) Für alle im Online-Shop von PURE.WHISKY. angebotenen Waren besteht das gesetzliche Mängelhaftungsrecht der Bundesrepublik Deutschland nach den Vorschriften des Bürgerlichen Gesetzbuches (§§ 434 ff. BGB) sowie den Bestimmungen des harmonisierten europäischen Verbrauchsgüterkaufrechts (Richtlinie (EU) 2019/771 über vertragsmäßige Aspekte des Warenkaufs).
                 </p>
                 <p className="mt-2">
-                  Die gesetzliche Gewährleistungsfrist beträgt für alle von uns gelieferten Waren <strong>mindestens zwei Jahre</strong> ab dem Zeitpunkt der Ablieferung der Ware.
+                  (2) Das gesetzliche Gewährleistungsrecht steht jedem Verbraucher (§ 13 BGB) zwingend zu. Es kann weder durch Allgemeine Geschäftsbedingungen noch durch vertragliche Vereinbarungen ausgeschlossen oder zum Nachteil des Verbrauchers eingeschränkt werden.
                 </p>
               </div>
 
               <div>
                 <h4 className="font-woodblock text-lg text-[#181F1C] uppercase tracking-wide mb-2">
-                  2. Ihre Rechte im Falle von Mängeln
+                  § 2 Gesetzliche Gewährleistungsfrist &amp; Vermutung der Mangelhaftigkeit
                 </h4>
                 <p>
-                  Sollte eine gelieferte Ware zum Zeitpunkt der Übergabe mangelhaft sein (z.&nbsp;B. Transportschäden, Korkfehler oder sonstige Abweichungen von der vereinbarten Beschaffenheit), stehen Ihnen die gesetzlichen Mängelrechte kostenlos zu:
+                  (1) Die gesetzliche Gewährleistungsfrist für sämtliche von uns gelieferten Waren beträgt <strong>zwei Jahre</strong> ab dem Zeitpunkt der Ablieferung der Ware an den Besteller oder einen von ihm benannten Dritten (§ 438 Abs. 1 Nr. 3 BGB).
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-3">
+                <p className="mt-2">
+                  (2) Zeigt sich innerhalb eines Jahres seit Gefahrübergang ein Mangel an der Ware, wird gesetzlich vermutet, dass die Sache bereits bei Gefahrübergang mangelhaft war, es sei denn, diese Vermutung ist mit der Art der Ware oder des Mangels unvereinbar (§ 477 BGB).
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-woodblock text-lg text-[#181F1C] uppercase tracking-wide mb-2">
+                  § 3 Rechte des Käufers bei Mangelhaftigkeit der Ware
+                </h4>
+                <p>
+                  (1) Ist die gelieferte Ware zum Zeitpunkt des Gefahrübergangs mangelhaft (z.&nbsp;B. Transportschäden am Glas, beschädigte Flaschenversiegelungen oder sensorische Mängel wie Korkschmecker), stehen dem Käufer im Rahmen der gesetzlichen Bestimmungen folgende Mängelrechte zu:
+                </p>
+                <div className="space-y-2.5 my-3">
                   <div className="p-3.5 rounded-xl bg-white border border-[#E2DDD5] space-y-1">
-                    <strong className="text-[#181F1C] text-sm block">1. Kostenlose Nacherfüllung</strong>
-                    <span className="text-xs text-[#55695E]">
-                      Sie können primär die kostenfreie Nachlieferung einer mangelfreien Flasche (Ersatzlieferung) oder – soweit bei Einzelabfüllungen noch möglich – Nachbesserung verlangen.
-                    </span>
+                    <strong className="text-[#181F1C] text-xs sm:text-sm block">1. Vorrangiger Anspruch auf unentgeltliche Nacherfüllung (§ 439 BGB)</strong>
+                    <p className="text-xs text-[#55695E] leading-relaxed">
+                      Der Käufer kann nach seiner Wahl die Beseitigung des Mangels oder die kostenfreie Lieferung einer mangelfreien Ware (Ersatzlieferung) verlangen. Bei streng limitierten Single Cask Einzelfass-Raritäten ist eine Nachlieferung identischer Flaschen mangels Bestands ausgeschlossen, sofern das jeweilige Einzelfass vollständig vergriffen ist. In diesem Fall greifen die nachfolgenden sekundären Gewährleistungsrechte.
+                    </p>
                   </div>
                   <div className="p-3.5 rounded-xl bg-white border border-[#E2DDD5] space-y-1">
-                    <strong className="text-[#181F1C] text-sm block">2. Minderung oder Rücktritt</strong>
-                    <span className="text-xs text-[#55695E]">
-                      Ist die Nacherfüllung unmöglich (z.&nbsp;B. streng limitierte Einzelfass-Rarität vergriffen) oder fehlgeschlagen, haben Sie das Recht auf Minderung des Kaufpreises oder Rücktritt vom Kaufvertrag mit vollständiger Erstattung.
-                    </span>
+                    <strong className="text-[#181F1C] text-xs sm:text-sm block">2. Rücktritt vom Vertrag oder Minderung des Kaufpreises (§§ 440, 441, 323, 326 Abs. 5 BGB)</strong>
+                    <p className="text-xs text-[#55695E] leading-relaxed">
+                      Schlägt die Nacherfüllung fehl, wird sie vom Verkäufer endgültig verweigert oder ist sie objektiv unmöglich, ist der Käufer berechtigt, vom Kaufvertrag zurückzutreten (verbunden mit der vollständigen Rückerstattung des Kaufpreises) oder den Kaufpreis angemessen herabzusetzen (Minderung).
+                    </p>
                   </div>
                 </div>
                 <p className="text-xs text-[#55695E]">
-                  Die Nacherfüllung erfolgt stets ohne Kosten für Sie (einschließlich aller Rücksende- und Versandkosten).
+                  (2) Die Ausübung der gesetzlichen Gewährleistungsrechte ist für den Verbraucher stets unentgeltlich. Der Verkäufer trägt alle zum Zwecke der Nacherfüllung erforderlichen Aufwendungen, insbesondere Transport-, Wege- und Portokosten (§ 439 Abs. 2 BGB).
                 </p>
               </div>
 
               <div>
                 <h4 className="font-woodblock text-lg text-[#181F1C] uppercase tracking-wide mb-2">
-                  3. Ihr Ansprechpartner für Gewährleistungsansprüche
+                  § 4 Zuständiger Vertragspartner &amp; Mängelanzeige
                 </h4>
                 <p>
-                  Für alle Fragen, Mängelanzeigen oder Reklamationen ist PURE.WHISKY. Ihr direkter, persönlicher Ansprechpartner:
+                  (1) Gesetzliche Gewährleistungsansprüche sind unmittelbar gegenüber dem Vertragspartner geltend zu machen:
                 </p>
-                <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#E2DDD5] my-2 text-xs sm:text-sm font-normal">
-                  <p className="font-bold text-[#181F1C]">PURE.WHISKY. · Inhaberin Ines Zager</p>
+                <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#E2DDD5] my-2 font-normal space-y-1">
+                  <p className="font-bold text-[#181F1C]">PURE.WHISKY.</p>
+                  <p>Inhaberin: Ines Zager (Einzelunternehmen)</p>
                   <p>Dürerring 1, 31582 Nienburg, Deutschland</p>
                   <p>E-Mail: <a href="mailto:info@pure-whisky.com" className="text-[#B85D2C] underline font-bold">info@pure-whisky.com</a></p>
                   <p>Telefon: <a href="tel:+491638738824" className="text-[#181F1C] font-bold">+49 163 8738824</a></p>
                 </div>
+                <p className="text-xs text-[#55695E]">
+                  (2) Zur zügigen Bearbeitung empfiehlt sich die Mitteilung per E-Mail unter Nennung der Rechnungs- oder Bestellnummer sowie einer Schilderung des Mangels (bei Transportschäden möglichst mit Fotos der beanstandeten Sendung). Die gesetzlichen Gewährleistungsrechte des Käufers werden durch das Fehlen von Fotos oder Vorabmitteilungen nicht berührt.
+                </p>
               </div>
 
               <div>
                 <h4 className="font-woodblock text-lg text-[#181F1C] uppercase tracking-wide mb-2">
-                  4. Abgrenzung zum EU-GARAN-Label
+                  § 5 Abgrenzung zu gewerblichen Herstellergarantien &amp; EU-GARAN-Label
                 </h4>
-                <p className="text-xs text-[#55695E] leading-relaxed">
-                  Die Europäische Union unterscheidet zwischen dem <strong>gesetzlichen Gewährleistungslabel</strong> (oben dargestellt, gilt für alle Verbrauchsgüter) und dem <strong>EU-GARAN-Label</strong>. Das GARAN-Label kennzeichnet freiwillige, mehrjährige gewerbliche Haltbarkeitsgarantien der Hersteller (z.&nbsp;B. für technische Geräte oder Maschinen). Bei Genussmitteln und Spirituosen wird keine industrielle Haltbarkeitsgarantie gewährt, sodass das GARAN-Label für Spirituosen nicht zur Anwendung kommt. Ihre gesetzlichen Gewährleistungsansprüche (mindestens 2 Jahre) gelten selbstverständlich uneingeschränkt.
+                <p>
+                  (1) Das gesetzliche Mängelhaftungsrecht (Gewährleistung) besteht kraft Gesetzes gegenüber dem Verkäufer. Hiervon rechtlich strikt zu unterscheiden sind freiwillige gewerbliche Garantien (Haltbarkeits- oder Funktionsgarantien), die durch Hersteller oder sonstige Dritte für bestimmte Erzeugnisse über die gesetzlichen Fristen hinaus gewährt werden können (§ 443 BGB).
+                </p>
+                <p className="mt-2">
+                  (2) Das durch die Richtlinie (EU) 2024/825 eingeführte harmonisierte <strong>EU-GARAN-Label</strong> kennzeichnet ausschließlich derartige freiwillige gewerbliche Haltbarkeitsgarantien der Hersteller (vorrangig relevant bei langlebigen technischen Gebrauchsgütern und Haushaltsgeräten). Für Spirituosen und Genussmittel werden herstellerseitig keine industriellen Haltbarkeitsgarantien vergeben; das GARAN-Label findet daher für Destillate keine Anwendung.
+                </p>
+                <p className="mt-2">
+                  (3) Die gesetzliche Gewährleistungsfrist von zwei Jahren bleibt hiervon unberührt und gilt in vollem Umfang.
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#E2DDD5] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="space-y-0.5 text-xs text-[#55695E]">
-                  <span className="font-bold text-[#181F1C] block">Offizielles Verbraucherportal der Europäischen Kommission:</span>
-                  <span>Umfassende Informationen zu Ihren europäischen Verbraucher- und Garantierechten in allen Amtssprachen.</span>
+              <div>
+                <h4 className="font-woodblock text-lg text-[#181F1C] uppercase tracking-wide mb-2">
+                  § 6 Harmonisierter amtlicher Hinweis der Europäischen Union
+                </h4>
+                <p>
+                  Gemäß den Publikationsvorgaben der Europäischen Kommission zur Harmonisierung der Verbraucherinformation im elektronischen Geschäftsverkehr wird nachfolgend der amtliche Hinweis wiedergegeben:
+                </p>
+                
+                <div className="my-4 p-5 sm:p-6 rounded-xl bg-[#FAF8F5] border border-[#E2DDD5] text-center space-y-3">
+                  <div className="max-w-xs sm:max-w-sm mx-auto rounded-lg overflow-hidden border border-[#D4C8B8] bg-white p-1 shadow-2xs">
+                    <img 
+                      src="https://pub-b33108412309406a9a941ddc51e9a5b9.r2.dev/Pure-Whisky/dashboard/1790431898932_eu_gesetzliche_gewaehrleistung.jpg" 
+                      alt="Harmonisierter Hinweis der Europäischen Union auf die gesetzliche Gewährleistung"
+                      className="w-full h-auto object-contain block rounded"
+                      loading="lazy"
+                    />
+                  </div>
+                  <p className="text-[11px] text-[#55695E] font-craft-mono">
+                    Amtliches Hinweisschild der Europäischen Kommission · Informationsportal „Your Europe“
+                  </p>
                 </div>
-                <a
-                  href="https://europa.eu/youreurope/citizens/consumers/shopping/guarantees/index_de.htm"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3.5 py-2 rounded-lg bg-white border border-[#D4C8B8] hover:border-[#B85D2C] text-xs font-craft-mono font-bold text-[#181F1C] hover:text-[#B85D2C] transition-colors shrink-0"
-                >
-                  europa.eu besuchen →
-                </a>
+
+                <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#E2DDD5] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="space-y-0.5 text-xs text-[#55695E]">
+                    <strong className="text-[#181F1C] block">Offizielles Justiz- und Verbraucherportal der Europäischen Kommission:</strong>
+                    <span>Umfassende Rechtsauskünfte zu grenzüberschreitenden und nationalen Verbraucherrechten in allen 24 EU-Amtssprachen.</span>
+                  </div>
+                  <a
+                    href="https://europa.eu/youreurope/citizens/consumers/shopping/guarantees/index_de.htm"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3.5 py-2 rounded-lg bg-white border border-[#D4C8B8] hover:border-[#181F1C] text-xs font-craft-mono font-bold text-[#181F1C] hover:bg-[#181F1C] hover:text-white transition-all shrink-0"
+                  >
+                    europa.eu öffnen →
+                  </a>
+                </div>
               </div>
             </div>
           )}
