@@ -869,6 +869,11 @@ export default {
       try {
         const assetResponse = await env.ASSETS.fetch(request);
         if (assetResponse.status === 404 && !url.pathname.startsWith('/assets/')) {
+          // Never return HTML fallback for binary assets, images, icons, or sitemaps
+          const staticExtensions = ['.ico', '.png', '.svg', '.jpg', '.jpeg', '.webp', '.txt', '.xml', '.json', '.webmanifest'];
+          if (staticExtensions.some(ext => url.pathname.toLowerCase().endsWith(ext))) {
+            return assetResponse;
+          }
           return await env.ASSETS.fetch(new URL('/', request.url));
         }
         return assetResponse;

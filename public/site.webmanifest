@@ -1,0 +1,23 @@
+{
+  "name": "PURE.WHISKY. | Single Cask Scotch Whisky",
+  "short_name": "PURE.WHISKY.",
+  "description": "Echter schottischer Single Cask Whisky in nativer Fassstärke. Unverdünnt, ungefiltert und in 100% recyceltem Wild Glass abgefüllt.",
+  "icons": [
+    {
+      "src": "/favicon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "theme_color": "#FAF8F5",
+  "background_color": "#FAF8F5",
+  "display": "standalone",
+  "start_url": "/"
+}

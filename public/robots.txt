@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Allow: /favicon.ico
+Allow: /favicon.svg
+Allow: /favicon-*.png
+Allow: /apple-touch-icon*.png
+Allow: /site.webmanifest
+
+Disallow: /api/settings/
+
+Sitemap: https://pure-whisky.com/sitemap.xml
