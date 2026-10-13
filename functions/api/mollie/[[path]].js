@@ -1,5 +1,5 @@
 export async function onRequest(context) {
-  const { request, params } = context;
+  const { request, params, env } = context;
   const url = new URL(request.url);
 
   const corsHeaders = {
@@ -21,22 +21,22 @@ export async function onRequest(context) {
         const params = new URLSearchParams(bodyText);
         const paymentId = params.get('id');
 
-        if (paymentId && context.env && context.env.PURE_KV) {
-          let serverKey = await context.env.PURE_KV.get('mollie_api_key') || context.env?.MOLLIE_API_KEY || 'live_U9khRJeSJzhqTfNJmBAWprDreve6fv';
+        const serverKey = (env?.MOLLIE_API_KEY || '').trim();
+        if (paymentId && serverKey && env && env.PURE_KV) {
           const mollieRes = await fetch(`https://api.mollie.com/v2/payments/${paymentId}`, {
             headers: { 'Authorization': `Bearer ${serverKey}` }
           });
           const payment = await mollieRes.json();
           if (payment && payment.status === 'paid' && payment.metadata && payment.metadata.orderId) {
             const orderId = payment.metadata.orderId;
-            const rawOrders = await context.env.PURE_KV.get('pure_orders');
+            const rawOrders = await env.PURE_KV.get('pure_orders');
             let orders = rawOrders ? JSON.parse(rawOrders) : [];
             if (Array.isArray(orders)) {
               const idx = orders.findIndex(o => o.orderId === orderId);
               if (idx >= 0) {
                 orders[idx].status = 'neu_eingegangen';
                 orders[idx].paymentStatus = `Bezahlt (${payment.method || 'Online-Zahlung'})`;
-                await context.env.PURE_KV.put('pure_orders', JSON.stringify(orders));
+                await env.PURE_KV.put('pure_orders', JSON.stringify(orders));
               }
             }
           }
@@ -51,17 +51,16 @@ export async function onRequest(context) {
   const molliePath = url.pathname.replace(/^\/api\/mollie/, '') + url.search;
   const targetUrl = 'https://api.mollie.com' + molliePath;
 
-  const headers = new Headers();
-  let authHeader = request.headers.get('Authorization');
-  if (!authHeader || authHeader.trim() === 'Bearer' || authHeader.trim() === 'Bearer null' || authHeader.trim() === 'Bearer undefined') {
-    let fallbackKey = null;
-    if (context.env && context.env.PURE_KV) {
-      try { fallbackKey = await context.env.PURE_KV.get('mollie_api_key'); } catch {}
-    }
-    fallbackKey = fallbackKey || context.env?.MOLLIE_API_KEY || 'live_U9khRJeSJzhqTfNJmBAWprDreve6fv';
-    authHeader = `Bearer ${fallbackKey}`;
+  const apiKey = (env?.MOLLIE_API_KEY || '').trim();
+  if (!apiKey) {
+    return new Response(JSON.stringify({ error: 'MOLLIE_API_KEY Secret fehlt in Cloudflare Pages.' }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
   }
-  headers.set('Authorization', authHeader);
+
+  const headers = new Headers();
+  headers.set('Authorization', `Bearer ${apiKey}`);
   const contentType = request.headers.get('Content-Type');
   if (contentType) headers.set('Content-Type', contentType);
   headers.set('Accept', 'application/json');

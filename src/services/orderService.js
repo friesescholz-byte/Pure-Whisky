@@ -12,11 +12,7 @@ export const REPLY_TO_EMAIL = 'info@pure-whisky.com';
 export const DEFAULT_MOLLIE_KEY = '';
 
 export function getMollieKey() {
-  const customKey = typeof window !== 'undefined' ? localStorage.getItem('pure_mollie_key') : null;
-  if (customKey && customKey.trim()) {
-    return customKey.trim();
-  }
-  return import.meta.env?.VITE_MOLLIE_API_KEY || '';
+  return '';
 }
 
 export function getResendKey() {
@@ -27,7 +23,6 @@ export function getResendKey() {
  * Creates a Mollie Payment via /api/mollie/v2/payments proxy
  */
 export async function createMolliePayment({ orderId, amount, description, redirectUrl, customerEmail }) {
-  const apiKey = getMollieKey();
   const formattedAmount = Number(amount).toFixed(2);
 
   const payload = {
@@ -49,15 +44,13 @@ export async function createMolliePayment({ orderId, amount, description, redire
   }
 
   try {
-    const headers = { 'Content-Type': 'application/json' };
-    const customKey = typeof window !== 'undefined' ? localStorage.getItem('pure_mollie_key') : null;
-    if (customKey && customKey.trim()) {
-      headers['Authorization'] = `Bearer ${customKey.trim()}`;
+    if (typeof window !== 'undefined') {
+      try { localStorage.removeItem('pure_mollie_key'); } catch {}
     }
 
     const response = await fetch('/api/mollie/v2/payments', {
       method: 'POST',
-      headers,
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
 
@@ -95,15 +88,13 @@ export async function createMolliePayment({ orderId, amount, description, redire
 export async function checkMolliePaymentStatus(paymentId) {
   if (!paymentId) return { success: false, status: 'unknown', paid: false };
   try {
-    const headers = { 'Content-Type': 'application/json' };
-    const customKey = typeof window !== 'undefined' ? localStorage.getItem('pure_mollie_key') : null;
-    if (customKey && customKey.trim()) {
-      headers['Authorization'] = `Bearer ${customKey.trim()}`;
+    if (typeof window !== 'undefined') {
+      try { localStorage.removeItem('pure_mollie_key'); } catch {}
     }
 
     const response = await fetch(`/api/mollie/v2/payments/${paymentId}`, {
       method: 'GET',
-      headers
+      headers: { 'Content-Type': 'application/json' }
     });
 
     const data = await response.json();

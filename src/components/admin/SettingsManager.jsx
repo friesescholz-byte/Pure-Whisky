@@ -6,21 +6,25 @@ export default function SettingsManager({
   onSaveAdminEmail 
 }) {
   const [emailInput, setEmailInput] = useState(adminEmail);
-  const [mollieKey, setMollieKey] = useState(
-    () => localStorage.getItem('pure_mollie_key') || 'live_U9khRJeSJzhqTfNJmBAWprDreve6fv'
-  );
+  const [mollieStatus, setMollieStatus] = useState({ configured: true, isLive: true, mode: 'live' });
   const [resendKey, setResendKey] = useState(
     () => localStorage.getItem('pure_resend_key') || (import.meta.env?.VITE_RESEND_API_KEY || '')
   );
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try { localStorage.removeItem('pure_mollie_key'); } catch {}
+    }
     fetch('/api/settings/mollie')
       .then(r => r.json())
       .then(data => {
-        if (data && data.key && data.key.trim()) {
-          setMollieKey(data.key.trim());
-          localStorage.setItem('pure_mollie_key', data.key.trim());
+        if (data) {
+          setMollieStatus({
+            configured: Boolean(data.configured),
+            isLive: Boolean(data.isLive),
+            mode: data.mode || 'live'
+          });
         }
       })
       .catch(() => {});
@@ -31,18 +35,9 @@ export default function SettingsManager({
     if (onSaveAdminEmail) {
       onSaveAdminEmail(emailInput.trim());
     }
-    const cleanMollie = mollieKey.trim();
-    localStorage.setItem('pure_mollie_key', cleanMollie);
     if (resendKey) {
       localStorage.setItem('pure_resend_key', resendKey.trim());
     }
-
-    // Sync to Cloudflare KV for all customer checkouts
-    fetch('/api/settings/mollie', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key: cleanMollie })
-    }).catch(err => console.warn('Could not sync Mollie key to KV:', err));
 
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 3000);
@@ -88,30 +83,30 @@ export default function SettingsManager({
 
           <div>
             <label className="block text-xs font-craft-mono font-bold text-[#181F1C] uppercase tracking-wider mb-1.5 flex items-center justify-between">
-              <span>Mollie API-Schlüssel (Live oder Test)</span>
-              {mollieKey.trim().startsWith('live_') ? (
+              <span>Mollie Payment Gateway (API Status)</span>
+              {mollieStatus.isLive ? (
                 <span className="text-[10px] text-emerald-800 bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 rounded-full font-craft-mono font-bold">
                   🟢 LIVE-MODUS AKTIV
                 </span>
-              ) : (
+              ) : mollieStatus.configured ? (
                 <span className="text-[10px] text-amber-800 bg-amber-100 border border-amber-300 px-2.5 py-0.5 rounded-full font-craft-mono font-bold">
-                  🟡 TEST-MODUS (test_...)
+                  🟡 TEST-MODUS AKTIV
+                </span>
+              ) : (
+                <span className="text-[10px] text-rose-800 bg-rose-100 border border-rose-300 px-2.5 py-0.5 rounded-full font-craft-mono font-bold">
+                  🔴 NICHT KONFIGURIERT
                 </span>
               )}
             </label>
-            <div className="relative">
-              <Key className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={mollieKey}
-                onChange={(e) => setMollieKey(e.target.value)}
-                placeholder="live_... oder test_..."
-                className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-[#D4C8B8] text-xs font-mono text-[#181F1C] bg-[#FAF8F5] focus:outline-none focus:border-[#B85D2C]"
-              />
+            <div className="p-4 rounded-xl border border-[#D4C8B8] bg-[#FAF8F5] text-xs space-y-1.5 text-[#3A4A40]">
+              <div className="flex items-center space-x-2 text-[#181F1C] font-semibold">
+                <ShieldCheck className="w-4 h-4 text-emerald-700" />
+                <span>Sichere Cloudflare Secret-Verwaltung (<code>MOLLIE_API_KEY</code>)</span>
+              </div>
+              <p className="text-[11px] text-[#55695E] leading-relaxed">
+                Ihr Mollie API-Schlüssel wird als verschlüsseltes Secret serverseitig geschützt. Er wird niemals im Quellcode oder im Browser der Kunden offengelegt.
+              </p>
             </div>
-            <p className="text-[11px] text-[#55695E] mt-1 leading-relaxed">
-              Tragen Sie hier Ihren <strong>Live-API-Key</strong> (beginnt mit <code>live_...</code>) aus Ihrem Mollie-Konto ein, um sofort echte Zahlungen zu empfangen. Für Testläufe kann ein <code>test_...</code> Key verwendet werden.
-            </p>
           </div>
 
           <div>

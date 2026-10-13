@@ -162,8 +162,8 @@ export default {
           const params = new URLSearchParams(bodyText);
           const paymentId = params.get('id');
 
-          if (paymentId && env && env.PURE_KV) {
-            let serverKey = await env.PURE_KV.get('mollie_api_key') || env?.MOLLIE_API_KEY || 'live_U9khRJeSJzhqTfNJmBAWprDreve6fv';
+          const serverKey = (env?.MOLLIE_API_KEY || '').trim();
+          if (paymentId && serverKey && env && env.PURE_KV) {
             const mollieRes = await fetch(`https://api.mollie.com/v2/payments/${paymentId}`, {
               headers: { 'Authorization': `Bearer ${serverKey}` }
             });
@@ -232,30 +232,29 @@ export default {
       return new Response('OK', { status: 200, headers: corsHeaders });
     }
 
-    // 0b. Settings API for Mollie Key Sync
+    // 0b. Settings Status API for Mollie (Secure: no keys returned, clears legacy KV entry)
     if (request.method === 'GET' && url.pathname === '/api/settings/mollie') {
-      let key = null;
       if (env && env.PURE_KV) {
-        try { key = await env.PURE_KV.get('mollie_api_key'); } catch {}
+        try { await env.PURE_KV.delete('mollie_api_key'); } catch {}
       }
-      return new Response(JSON.stringify({ key: key || '' }), {
+      const hasKey = Boolean(env?.MOLLIE_API_KEY && env.MOLLIE_API_KEY.trim());
+      const isLive = Boolean(hasKey && env.MOLLIE_API_KEY.trim().startsWith('live_'));
+      return new Response(JSON.stringify({ 
+        configured: hasKey, 
+        isLive: isLive,
+        mode: isLive ? 'live' : (hasKey ? 'test' : 'unconfigured')
+      }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
     if (request.method === 'POST' && url.pathname === '/api/settings/mollie') {
-      try {
-        const body = await request.json();
-        const newKey = (body.key || '').trim();
-        if (env && env.PURE_KV && newKey) {
-          await env.PURE_KV.put('mollie_api_key', newKey);
-        }
-        return new Response(JSON.stringify({ success: true, key: newKey }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
-      } catch (err) {
-        return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
-      }
+      return new Response(JSON.stringify({ 
+        success: true, 
+        message: 'Mollie API-Schlüssel wird sicher über Cloudflare Secrets verwaltet.' 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
 
     // 0c. Orders API for Cross-Device Synchronization
@@ -731,17 +730,18 @@ export default {
       const molliePath = url.pathname.replace(/^\/api\/mollie/, '') + url.search;
       const targetUrl = 'https://api.mollie.com' + molliePath;
 
-      const headers = new Headers();
-      let authHeader = request.headers.get('Authorization');
-      if (!authHeader || authHeader.trim() === 'Bearer' || authHeader.trim() === 'Bearer null' || authHeader.trim() === 'Bearer undefined') {
-        let fallbackKey = null;
-        if (env && env.PURE_KV) {
-          try { fallbackKey = await env.PURE_KV.get('mollie_api_key'); } catch {}
-        }
-        fallbackKey = fallbackKey || env?.MOLLIE_API_KEY || 'live_U9khRJeSJzhqTfNJmBAWprDreve6fv';
-        authHeader = `Bearer ${fallbackKey}`;
+      const apiKey = (env?.MOLLIE_API_KEY || '').trim();
+      if (!apiKey) {
+        return new Response(JSON.stringify({ 
+          error: 'Mollie API-Schlüssel nicht auf dem Server konfiguriert (MOLLIE_API_KEY Secret fehlt in Cloudflare).' 
+        }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
       }
-      headers.set('Authorization', authHeader);
+
+      const headers = new Headers();
+      headers.set('Authorization', `Bearer ${apiKey}`);
 
       const contentType = request.headers.get('Content-Type');
       if (contentType) headers.set('Content-Type', contentType);
