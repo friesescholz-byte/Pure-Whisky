@@ -80,6 +80,29 @@ export default {
       return Response.redirect(targetUrl, 301);
     }
 
+    // 00a. Admin Auth API: POST /api/admin/verify-password (Weymann System)
+    if (url.pathname === '/api/admin/verify-password' && request.method === 'POST') {
+      try {
+        const { password } = await request.json();
+        const serverSecret = env?.Passwort || env?.ADMIN_PASSWORD;
+        const clean = (password || '').trim();
+        if (serverSecret && clean === serverSecret.trim()) {
+          return new Response(JSON.stringify({ success: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+        return new Response(JSON.stringify({ success: false, error: 'Falsches Passwort' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      } catch (err) {
+        return new Response(JSON.stringify({ success: false, error: err.message }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+    }
+
     // 00b. Direct Media Upload API (Cloudflare R2 Bucket: website-datein -> Pure-Whisky/dashboard/)
     if (url.pathname === '/api/upload' && request.method === 'POST') {
       try {

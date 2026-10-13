@@ -181,24 +181,39 @@ Ines Zager · PURE.WHISKY.`);
     }
   };
 
-  // Login handler
+  // Login handler (Weymann System - verified against Cloudflare Secret)
   const handleLogin = async (e) => {
     e.preventDefault();
     const cleanPw = passwordInput.trim();
-    if (cleanPw === 'pure2026' || cleanPw === 'admin' || cleanPw === 'Scholz&Friese') {
-      setAuthError(false);
+    if (!cleanPw) {
+      setAuthError(true);
+      return;
+    }
 
-      // Check if device is trusted
-      const trusted = localStorage.getItem('pure_admin_trusted_device') === 'true';
-      if (trusted) {
-        setIsAuthenticated(true);
-        localStorage.setItem('pure_admin_auth', 'true');
-        return;
+    try {
+      const res = await fetch('/api/admin/verify-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: cleanPw })
+      });
+      const data = await res.json();
+      if (res.ok && data?.success) {
+        setAuthError(false);
+
+        // Check if device is trusted
+        const trusted = localStorage.getItem('pure_admin_trusted_device') === 'true';
+        if (trusted) {
+          setIsAuthenticated(true);
+          localStorage.setItem('pure_admin_auth', 'true');
+          return;
+        }
+
+        // Untrusted device: trigger 2FA
+        await triggerSend2Fa();
+      } else {
+        setAuthError(true);
       }
-
-      // Untrusted device: trigger 2FA
-      await triggerSend2Fa();
-    } else {
+    } catch (err) {
       setAuthError(true);
     }
   };
