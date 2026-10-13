@@ -162,7 +162,7 @@ export default {
           const params = new URLSearchParams(bodyText);
           const paymentId = params.get('id');
 
-          const serverKey = (env?.MOLLIE_API_KEY || '').trim();
+          const serverKey = (env?.MOLLIE_API_KEY || env?.mollie_api_key || env?.MOLLIE_KEY || env?.VITE_MOLLIE_API_KEY || '').trim();
           if (paymentId && serverKey && env && env.PURE_KV) {
             const mollieRes = await fetch(`https://api.mollie.com/v2/payments/${paymentId}`, {
               headers: { 'Authorization': `Bearer ${serverKey}` }
@@ -237,12 +237,20 @@ export default {
       if (env && env.PURE_KV) {
         try { await env.PURE_KV.delete('mollie_api_key'); } catch {}
       }
-      const hasKey = Boolean(env?.MOLLIE_API_KEY && env.MOLLIE_API_KEY.trim());
-      const isLive = Boolean(hasKey && env.MOLLIE_API_KEY.trim().startsWith('live_'));
+      const keyCandidates = [
+        env?.MOLLIE_API_KEY,
+        env?.mollie_api_key,
+        env?.MOLLIE_KEY,
+        env?.VITE_MOLLIE_API_KEY
+      ].filter(Boolean);
+      const activeKey = (keyCandidates[0] || '').trim();
+      const hasKey = Boolean(activeKey);
+      const isLive = Boolean(hasKey && activeKey.startsWith('live_'));
       return new Response(JSON.stringify({ 
         configured: hasKey, 
         isLive: isLive,
-        mode: isLive ? 'live' : (hasKey ? 'test' : 'unconfigured')
+        mode: isLive ? 'live' : (hasKey ? 'test' : 'unconfigured'),
+        envBindings: Object.keys(env || {})
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
@@ -730,7 +738,7 @@ export default {
       const molliePath = url.pathname.replace(/^\/api\/mollie/, '') + url.search;
       const targetUrl = 'https://api.mollie.com' + molliePath;
 
-      const apiKey = (env?.MOLLIE_API_KEY || '').trim();
+      const apiKey = (env?.MOLLIE_API_KEY || env?.mollie_api_key || env?.MOLLIE_KEY || env?.VITE_MOLLIE_API_KEY || '').trim();
       if (!apiKey) {
         return new Response(JSON.stringify({ 
           error: 'Mollie API-Schlüssel nicht auf dem Server konfiguriert (MOLLIE_API_KEY Secret fehlt in Cloudflare).' 
