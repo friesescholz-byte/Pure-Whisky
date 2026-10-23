@@ -52,6 +52,73 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@600;700&family=Oswald:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
+    <!-- Cloudflare Turnstile Script -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+    <!-- Schema.org Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": ["LocalBusiness", "Store", "OnlineStore", "Winery"],
+          "@id": "https://pure-whisky.com/#organization",
+          "name": "PURE.WHISKY.",
+          "legalName": "PURE.WHISKY. · Inhaberin Ines Zager",
+          "alternateName": "PURE.WHISKY. Ines Zager",
+          "url": "https://pure-whisky.com/",
+          "logo": "https://pure-whisky.com/favicon-512x512.png",
+          "image": "https://pure-whisky.com/favicon-512x512.png",
+          "description": "Echter schottischer Single Cask Whisky in nativer Fassstärke. Unverdünnt, ungefiltert und in 100% recyceltem Wild Glass abgefüllt. Persönlich ausgewählt nach Kriterien, die sich an EMAS und ISO 14001 orientieren, von Umweltjuristin Ines Zager.",
+          "telephone": "+49-163-8738824",
+          "email": "info@pure-whisky.com",
+          "priceRange": "€€€",
+          "vatID": "DE366683133",
+          "founder": {
+            "@type": "Person",
+            "name": "Ines Zager",
+            "jobTitle": "Gründerin & Umweltjuristin",
+            "url": "https://pure-whisky.com/"
+          },
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Dürerring 1",
+            "addressLocality": "Nienburg",
+            "postalCode": "31582",
+            "addressRegion": "Niedersachsen",
+            "addressCountry": "DE"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 52.6455,
+            "longitude": 9.2223
+          },
+          "currenciesAccepted": "EUR",
+          "paymentAccepted": "Kreditkarte, PayPal, Banküberweisung",
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+              "opens": "09:00",
+              "closes": "18:00"
+            }
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://pure-whisky.com/#website",
+          "url": "https://pure-whisky.com/",
+          "name": "PURE.WHISKY. | Single Cask Scotch Whisky",
+          "description": "Single Cask Scotch Whisky in Fassstärke · Ines Zager",
+          "publisher": {
+            "@id": "https://pure-whisky.com/#organization"
+          },
+          "inLanguage": "de-DE"
+        }
+      ]
+    }
+    </script>
+
     <!-- Cookie Banner & Analytics Tracking -->
     <script src="https://autumn-flower-76fa.friese-scholz.workers.dev/embed.js" data-tenant-id="pure-whisky-fe456645" defer></script>
   </head>

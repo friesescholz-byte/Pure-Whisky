@@ -80,10 +80,49 @@ export default {
       return Response.redirect(targetUrl, 301);
     }
 
-    // 00a. Admin Auth API: POST /api/admin/verify-password (Weymann System)
+    // 00a. Admin Auth API: POST /api/admin/verify-password (Weymann System & Cloudflare Turnstile)
     if (url.pathname === '/api/admin/verify-password' && request.method === 'POST') {
       try {
-        const { password } = await request.json();
+        const { password, turnstileToken } = await request.json();
+
+        // 1. Serverseitige Cloudflare Turnstile Validierung
+        const turnstileSecret = env?.TURNSTILE_SECRET_KEY || '0x4AAAAAAFg3mzi71HiwF2K0ALtvti_MJP4';
+        if (turnstileSecret) {
+          if (!turnstileToken) {
+            return new Response(JSON.stringify({ 
+              success: false, 
+              error: 'Bitte bestätigen Sie die Sicherheitsprüfung (Turnstile).' 
+            }), {
+              status: 403,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            });
+          }
+
+          const clientIp = request.headers.get('CF-Connecting-IP') || '';
+          const verifyData = new URLSearchParams();
+          verifyData.append('secret', turnstileSecret);
+          verifyData.append('response', turnstileToken);
+          if (clientIp) verifyData.append('remoteip', clientIp);
+
+          const cfVerifyRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: verifyData.toString()
+          });
+
+          const cfVerifyOutcome = await cfVerifyRes.json();
+          if (!cfVerifyOutcome.success) {
+            return new Response(JSON.stringify({ 
+              success: false, 
+              error: 'Sicherheitsprüfung fehlgeschlagen. Bitte versuchen Sie es erneut.' 
+            }), {
+              status: 403,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            });
+          }
+        }
+
+        // 2. Passwort-Prüfung gegen Cloudflare Secret (Weymann-Prinzip)
         const serverSecret = env?.Passwort || env?.ADMIN_PASSWORD;
         const clean = (password || '').trim();
         if (serverSecret && clean === serverSecret.trim()) {
@@ -897,20 +936,34 @@ export default {
 
     // 4. Default: Serve static assets
     if (env.ASSETS) {
+      const attachSecurityHeaders = (res) => {
+        if (!res) return res;
+        const newHeaders = new Headers(res.headers);
+        newHeaders.set('X-Frame-Options', 'DENY');
+        newHeaders.set('X-Content-Type-Options', 'nosniff');
+        newHeaders.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+        return new Response(res.body, {
+          status: res.status,
+          statusText: res.statusText,
+          headers: newHeaders
+        });
+      };
+
       try {
-        const assetResponse = await env.ASSETS.fetch(request);
+        let assetResponse = await env.ASSETS.fetch(request);
         if (assetResponse.status === 404 && !url.pathname.startsWith('/assets/')) {
           // Never return HTML fallback for binary assets, images, icons, or sitemaps
           const staticExtensions = ['.ico', '.png', '.svg', '.jpg', '.jpeg', '.webp', '.txt', '.xml', '.json', '.webmanifest'];
           if (staticExtensions.some(ext => url.pathname.toLowerCase().endsWith(ext))) {
-            return assetResponse;
+            return attachSecurityHeaders(assetResponse);
           }
-          return await env.ASSETS.fetch(new URL('/', request.url));
+          assetResponse = await env.ASSETS.fetch(new URL('/', request.url));
         }
-        return assetResponse;
+        return attachSecurityHeaders(assetResponse);
       } catch (err) {
         try {
-          return await env.ASSETS.fetch(new URL('/', request.url));
+          const fallback = await env.ASSETS.fetch(new URL('/', request.url));
+          return attachSecurityHeaders(fallback);
         } catch {
           return new Response('Asset fetch failed: ' + err.message, { status: 500 });
         }

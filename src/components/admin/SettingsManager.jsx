@@ -8,7 +8,7 @@ export default function SettingsManager({
   const [emailInput, setEmailInput] = useState(adminEmail);
   const [mollieStatus, setMollieStatus] = useState({ configured: true, isLive: true, mode: 'live' });
   const [resendKey, setResendKey] = useState(
-    () => localStorage.getItem('pure_resend_key') || (import.meta.env?.VITE_RESEND_API_KEY || '')
+    () => localStorage.getItem('pure_resend_key') || ''
   );
   const [savedSuccess, setSavedSuccess] = useState(false);
 

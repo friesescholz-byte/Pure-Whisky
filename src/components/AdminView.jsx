@@ -50,7 +50,10 @@ export default function AdminView({
     return localStorage.getItem('pure_admin_auth') === 'true';
   });
   const [passwordInput, setPasswordInput] = useState('');
-  const [authError, setAuthError] = useState(false);
+  const [authError, setAuthError] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const turnstileContainerRef = useRef(null);
+  const turnstileWidgetIdRef = useRef(null);
 
   // 2FA Flow State
   const [authStep, setAuthStep] = useState('password'); // 'password' | '2fa'
@@ -106,6 +109,58 @@ export default function AdminView({
   const [logPage, setLogPage] = useState(1);
   const [historyPage, setHistoryPage] = useState(1);
 
+  // Cloudflare Turnstile Widget Initialization & Lifecycle
+  useEffect(() => {
+    if (isAuthenticated || authStep !== 'password') return;
+
+    let intervalId = null;
+
+    const mountTurnstile = () => {
+      if (window.turnstile && turnstileContainerRef.current) {
+        try {
+          turnstileContainerRef.current.innerHTML = '';
+          turnstileWidgetIdRef.current = window.turnstile.render(turnstileContainerRef.current, {
+            sitekey: '0x4AAAAAAFg3m2C-3yTmGJe6',
+            callback: (token) => {
+              setTurnstileToken(token);
+              setAuthError('');
+            },
+            'expired-callback': () => {
+              setTurnstileToken('');
+            },
+            'error-callback': () => {
+              setTurnstileToken('');
+            },
+            theme: 'light'
+          });
+        } catch (err) {
+          console.error('Turnstile render error:', err);
+        }
+      }
+    };
+
+    if (window.turnstile) {
+      mountTurnstile();
+    } else {
+      intervalId = setInterval(() => {
+        if (window.turnstile) {
+          clearInterval(intervalId);
+          mountTurnstile();
+        }
+      }, 150);
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+      if (turnstileWidgetIdRef.current !== null && window.turnstile?.remove) {
+        try {
+          window.turnstile.remove(turnstileWidgetIdRef.current);
+          turnstileWidgetIdRef.current = null;
+        } catch (_) {}
+      }
+    };
+  }, [isAuthenticated, authStep]);
+
   // Blog Post Form State & Auto-scroll Ref
   const blogEditorRef = useRef(null);
   const [isEditingPost, setIsEditingPost] = useState(false);
@@ -124,7 +179,7 @@ export default function AdminView({
   });
 
   // Mail Composition State
-  const RESEND_API_KEY = localStorage.getItem('pure_resend_key') || (import.meta.env ? import.meta.env.VITE_RESEND_API_KEY : '');
+  const RESEND_API_KEY = localStorage.getItem('pure_resend_key') || '';
   const [senderName, setSenderName] = useState('PURE.WHISKY.');
   const [senderEmail, setSenderEmail] = useState('noreply@scholz-friese-webdesign.de');
   const [emailSubject, setEmailSubject] = useState('Exklusive Fass-Zuteilung: Neue Single Cask Abfüllungen eingetroffen');
@@ -181,12 +236,17 @@ Ines Zager · PURE.WHISKY.`);
     }
   };
 
-  // Login handler (Weymann System - verified against Cloudflare Secret)
+  // Login handler (Weymann System & Cloudflare Turnstile - verified against Cloudflare Secret)
   const handleLogin = async (e) => {
     e.preventDefault();
     const cleanPw = passwordInput.trim();
     if (!cleanPw) {
-      setAuthError(true);
+      setAuthError('Bitte Passwort eingeben.');
+      return;
+    }
+
+    if (!turnstileToken) {
+      setAuthError('Bitte bestätigen Sie die Sicherheitsprüfung (Turnstile).');
       return;
     }
 
@@ -194,11 +254,14 @@ Ines Zager · PURE.WHISKY.`);
       const res = await fetch('/api/admin/verify-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: cleanPw })
+        body: JSON.stringify({ 
+          password: cleanPw,
+          turnstileToken
+        })
       });
       const data = await res.json();
       if (res.ok && data?.success) {
-        setAuthError(false);
+        setAuthError('');
 
         // Check if device is trusted
         const trusted = localStorage.getItem('pure_admin_trusted_device') === 'true';
@@ -211,10 +274,16 @@ Ines Zager · PURE.WHISKY.`);
         // Untrusted device: trigger 2FA
         await triggerSend2Fa();
       } else {
-        setAuthError(true);
+        setAuthError(data?.error || 'Falsches Passwort oder Sicherheitsprüfung fehlgeschlagen.');
+        if (window.turnstile && turnstileWidgetIdRef.current !== null) {
+          try {
+            window.turnstile.reset(turnstileWidgetIdRef.current);
+            setTurnstileToken('');
+          } catch (_) {}
+        }
       }
     } catch (err) {
-      setAuthError(true);
+      setAuthError('Verbindungsfehler beim Anmelden. Bitte erneut versuchen.');
     }
   };
 
@@ -699,7 +768,7 @@ Ines Zager · PURE.WHISKY.`);
           });
         } catch (fetchErr) {
           // Fallback to local proxy if offline
-          const apiKey = localStorage.getItem('pure_resend_key') || (import.meta.env?.VITE_RESEND_API_KEY || '');
+          const apiKey = localStorage.getItem('pure_resend_key') || '';
           response = await fetch('/api/resend/emails', {
             method: 'POST',
             headers: {
@@ -786,30 +855,38 @@ Ines Zager · PURE.WHISKY.`);
                   <input
                     type="password"
                     value={passwordInput}
-                    onChange={(e) => setPasswordInput(e.target.value)}
+                    onChange={(e) => {
+                      setPasswordInput(e.target.value);
+                      if (authError) setAuthError('');
+                    }}
                     placeholder="Passwort eingeben..."
                     disabled={isSending2Fa}
                     className="w-full px-4 py-3 rounded-xl border border-[#D4C8B8] bg-[#FAF8F5] focus:bg-white focus:outline-none focus:border-[#B85D2C] text-sm text-[#181F1C] disabled:opacity-50"
                     autoFocus
                   />
                   {authError && (
-                    <p className="text-xs text-rose-600 mt-1 flex items-center space-x-1">
-                      <AlertCircle className="w-3.5 h-3.5" />
-                      <span>Falsches Passwort. Bitte erneut versuchen.</span>
+                    <p className="text-xs text-rose-600 mt-1.5 flex items-center space-x-1">
+                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                      <span>{typeof authError === 'string' ? authError : 'Falsches Passwort. Bitte erneut versuchen.'}</span>
                     </p>
                   )}
                   {twoFaError && (
-                    <p className="text-xs text-rose-600 mt-1 flex items-center space-x-1">
-                      <AlertCircle className="w-3.5 h-3.5" />
+                    <p className="text-xs text-rose-600 mt-1.5 flex items-center space-x-1">
+                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                       <span>{twoFaError}</span>
                     </p>
                   )}
                 </div>
 
+                {/* Cloudflare Turnstile Bot-Schutz */}
+                <div className="flex justify-center pt-1 pb-1">
+                  <div ref={turnstileContainerRef} className="cf-turnstile min-h-[65px]" />
+                </div>
+
                 <button
                   type="submit"
-                  disabled={isSending2Fa}
-                  className="w-full py-3.5 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-md flex items-center justify-center space-x-2 disabled:opacity-60 cursor-pointer"
+                  disabled={isSending2Fa || !turnstileToken}
+                  className="w-full py-3.5 rounded-xl bg-[#B85D2C] hover:bg-[#A04E24] text-white font-woodblock text-lg tracking-wider uppercase transition-all shadow-md flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {isSending2Fa ? (
                     <>

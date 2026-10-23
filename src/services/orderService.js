@@ -16,7 +16,7 @@ export function getMollieKey() {
 }
 
 export function getResendKey() {
-  return import.meta.env?.VITE_RESEND_API_KEY || localStorage.getItem('pure_resend_key') || '';
+  return localStorage.getItem('pure_resend_key') || '';
 }
 
 /**
